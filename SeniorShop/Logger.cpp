@@ -1,24 +1,22 @@
-#include "Logger.hpp"
-#include <iostream>
-#include <fstream>
-#include <chrono>
-#include <iomanip>
+#include "Logger.h"
 
-void Logger::LogAttempt(const std::string& _login, bool success)
-{
-	std::ofstream _logFile("Logs.txt", std::ios::app);
-	if (!_logFile.is_open())
-	{
-		std::cerr << "Ошибка открытия файла Logs.txt\n";
-		return;
-	}
-    std::time_t now = std::time(nullptr); //текущее время в секундах
-    std::tm* local_tm = std::localtime(&now); //преобразуем в локальное время
-    char timeBuffer[20];//20 byte, "YYYY-MM-DD HH:MM:SS" + null"defualt"
-    std::strftime(timeBuffer, sizeof(timeBuffer), "%Y-%m-%d %H:%M:%S", local_tm);
+void Logger::log_attempt(const std::string& username, bool success) {
+    std::ofstream log_file;
 
-    _logFile << timeBuffer
-        << " | Пользователь: " << _login
-        << " | Результат: " << (success ? "успешно" : "грустно")
-        << std::endl;
+    try {
+        log_file.open("Logs.txt", std::ios::trunc);
+    } catch (...) {
+        std::cerr << "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р°" << std::endl;
+        return;
+    }
+
+    auto log = std::chrono::system_clock::now();
+    std::string time_buffer = std::format("{:%Y-%m-%d %H:%M:%S}",log);
+
+    log_file << time_buffer
+             << " | РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: " << username
+             << " | Р РµР·СѓР»СЊС‚Р°С‚: " << (success ? "true" : "false")
+             << std::endl;
+
+    log_file.close();
 }
