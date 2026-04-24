@@ -185,6 +185,6 @@ bool AuthSystemUser::change_user() {
         }
     }
 
-    std::cout << "Пользователь не найден" << std::endl;
+    std::cerr << "Пользователь не найден" << std::endl;
     return false;
 }

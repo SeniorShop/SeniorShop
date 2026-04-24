@@ -10,10 +10,10 @@ add_executable(RemakedSeniorShop main.cpp
     AuthSystemUser.h AuthSystemUser.cpp
     Libraries.h
     Logger.h
-
-
     User.h User.cpp
     Logger.cpp
+    LoginSystem.h LoginSystem.cpp
+    Captcha.h Captcha.cpp
 
 )
 
