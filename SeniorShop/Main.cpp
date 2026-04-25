@@ -1,10 +1,7 @@
-#include <Windows.h>
-
 #include "LoginSystem.h"
 
 int main() {
-    SetConsoleCP(1251); //Андрей, если не сработает надо попробовать UTF-8
-    SetConsoleOutputCP(1251);
+    setlocale(LC_ALL,"Rus");
 
     LoginSystem login_system;
     login_system.launch();
