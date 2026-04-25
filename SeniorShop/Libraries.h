@@ -11,4 +11,5 @@
 #include <iomanip>
 #include <random>
 #include <format>
+#include <locale>
 #endif // LIBRARIES_H
