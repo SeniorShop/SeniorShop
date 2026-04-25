@@ -3,10 +3,11 @@
 #include "LoginSystem.h"
 
 int main() {
-    SetConsoleCP(1251);
+    SetConsoleCP(1251); //Андрей, если не сработает надо попробовать UTF-8
     SetConsoleOutputCP(1251);
 
     LoginSystem login_system;
     login_system.launch();
+
     return 0;
 }
