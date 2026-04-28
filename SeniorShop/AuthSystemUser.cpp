@@ -14,7 +14,7 @@ AuthSystemUser::AuthSystemUser(const std::string& filename) : _usersFilename(fil
 	{
 		_users.push_back({ "SuperAdmin", "admin***123", "superadmin" });
 		saveToFile();
-		std::cout << "const superadmin, ����� �������� ����� (����� SuperAdmin, ������ admin***123)\n";
+		std::cout << "const superadmin, áóäåò ïðîâåðêà ïîòîì (ëîãèí SuperAdmin, ïàðîëü admin***123)\n";
 
 	}
 }
@@ -24,16 +24,40 @@ AuthSystemUser::~AuthSystemUser()
 	saveToFile();
 }
 
-bool AuthSystemUser::isValidLogin(const std::string& login) const
+bool AuthSystemUser::CheckLogin(const std::string& str)
 {
-	if (login.size() < 5 || login.size() > 20) return false;
-	for (char ch : login)
-	{
-		unsigned char uc = static_cast<unsigned char>(ch);
-		if (!(std::isalnum(uc)))
-			return false;
-	}
-	return true;
+    // äîïîëíèòü: 
+    // ïðîâåðêó, ñóùåñòâóåò ëè ïîëüçîâàòåëü
+
+    if (str.size() < 5 || str.size() >= 20)
+    {
+        std::cout << "Íåäîïóñòèìàÿ äëèíà ëîãèíà. Îò 5 äî 20 ñèìâîëîâ\n";
+        return false;
+
+    }
+    std::unordered_set<char> specialSymbols;
+    for (char i = 'A'; i <= 'Z'; i++)
+    {
+        specialSymbols.insert(i);
+    }
+    for (char i = 'a'; i <= 'z'; i++)
+    {
+        specialSymbols.insert(i);
+    }
+    for (char i = '0'; i <= '9'; i++)
+    {
+        specialSymbols.insert(i);
+    }
+    for (char symb : str)
+    {
+        if (!specialSymbols.count(symb))
+        {
+            std::cout << "Íåêîððåêòíûå ñèìâîëû â ëîãèíå\n\n";
+            return false;
+        }
+    }
+   
+    return true;
 }
 
 bool AuthSystemUser::isValidPass(const std::string& pass) const
@@ -55,7 +79,7 @@ bool AuthSystemUser::isValidCurrentStatus(const std::string& currentStatus) cons
 	return (currentStatus == "superadmin" || currentStatus == "admin" || currentStatus == "user");
 }
 
-//������ � �������
+//ðàáîòà ñ ôàéëàìè
 
 void AuthSystemUser::loadFromFile()
 {
@@ -67,7 +91,7 @@ void AuthSystemUser::loadFromFile()
 	User _u;
 	while (std::getline(in, choose))
 	{
-		if (choose.empty()) continue; //�������� �� null
+		if (choose.empty()) continue; //ïðîâåðêà íà null
 		std::istringstream iss(choose);
 
 		if (std::getline(iss, _u._login, '|')
