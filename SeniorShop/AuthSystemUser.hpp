@@ -18,9 +18,8 @@ class AuthSystemUser
 private:
 	std::vector<User> _users;
 	std::string _usersFilename;
-bool CheckLogin(const std::string& str) const;
-bool CheckPass(const std::string& str) const;
-
+	bool CheckLogin(const std::string& str) const;
+	bool CheckPass(const std::string& str) const;
 	bool isValidCurrentStatus(const std::string& currentStatus) const;
 	bool userExists(const std::string&_login) const;
 	void loadFromFile();
