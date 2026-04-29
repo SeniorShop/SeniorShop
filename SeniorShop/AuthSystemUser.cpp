@@ -60,9 +60,50 @@ bool AuthSystemUser::CheckLogin(const std::string& str)
     return true;
 }
 
-bool AuthSystemUser::isValidPass(const std::string& pass) const
+bool AuthSystemUser::CheckPass(const std::string& str)
 {
-	return pass.size() >= 8;
+    if (str.size() < 5 || str.size() >= 64)
+    {
+        std::cout << "Íåäîïóñòèìàÿ äëèíà ïàðîëÿ. Îò 5 äî 64 ñèìâîëîâ\n";
+        return false;
+
+    }
+    int symbolsCount = 0;
+    std::unordered_set<char> specialSymbols;
+    std::unordered_set<char> passSymbols{ '!', '@', '#', '%', '^', '&', '*', '(',')', '-', '_', '=', '+', '/', '?', '|', '\\', '\"', '\'', ',', '.', '>', '<', '~', '`', ':', ';', '{','}', '[', ']' };
+
+    for (char i = '!'; i <= '~'; i++)
+    {
+        specialSymbols.insert(i);
+    }
+
+    for (char symb : str)
+    {
+        if (!specialSymbols.count(symb))
+        {
+            
+            std::cout << "Íåêîððåêòíûå ñèìâîëû â ïàðîëå\n\n";
+            return false;
+        }
+    }
+
+    for (char symb : str)
+    {
+            
+        if (passSymbols.count(symb))
+        {
+            symbolsCount++;
+            
+        }
+
+    }
+    if (symbolsCount >= 3)
+    {
+        return true;
+    }
+  
+    std::cout << "Òðåáóåòñÿ ìèíèìóì 3 ñïåöèàëüíûõ ñèìâîëà\n\n";
+    return false;
 }
 
 bool AuthSystemUser::userExists(const std::string& _login) const
