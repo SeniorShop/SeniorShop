@@ -12,4 +12,5 @@
 #include <random>
 #include <format>
 #include <locale>
+#include <unordered_set>
 #endif // LIBRARIES_H

@@ -14,21 +14,49 @@ AuthSystemUser::AuthSystemUser() {
 
 bool AuthSystemUser::is_valid_username(const std::string& username) const {
     if (username.size() < 5 || username.size() > 20) return false;
-    for (char check_symbols : username) {
-        if (!std::isalnum(static_cast<unsigned char>(check_symbols)))
+
+    std::unordered_set<char> specialSymbols;
+    for (char i = 'A'; i <= 'Z'; i++) specialSymbols.insert(i);
+    for (char i = 'a'; i <= 'z'; i++) specialSymbols.insert(i);
+    for (char i = '0'; i <= '9'; i++) specialSymbols.insert(i);
+
+    for (char check_symbol : username) {
+        if (!specialSymbols.count(check_symbol)) {
+            std::cout << "Имя пользователя содержит недействвительный символ";
             return false;
+        }
     }
     return true;
 }
 
 bool AuthSystemUser::is_valid_pass(const std::string& password) const {
     if(password.size() < 8) return false;
+
     std::size_t count_unique_symbols = 0;
-    for(char check_symbols : password) {
-        if(!std::isalnum(static_cast<unsigned char>(check_symbols)))
-            count_unique_symbols++;
+
+    std::unordered_set<char> special_symbols;
+    std::unordered_set<char> pass_symbols{
+        '!', '@', '#', '%', '^',
+        '&', '*', '(',')', '-',
+        '_', '=', '+', '/', '?',
+        '|', '\\', '\"', '\'', ',',
+        '.', '>', '<', '~', '`',
+        ':', ';', '{','}', '[',
+        ']'
+    };
+
+    for (char i = '!'; i <= '~'; i++)  special_symbols.insert(i);
+
+    for (char symb : password) {
+        if (!special_symbols.count(symb)) {
+            std::cout << "Íåêîððåêòíûå ñèìâîëû â ïàðîëå\n\n";
+            return false;
+        }
     }
-    if(count_unique_symbols < 3)
+
+    for (char symb : password) if (pass_symbols.count(symb)) count_unique_symbols++;
+
+    if (count_unique_symbols < 3)
         return false;
     return true;
 }
