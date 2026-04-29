@@ -127,7 +127,6 @@
     <ClInclude Include="Product.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Product.cpp" />
     <ClCompile Include="Storage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
