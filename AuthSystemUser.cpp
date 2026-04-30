@@ -15,14 +15,14 @@ AuthSystemUser::AuthSystemUser() {
 bool AuthSystemUser::is_valid_username(const std::string& username) const {
     if (username.size() < 5 || username.size() > 20) return false;
 
-    std::unordered_set<char> specialSymbols;
-    for (char i = 'A'; i <= 'Z'; i++) specialSymbols.insert(i);
-    for (char i = 'a'; i <= 'z'; i++) specialSymbols.insert(i);
-    for (char i = '0'; i <= '9'; i++) specialSymbols.insert(i);
+    std::unordered_set<char> special_symbols;
+    for (char i = 'A'; i <= 'Z'; i++) special_symbols.insert(i);
+    for (char i = 'a'; i <= 'z'; i++) special_symbols.insert(i);
+    for (char i = '0'; i <= '9'; i++) special_symbols.insert(i);
 
     for (char check_symbol : username) {
-        if (!specialSymbols.count(check_symbol)) {
-            std::cout << "Имя пользователя содержит недействвительный символ";
+        if (!special_symbols.count(check_symbol)) {
+            std::cerr << "Имя пользователя содержит недействительный символ" << std::endl;
             return false;
         }
     }
@@ -108,41 +108,41 @@ void AuthSystemUser::save_to_file(User& add_user) {
     out_file.close();
 }
 
-bool AuthSystemUser::register_user() {
+void AuthSystemUser::register_user() {
     std::string username, password;
     std::size_t choice_status;
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка регистрации пользователя" << std::endl;
-        return false;
+        return;
     }
 
     std::cout << "Логин: ";
     std::cin >> username;
 
     if (!is_valid_username(username)) {
-        std::cout << "Неверный логин (должен быть 5-20 символов, только буквы и цифры)" << std::endl;
-        return false;
+        std::cerr << "Неверный логин (должен быть 5-20 символов, только буквы и цифры)" << std::endl;
+        return;
     }
 
     if (user_exists(username)) {
-        std::cout << "Пользователь с таким логином уже существует" << std::endl;
-        return false;
+        std::cerr << "Пользователь с таким логином уже существует" << std::endl;
+        return;
     }
 
     std::cout << "Пароль: ";
     std::cin >> password;
 
     if (!is_valid_pass(password)) {
-        std::cout << "Неверный пароль (минимум 8 символов, минимум 3 не буквенно-цифровых символа)" << std::endl;
-        return false;
+        std::cerr << "Неверный пароль (минимум 8 символов, минимум 3 не буквенно-цифровых символа)" << std::endl;
+        return;
     }
 
     std::string statuses[]{"user", "admin", "superadmin"};
     std::cout << "1) Обычный пользователь\n2) Администратор\n3) Супер-администратор\nВыберите статус: ";
     std::cin >> choice_status;
 
-    if(choice_status < 1 || choice_status > 3) return false;
+    if(choice_status < 1 || choice_status > 3) return;
 
     User add_user;
     add_user.username = username;
@@ -151,7 +151,8 @@ bool AuthSystemUser::register_user() {
     users.push_back(add_user);
     save_to_file(add_user);
     Logger::log_attempt(username, true);
-    return true;
+    std::cout << "Регистрация прошла успешно" << std::endl;
+    start_storage.start();
 }
 
 void AuthSystemUser::show_all_users() {
@@ -161,7 +162,7 @@ void AuthSystemUser::show_all_users() {
     }
 }
 
-bool AuthSystemUser::login() {
+void AuthSystemUser::login() {
     std::string username, password;
     std::cout << "Логин: ";
     std::cin >> username;
@@ -170,20 +171,20 @@ bool AuthSystemUser::login() {
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка авторизации пользователя" << std::endl;
-        return false;
+        return;
     }
 
     for (const auto& user : users) {
         if (user.username == username && user.password == password) {
             Logger::log_attempt(username, true);
             std::cout << "Добро пожаловать, " << username << "!" << std::endl;
-            return true;
+            start_storage.start();
         }
     }
 
     Logger::log_attempt(username, false);
     std::cout << "Неверный логин или пароль" << std::endl;
-    return false;
+    return;
 }
 
 bool AuthSystemUser::is_super_admin_exists() {
@@ -194,7 +195,7 @@ bool AuthSystemUser::is_super_admin_exists() {
     return false;
 }
 
-bool AuthSystemUser::change_user() {
+void AuthSystemUser::change_user() {
     std::string name, password, status, new_name, new_password, new_status;
     std::cout << "Логин: ";
     std::cin >> name;
@@ -205,7 +206,7 @@ bool AuthSystemUser::change_user() {
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка смены пользователя" << std::endl;
-        return false;
+        return;
     }
 
     for (auto& user : users) {
@@ -222,10 +223,10 @@ bool AuthSystemUser::change_user() {
             user.status = new_status;
 
             save_to_file(user);
-            return true;
+            return;
         }
     }
 
     std::cerr << "Пользователь не найден" << std::endl;
-    return false;
+    return;
 }
