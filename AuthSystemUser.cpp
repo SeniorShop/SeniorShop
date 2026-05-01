@@ -184,7 +184,7 @@ void AuthSystemUser::login() {
 
     Logger::log_attempt(username, false);
     std::cout << "Неверный логин или пароль" << std::endl;
-    return;
+    start_storage.start();
 }
 
 bool AuthSystemUser::is_super_admin_exists() {
