@@ -9,12 +9,9 @@
 class Personal : public AuthSystemUser {
 public:
 	void ManagePersonal();
-	bool IsSupAdmin();
-	void AddUser();
 	void RemoveUser();
 	void UserPassChange();
 	void UserRoleChange();
-	void PrintUsers();
 protected:
 
 private:

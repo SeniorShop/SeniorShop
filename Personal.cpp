@@ -7,7 +7,7 @@ void Personal::ManagePersonal() {
 		scanf_s("%d", &choose);
 		switch (choose) {
 		case 1:
-			this->AddUser();
+			this->register_user();
 		case 2:
 			this->RemoveUser();
 		case 3:
@@ -15,17 +15,11 @@ void Personal::ManagePersonal() {
 		case 4:
 			this->UserRoleChange();
 		case 5:
-			this->PrintUsers();
+			this->show_all_users();
 		case 0:
 			break;
 		}
 	}
-}
-bool Personal::IsSupAdmin() {
-	
-}
-void Personal::AddUser() {
-	this->register_user();
 }
 void Personal::RemoveUser() {
 
@@ -35,7 +29,4 @@ void Personal::UserPassChange() {
 }
 void Personal::UserRoleChange() {
 
-}
-void Personal::PrintUsers() {
-	this->show_all_users();
 }
