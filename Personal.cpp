@@ -36,7 +36,7 @@ void Personal::UserPassChange() {
         scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
-            printf("Ошибка смены пользователя");
+            printf("Ошибка смены пароля пользователя");
             continue;
         }
 
@@ -60,7 +60,7 @@ void Personal::UserRoleChange() {
         scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
-            std::cerr << "Ошибка смены пользователя" << std::endl;
+            printf("Ошибка смены статуса пользователя");
             continue;
         }
 
