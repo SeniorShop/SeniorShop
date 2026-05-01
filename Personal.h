@@ -1,15 +1,17 @@
 #ifndef _PERSONAL_H_
 #define _PERSONAL_H_
 
-#include "Libraries.h"
-#include "User.h"
+#include <stdio.h>
 
-class Personal {
+#include "Libraries.h"
+#include "AuthSystemUser.h"
+
+class Personal : public AuthSystemUser {
 public:
-	int ManagePersonal();
+	void ManagePersonal();
 	bool IsSupAdmin();
 	void AddUser();
-	void DeleteUser();
+	void RemoveUser();
 	void UserPassChange();
 	void UserRoleChange();
 	void PrintUsers();
