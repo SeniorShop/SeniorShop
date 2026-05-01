@@ -30,10 +30,10 @@ void Personal::RemoveUser() {
 
 }
 void Personal::UserPassChange() {
-    std::string name, password, role, newPassword;
+    char name[67], password[67], role[67], newPassword[67];
     while (true) {
         printf("Введите через пробел: логин пароль текущий_статус\n>>: ");
-        scanf_s("%s %s %s", &name, &password, &role);
+        scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
             printf("Ошибка смены пользователя");
@@ -54,10 +54,10 @@ void Personal::UserPassChange() {
     }
 }
 void Personal::UserRoleChange() {
-    std::string name, password, role, newRole;
+    char name[67], password[67], role[67], newRole[67];
     while (true) {
         printf("Введите через пробел: логин пароль текущий_статус\n>>: ");
-        scanf_s("%s %s %s", &name, &password, &role);
+        scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
             std::cerr << "Ошибка смены пользователя" << std::endl;
