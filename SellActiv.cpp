@@ -1,13 +1,13 @@
 #include "SellActiv.h"
 
-PromoManager::PromoManager() : discountUsed(false) {
-    srand(static_cast<unsigned>(time(0)));
+PromoManager::PromoManager() : discount_used(false) {
+    srand(static_cast<unsigned int>(time(0)));
 }
 
-void PromoManager::showPromoMenu(double& totalSum, const std::vector<std::pair<std::string, double>>& cart) {
-    if (discountUsed) {
-        std::cout << "\nВы уже использовали акцию для этого чека!\n";
-        Sleep(1500);
+void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
+    if (discount_used) {
+        std::cout << "Вы уже использовали акцию для этого чека!\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         return;
     }
 
@@ -23,29 +23,29 @@ void PromoManager::showPromoMenu(double& totalSum, const std::vector<std::pair<s
 
     if (choice == "1") {
         double discount = 0.0;
-        if (totalSum >= 2000) {           
-            discount = totalSum * 0.15;
-            totalSum -= discount;
-            discountUsed = true;
+        if (total_sum >= 2000) {
+            discount = total_sum * 0.15;
+            total_sum -= discount;
+            discount_used = true;
             std::cout << "Скидка 15% применена!\n";
         }
-        else {
+        else
             std::cout << "Сумма чека меньше 2000 руб.\n";
-        }
+
     }
     else if (choice == "2") {
-        applyMathQuiz(totalSum);
+        apply_math_quiz(total_sum);
     }
     else if (choice == "3") {
-        applyMeatPromotion(totalSum, cart);
+        apply_meat_promotion(total_sum, cart);
     }
     else if (choice == "4") {
-        applyWheelOfFortune(totalSum);
+        apply_wheel_of_fortune(total_sum);
     }
-    Sleep(1500);
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 }
 
-void PromoManager::applyMathQuiz(double& totalSum) {
+void PromoManager::apply_math_quiz(double& total_sum) {
     int a = rand() % 50 + 10;
     int b = rand() % 50 + 10;
     int answer;
@@ -55,38 +55,38 @@ void PromoManager::applyMathQuiz(double& totalSum) {
     double discount = 0.0;
 
     if (answer == (a + b)) {
-        discount = totalSum * 0.30;
-        totalSum -= discount;
-        discountUsed = true;
+        discount = total_sum * 0.30;
+        total_sum -= discount;
+        discount_used = true;
         std::cout << "Верно! Скидка 30% ваша.\n";
     }
-    else {
-        std::cout << "Неверно. Акция аннулирована.\n";
-    }
+    else
+        std::cerr << "Неверно. Акция аннулирована.\n";
+
 }
 
-void PromoManager::applyMeatPromotion(double& totalSum, const std::vector<std::pair<std::string, double>>& cart) {
+void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
     double weight = 0;
-    for (auto const& item : cart) {
+    for (const auto& item : cart) {
         if (item.first == "Мясо" || item.first == "мясо") weight += item.second;
     }
 
     if (weight >= 10.0) {
-        totalSum -= 200;
-        discountUsed = true;
+        total_sum -= 200;
+        discount_used = true;
         std::cout << "Акция применена! Списано 200 руб за мясо.\n";
     }
-    else {
-        std::cout << "Нужно минимум 10 кг мяса (у вас " << weight << ").\n";
-    }
+    else
+        std::cerr << "Нужно минимум 10 кг мяса (у вас " << weight << ").\n";
+
 }
 
-void PromoManager::applyWheelOfFortune(double& totalSum) {
+void PromoManager::apply_wheel_of_fortune(double& total_sum) {
     std::string choice;
 
     std::cout << "\nНаш магазин рад, что вы приняли участие в нашей акции\n";
     std::cout << "\t\tКОЛЕСО ФОРТУНЫ \n";
-    std::cout << "Стоимость участия: 1000 рублей(добавятся к сумме чека в случаве проигрыша)\n";
+    std::cout << "Стоимость участия: 1000 рублей(добавятся к сумме чека в случае проигрыша)\n";
     std::cout << "Возможные призы:\n";
     std::cout << "1. Скидка 10% на покупку\n";
     std::cout << "2. Скидка 20% на покупку\n";
@@ -94,54 +94,49 @@ void PromoManager::applyWheelOfFortune(double& totalSum) {
     std::cout << "4. Скидка 50% на покупку\n";
     std::cout << "5. Бесплатная покупка (все товары бесплатно!)\n\n\n";
 
-
     std::cout << "Хотите участвовать?\n1 - Да\n2 - Нет\nВвод: ";
     Getline(choice);
 
-    if (choice == "2")
-    {
+    if (choice == "2") {
         std::cout << "Отказ от участия\n";
-        Sleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         return;
     }
     else if (choice != "1")
-    {
         return;
-    }
 
     double discount = 0.0;
 
     int prize = rand() % 100 + 1;
     if (prize >= 26 && prize <= 50) {
-        discount = totalSum * 0.10;
-        std::cout << "ВЫИГРЫШ: Скидка 10%!\n";
+        discount = total_sum * 0.10;
+        std::cout << "ВЫИГРЫШ: Скидка 10%!" << std::endl;
     }
     else if (prize >= 51 && prize <= 70) {
-        discount = totalSum * 0.20;
-        std::cout << "ВЫИГРЫШ: Скидка 20%!\n";
+        discount = total_sum * 0.20;
+        std::cout << "ВЫИГРЫШ: Скидка 20%!" << std::endl;
     }
     else if (prize >= 71 && prize <= 85) {
-        discount = totalSum * 0.30;
-        std::cout << "ВЫИГРЫШ: Скидка 30%!\n";
+        discount = total_sum * 0.30;
+        std::cout << "ВЫИГРЫШ: Скидка 30%!" << std::endl;
     }
     else if (prize >= 86 && prize <= 95) {
-        discount = totalSum * 0.50;
-        std::cout << "ВЫИГРЫШ: Скидка 50%!\n";
+        discount = total_sum * 0.50;
+        std::cout << "ВЫИГРЫШ: Скидка 50%!" << std::endl;
     }
     else if (prize >= 96 && prize <= 100) {
-        totalSum = 0;
-        std::cout << "ДЖЕКПОТ: Покупка бесплатно!\n";
+        total_sum = 0;
+        std::cout << "ДЖЕКПОТ: Покупка бесплатно!" << std::endl;
     }    
     else {
-        std::cout << "Увы, в этот раз без приза.\n";
-        totalSum += 1000;
-        std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << totalSum << " руб.\n";
-        Sleep(1000);
+        std::cout << "Увы, в этот раз без приза" << std::endl;
+        total_sum += 1000;
+        std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     }    
 
-    totalSum -= discount;
-    if (totalSum < 0) totalSum = 0;
+    total_sum -= discount;
+    if (total_sum < 0) total_sum = 0;
 
-    discountUsed = true;
-    
+    discount_used = true;
 }
