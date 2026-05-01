@@ -13,7 +13,7 @@ add_executable(SeniorShop Main.cpp
     Logger.cpp
     LoginSystem.h LoginSystem.cpp
     Captcha.h Captcha.cpp
- "Personal.h")
+ "Personal.h" "Personal.cpp")
 
 include(GNUInstallDirs)
 install(TARGETS SeniorShop
