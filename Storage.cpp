@@ -83,24 +83,41 @@ void Storage::add_product() {
 
 void Storage::show_all() {
     if (goods.empty()) {
-        std::cerr << "Список товаров пустой" << std::endl;
+        std::cout << "Склад пуст." << std::endl;
         return;
     }
-    for (auto i = 0; i < goods.size(); ++i) {
-        Product write_product = goods[i];
-        std::cout << i + 1 << " | Название: " << write_product.name << " | Категория: " << write_product.category
-                      << " | Цена: " << write_product.price << " | Артикль: " << write_product.article
-                      << " | Период: " << write_product.begin_date << " - " << write_product.end_date
-                      << " | Количество: " << write_product.count << " | Производитель: " << write_product.manufacturer
-                      << " | Страна производства: " << write_product.country << '\n';
+
+    // Константы ширины колонок
+    const int w_ID = 4, w_name = 16, w_cat = 14, w_price = 10, w_count = 8, w_art = 12;
+
+    std::cout << "\n" << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n";
+    std::cout << std::left
+        << std::setw(w_ID) << "ID"
+        << std::setw(w_name) << "Название"
+        << std::setw(w_cat) << "Категория"
+        << std::setw(w_price) << "Цена"
+        << std::setw(w_count) << "Кол-во"
+        << std::setw(w_art) << "Артикль" << "\n";
+    std::cout << std::setfill('-') << std::setw(80) << "" << std::setfill(' ') << "\n";
+
+    for (std::size_t i = 0; i < goods.size(); ++i) {
+        Product& p = goods[i];
+
+        std::cout << std::left
+            << std::setw(w_ID) << i + 1
+            << std::setw(w_name) << format_field(p.name, w_name - 1)
+            << std::setw(w_cat) << format_field(p.category, w_cat - 1)
+            << std::setw(w_price) << std::fixed << std::setprecision(2) << p.price
+            << std::setw(w_count) << p.count
+            << p.article << "\n";
     }
+    std::cout << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n\n";
 }
 void Storage::show_valid_products() {
     if (goods.empty()) {
         std::cerr << "Список товаров пустой" << std::endl;
         return;
     }
-
     int valid_count = 0;
     for (size_t i = 0; i < goods.size(); ++i) {
         if (!is_expired(goods[i].end_date)) {
@@ -116,7 +133,6 @@ void Storage::show_valid_products() {
             valid_count++;
         }
     }
-
     if (valid_count == 0) {
         std::cout << "Нет годных товаров на складе\n";
     } else {
@@ -162,8 +178,13 @@ std::chrono::sys_days Storage::parse_date(const std::string& date_str) {
         std::chrono::year(year) / std::chrono::month(month) / std::chrono::day(day)
         );
 }
+std::string Storage::format_field(std::string str, std::size_t width) const {
+    if (str.length() > width) {
+        return str.substr(0, width - 2) + "..";
+    }
+    return str;
+}
 bool Storage::is_expired(const std::string& end_date_str) {
-
     try {
         auto now = std::chrono::system_clock::now();
         auto today = now;
@@ -176,27 +197,25 @@ bool Storage::is_expired(const std::string& end_date_str) {
     }
 }
 bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str) {
-        try {
-            auto begin_date = parse_date(begin_date_str);
-            auto end_date = parse_date(end_date_str);
+    try {
+        auto begin_date = parse_date(begin_date_str);
+        auto end_date = parse_date(end_date_str);
 
-            if (begin_date > end_date) {
-                std::cerr << "Дата начала не может быть позже даты окончания!\n";
-                return false;
-            }
-
-            return true;
-        } catch (...) {
-            std::cerr << "Неверный формат даты! Используйте ДД.ММ.ГГГГ\n";
+        if (begin_date > end_date) {
+            std::cerr << "Дата начала не может быть позже даты окончания!\n";
             return false;
         }
-    }
 
+        return true;
+    } catch (...) {
+        std::cerr << "Неверный формат даты! Используйте ДД.ММ.ГГГГ\n";
+        return false;
+    }
+}
 bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) {
     if (!is_date_range_valid(begin_date, end_date)) {
         return false;
     }
-
     if (is_expired(end_date)) {
         auto today = std::chrono::system_clock::now();
         auto get_end_date = parse_date(end_date);
@@ -205,15 +224,12 @@ bool Storage::validate_dates(const std::string& begin_date, const std::string& e
                     << " дней (срок годности истек " << end_date << ")\n";
         return false;
     }
-
     auto get_end_date = parse_date(end_date);
     auto today = std::chrono::system_clock::now();
     auto days_left = duration_cast<std::chrono::days>(get_end_date - today).count();
-
     if (days_left <= 30 && days_left > 0) {
         std::cout << "Срок годности истекает через " << days_left << " дней!\n";
     }
-
     return true;
 }
 bool Storage::check_characteristics(const Product& analyse_product) {
