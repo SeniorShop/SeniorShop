@@ -42,8 +42,8 @@ void Personal::UserPassChange() {
 
         for (auto& user : users) {
             if (user.username == name && user.password == password && user.status == role) {
-                std::cout << "Новый пароль: ";
-                std::cin >> newPassword;
+                printf("Новый пароль\n>>: ");
+                scanf_s("%s", name, (unsigned int)sizeof(name));
 
                 user.password = newPassword;
 
@@ -66,9 +66,8 @@ void Personal::UserRoleChange() {
 
         for (auto& user : users) {
             if (user.username == name && user.password == password && user.status == role) {
-
-                std::cout << "Новый статус: ";
-                std::cin >> newRole;
+                printf("Новый статус\n>>: ");
+                scanf_s("%s", name, (unsigned int)sizeof(name));
 
                 user.status = newRole;
 
