@@ -25,6 +25,8 @@ private:
     bool validate_dates(const std::string& begin_date, const std::string& end_date);
     bool is_expired(const std::string& end_date_str);
     std::chrono::sys_days parse_date(const std::string& date_str);
+    // Метод для обрезки длинных строк
+    std::string formatField(std::string str, size_t width) const;
 };
 
 #endif // STORAGE_H
