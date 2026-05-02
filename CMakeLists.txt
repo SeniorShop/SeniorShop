@@ -13,6 +13,7 @@ add_executable(SeniorShop Main.cpp
     Logger.cpp
     LoginSystem.h LoginSystem.cpp
     Captcha.h Captcha.cpp
+    Personal.h Personal.cpp
     Storage.h Storage.cpp
     SellActiv.h SellActiv.cpp
 )
