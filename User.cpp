@@ -1,7 +1,5 @@
 #include "User.h"
 
-User::~User() = default;
-
 void User::set_name(const std::string& set_name) {
     username = set_name;
 }
@@ -19,4 +17,7 @@ std::string User::get_password() const {
 }
 std::string User::get_status() const {
     return status;
+}
+bool User::operator==(const User& other) const {
+    return this->username == other.username && this->password == other.password && this->status == other.status;
 }
