@@ -27,7 +27,29 @@ void Personal::ManagePersonal() {
 	}
 }
 void Personal::RemoveUser() {
+    char name[67], password[67], role[67], newName[67] = "", newPassword[67] = "", newRole[67] = "";
+    while (true) {
+        printf("Введите через пробел: логин пароль текущий_статус\n>>: ");
+        scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
+        if (!check_bot.verify()) {
+            printf("Ошибка смены статуса пользователя");
+            continue;
+        }
+
+        for (auto& user : users) {
+            if (user.username == name && user.password == password && user.status == role) {
+                
+                user.username = newName;
+                user.password = newPassword;
+                user.status = newRole;
+
+                save_to_file(user);
+                printf("пользоветель успешно удалён\n");
+                break;
+            }
+        }
+    }
 }
 void Personal::UserPassChange() {
     char name[67], password[67], role[67], newPassword[67];
@@ -36,7 +58,7 @@ void Personal::UserPassChange() {
         scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
-            printf("Ошибка смены пароля пользователя");
+            printf("Ошибка смены пароля пользователя\n");
             continue;
         }
 
@@ -48,6 +70,7 @@ void Personal::UserPassChange() {
                 user.password = newPassword;
 
                 save_to_file(user);
+                printf("пароль успешно сменён\n");
                 break;
             }
         }
@@ -72,6 +95,7 @@ void Personal::UserRoleChange() {
                 user.status = newRole;
 
                 save_to_file(user);
+                printf("статус успешно сменён\n");
                 break;
             }
         }
