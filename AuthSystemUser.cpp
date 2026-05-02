@@ -96,6 +96,10 @@ void AuthSystemUser::load_from_file() {
 }
 
 void AuthSystemUser::save_to_file(User& add_user) {
+    auto exist = std::find(users.begin(),users.end(),add_user);
+    if(exist == users.end()) {
+        users.push_back(add_user);
+    }
     std::ofstream out_file("Users.txt", std::ios::trunc);
     if (!out_file.is_open()) {
         std::cerr << "Ошибка открытия файла" << std::endl;
@@ -103,14 +107,14 @@ void AuthSystemUser::save_to_file(User& add_user) {
     }
 
     for (const auto& u : users) {
-        out_file << u.username << "|" << u.password << "|" << u.status << std::endl;  // Используйте | как разделитель
+        out_file << u.username << "|" << u.password << "|" << u.status << '\n';  // Используйте | как разделитель
     }
     out_file.close();
 }
 
 void AuthSystemUser::register_user() {
     std::string username, password;
-    std::size_t choice_status;
+    std::size_t choice_status, choice_to_continue;
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка регистрации пользователя" << std::endl;
@@ -142,6 +146,9 @@ void AuthSystemUser::register_user() {
     std::cout << "1) Обычный пользователь\n2) Администратор\n3) Супер-администратор\nВыберите статус: ";
     std::cin >> choice_status;
 
+    if(choice_status == 3)
+        is_super_admin = 1;
+
     if(choice_status < 1 || choice_status > 3) return;
 
     User add_user;
@@ -152,7 +159,14 @@ void AuthSystemUser::register_user() {
     save_to_file(add_user);
     Logger::log_attempt(username, true);
     std::cout << "Регистрация прошла успешно" << std::endl;
-    start_storage.start();
+
+    std::cout << "Для возвращения в пункт системы входа напишите 0, 1 - для работы со складом\n";
+    std::cin >> choice_to_continue;
+
+    if(choice_to_continue == 1)
+        start_storage.start();
+    else
+        return;
 }
 
 void AuthSystemUser::show_all_users() {
@@ -194,8 +208,177 @@ bool AuthSystemUser::is_super_admin_exists() {
     }
     return false;
 }
+void AuthSystemUser::remove_user() {
+    if (!check_bot.verify()) {
+        std::cerr << "Ошибка смены статуса пользователя" << std::endl;
+        return;
+    }
+
+    if(is_super_admin != 1) {
+        std::cerr << "Редактировать персонал может только суперпользователь" << std::endl;
+        return;
+    }
+
+    std::ifstream read_from("Users.txt");
+
+    if(!read_from.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return;
+    }
+
+    std::string get_name, get_password, get_status;
+
+    User get_users;
+
+    while(std::getline(read_from, get_name, '|') &&
+           std::getline(read_from, get_password, '|') &&
+           std::getline(read_from, get_status)) {
+
+        get_users.username = get_name;
+        get_users.password = get_password;
+        get_users.status = get_status;
+        users.push_back(get_users);
+    }
+
+    read_from.close();
+
+    std::string name, password, status;
+    while (true) {
+        std::cout << "Введите через пробел (логин пароль текущий_статус): ";
+        std::cin >> name >> password >> status;
+        for (auto& user : users) {
+            if (user.username == name && user.password == password && user.status == status) {
+                users.erase(std::remove(users.begin(),users.end(),user),users.end());
+                std::filesystem::remove("Users.txt");
+                std::cout << "Пользователь успешно удален" << std::endl;
+                break;
+            }
+        }
+    }
+
+    std::ofstream rewrite_to("Users.txt",std::ios::trunc);
+    if(rewrite_to.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return;
+    }
+
+    for(auto& write_users : users) {
+        rewrite_to << write_users.username << "|" << write_users.password << "|" << write_users.status << '\n';
+    }
+    std::cout << std::endl;
+
+    rewrite_to.close();
+}
+void AuthSystemUser::user_pass_change() {
+
+    std::string name, password, status, new_password;
+
+    std::ifstream save("Users.txt");
+    if(!save.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return;
+    }
+
+    users.clear();
+
+    std::string get_name, get_password, get_status;
+    User get_user, get_users;
+
+    while(std::getline(save, get_name, '|') &&
+           std::getline(save, get_password, '|') &&
+           std::getline(save, get_status)) {
+
+        get_users.username = get_name;
+        get_users.password = get_password;
+        get_users.status = get_status;
+        users.push_back(get_users);
+    }
+
+    save.close();
+
+    while (true) {
+        std::cout << "Введите через пробел (логин пароль текущий_статус): ";
+        std::cin >> name >> password >> status;
+
+        for (auto& user : users) {
+            if (user.username == name && user.password == password && user.status == status) {
+                users.erase(std::remove(users.begin(),users.end(),user),users.end());
+                std::cout << "Новый пароль: ";
+                std::cin >> new_password;
+                get_user.username = name;
+                get_user.password = new_password;
+                get_user.status = status;
+                break;
+            }
+        }
+    }
+    save_to_file(get_user);
+}
+void AuthSystemUser::user_status_change() {
+
+    std::string name, password, status, new_status;
+
+    std::ifstream save("Users.txt");
+    if(!save.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return;
+    }
+
+    users.clear();
+
+    std::string get_name, get_password, get_status;
+    User get_user, get_users;
+
+    while(std::getline(save, get_name, '|') &&
+           std::getline(save, get_password, '|') &&
+           std::getline(save, get_status)) {
+
+        get_users.username = get_name;
+        get_users.password = get_password;
+        get_users.status = get_status;
+        users.push_back(get_users);
+    }
+
+    save.close();
+
+    while (true) {
+        std::cout << "Введите через пробел (логин пароль текущий_статус): ";
+        std::cin >> name >> password >> status;
+
+        for (auto& user : users) {
+            if (user.username == name && user.password == password && user.status == status) {
+                users.erase(std::remove(users.begin(),users.end(),user),users.end());
+                std::cout << "Новый статус: ";
+                std::cin >> new_status;
+                get_user.username = name;
+                get_user.password = password;
+                get_user.status = new_status;
+                break;
+            }
+        }
+    }
+    save_to_file(get_user);
+}
 
 void AuthSystemUser::change_user() {
+
+    if(!check_bot.verify()) {
+        std::cerr << "Ошибка смены пользователя" << std::endl;
+        return;
+    }
+
+    if(is_super_admin != 1) {
+        std::cerr << "Редактировать персонал может только суперпользователь" << std::endl;
+        return;
+    }
+
+    std::size_t choice_action;
+    std::cout << "1) Изменить пароль пользователя\n2) Изменить статус пользователя\n3)Изменить все данные пользователя\nВыберите действие: ";
+    std::cin >> choice_action;
+
+    if(choice_action == 1) user_pass_change();
+    if(choice_action == 2) user_status_change();
+
     std::string name, password, status, new_name, new_password, new_status;
     std::cout << "Логин: ";
     std::cin >> name;
@@ -203,11 +386,6 @@ void AuthSystemUser::change_user() {
     std::cin >> password;
     std::cout << "Текущий статус: ";
     std::cin >> status;
-
-    if(!check_bot.verify()) {
-        std::cerr << "Ошибка смены пользователя" << std::endl;
-        return;
-    }
 
     for (auto& user : users) {
         if (user.username == name && user.password == password && user.status == status) {
