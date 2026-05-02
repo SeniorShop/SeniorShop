@@ -83,7 +83,7 @@ void Personal::UserRoleChange() {
         scanf_s("%s %s %s", name, (unsigned int)sizeof(name), password, (unsigned int)sizeof(password), role, (unsigned int)sizeof(role));
 
         if (!check_bot.verify()) {
-            printf("Ошибка смены статуса пользователя");
+            printf("Ошибка смены статуса пользователя\n");
             continue;
         }
 
