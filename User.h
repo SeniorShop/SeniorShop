@@ -1,6 +1,8 @@
 #ifndef USER_H
 #define USER_H
-#include "Libraries.h"
+#include <iostream>
+#include <string>
+
 struct User {
     virtual ~User();
     std::string username;

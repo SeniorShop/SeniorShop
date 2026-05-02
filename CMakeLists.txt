@@ -7,13 +7,16 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_executable(SeniorShop Main.cpp
     AuthSystemUser.h AuthSystemUser.cpp
-    Libraries.h
     Logger.h
+    Product.h Product.cpp
     User.h User.cpp
     Logger.cpp
     LoginSystem.h LoginSystem.cpp
     Captcha.h Captcha.cpp
- "Personal.h" "Personal.cpp")
+    Personal.h Personal.cpp
+    Storage.h Storage.cpp
+    SellActiv.h SellActiv.cpp
+)
 
 include(GNUInstallDirs)
 install(TARGETS SeniorShop

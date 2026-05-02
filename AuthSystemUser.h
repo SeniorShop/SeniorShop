@@ -3,9 +3,12 @@
 #include "Logger.h"
 #include "User.h"
 #include "Captcha.h"
+#include "Storage.h"
+#include <unordered_set>
 
 class AuthSystemUser {
-    
+    Storage start_storage;
+    Captcha check_bot;
     std::ofstream write_to;
     std::ifstream read_from;
     bool is_valid_username(const std::string& username) const;
@@ -14,9 +17,9 @@ class AuthSystemUser {
     bool user_exists(const std::string& username) const;
 public:
     AuthSystemUser();
-    bool register_user();
-    bool login();
-    bool change_user();
+    void register_user();
+    void login();
+    void change_user();
     void show_all_users();
     bool is_super_admin_exists();
 protected:
