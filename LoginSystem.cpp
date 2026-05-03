@@ -2,7 +2,7 @@
 
 void LoginSystem::launch() {
     std::size_t choice_option;
-    std::cout << "1) Регистрация\n2) Авторизация\n3) Смена пользователя\n4) Показать всех пользователей\n5) Выход\nВыберите опцию: ";
+    std::cout << "1) Регистрация\n2) Авторизация\n3) Смена пользователя\n4) Удаление пользователя\n5) Показать всех пользователей\n6) Выход\nВыберите опцию: ";
     std::cin >> choice_option;
 
     switch(choice_option) {
@@ -16,25 +16,35 @@ void LoginSystem::launch() {
         change_user_button();
         break;
     case 4:
-        show_all_users_button();
+        delete_user_button();
         break;
     case 5:
+        show_all_users_button();
+        break;
+    case 6:
         exit_button();
         break;
     }
 }
 
 void LoginSystem::registration_button() {
-    asu.register_user();
+    set_status = asu.register_user();
+    return;
 }
 void LoginSystem::authorization_button() {
     asu.login();
 }
 void LoginSystem::change_user_button() {
-    asu.change_user();
+    asu.change_user(set_status);
+    return;
+}
+void LoginSystem::delete_user_button() {
+    asu.remove_user(set_status);
+    return;
 }
 void LoginSystem::show_all_users_button() {
     asu.show_all_users();
+    return;
 }
 void LoginSystem::exit_button() {
     std::cout << "Завершение программы" << std::endl;

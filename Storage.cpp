@@ -18,7 +18,7 @@ void Storage::load_from_file(const std::string& product_database) {
         }
         input.close();
         std::cout << "Было считано товаров с базы данных: " << goods.size() << std::endl;
-    }
+}
 
 void Storage::save_to_file(const std::string& product_database) {
     std::ofstream output(product_database);
@@ -34,8 +34,253 @@ void Storage::save_to_file(const std::string& product_database) {
     output.close();
     std::cout << "Было записано " << goods.size() << " товаров в базу данных" << std::endl;
 }
-void Storage::start() {
-    // Реализация будет позже
+bool Storage::is_existed_name_storage(std::string& check_name_storage) {
+    if(!std::filesystem::exists("StorageDatabase.txt"))
+        return false;
+
+    std::ifstream check_exist_storage("StorageDatabase.txt");
+    if(!check_exist_storage.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return false;
+    }
+
+    std::string name_storage, line;
+    bool found = false;
+
+    while(std::getline(check_exist_storage, line)) {
+        if(line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string id_str;
+        if(std::getline(ss, id_str, '|') && std::getline(ss, name_storage)) {
+            if(name_storage == check_name_storage) {
+                found = true;
+                break;
+            }
+        }
+    }
+
+    check_exist_storage.close();
+    return found;
+}
+void Storage::list_superadmin_actions() {
+    //storage = storages[select_storage()];
+    std::size_t select_action;
+    std::cout << "Список действий для супер админа:\n";
+    std::cout << "1) Добавить продажу\n";
+    std::cout << "2) Показать склад\n";
+    std::cout << "3) Пополнить склад\n";
+    std::cout << "4) Списать товар со склада\n";
+    std::cout << "5) Изменить цену товара\n";
+    std::cout << "6) Редактировать склад\n";
+    std::cout << "7) Редактировать персонал\n";
+    std::cout << "8) Отчет\n";
+    std::cout << "9) Поставки\n";
+    std::cout << "Выберите действие: ";
+    std::cin >> select_action;
+
+    // реализация будет позже
+}
+void Storage::list_admin_actions() {
+    std::size_t select_action;
+    std::cout << "Список действий для админа:\n";
+    std::cout << "1) Начать продажу\n";
+    std::cout << "2) Показать склад\n";
+    std::cout << "3) Пополнить склад\n";
+    std::cout << "4) Пополнить товар\n";
+    std::cout << "5) Списать товар\n";
+    std::cout << "6) Изменить цену\n";
+    std::cout << "7) Отчет\n";
+    std::cout << "8) Поставки\n";
+    std::cout << "9) Выход\n";
+    std::cout << "Выберите действие: ";
+    std::cin >> select_action;
+
+    // реализация будет позже
+}
+void Storage::list_similar_user_actions() {
+    std::size_t select_action;
+    std::cout << "Список действий для пользователя:\n";
+    std::cout << "1) Начать продажу\n";
+    std::cout << "2) Показать склад\n";
+    std::cout << "3) Пополнить склад\n";
+    std::cout << "4) Списать товар\n";
+    std::cout << "5) Отчет\n";
+    std::cout << "6) Выход\n";
+    std::cout << "Выберите действие: ";
+    std::cin >> select_action;
+
+    // реализация будет позже
+}
+bool Storage::is_existed_ID_storage(int& check_ID_storage) {
+    if(!std::filesystem::exists("StorageDatabase.txt"))
+        return false;
+
+    std::ifstream check_exist_ID_storage("StorageDatabase.txt");
+    if(!check_exist_ID_storage.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return false;
+    }
+
+    std::string line;
+    bool found = false;
+
+    while(std::getline(check_exist_ID_storage, line)) {
+        if(line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string id_str;
+
+        if(std::getline(ss, id_str, '|')) {
+            try {
+                int id = std::stoi(id_str);
+                if(id == check_ID_storage) {
+                    found = true;
+                    break;
+                }
+            } catch(...) {
+                continue;
+            }
+        }
+    }
+
+    check_exist_ID_storage.close();
+    return found;
+}
+int Storage::select_storage() {
+    std::string name_storage;
+    std::size_t type_storages;
+    int ID_storage = 0, result = -1;
+
+    std::cout << std::setw(60) << std::right << "ВЫБОР СКЛАДА" << std::endl;
+    std::cout << "1) Новый склад (с нуля)" << std::endl;
+    std::cout << "2) Существующий склад" << std::endl;
+    std::cout << "Выберите тип склада: ";
+    std::cin >> type_storages;
+
+    std::cin.ignore(365000, '\n');
+
+    if(type_storages == 1) {
+        std::cout << "Введите название нового склада: ";
+        Getline(name_storage);
+
+        if(name_storage.empty()) {
+            std::cerr << "Название склада не может быть пустым!" << std::endl;
+            return -1;
+        }
+
+        if(is_existed_name_storage(name_storage)) {
+            std::cerr << "Склад с названием '" << name_storage << "' уже существует!" << std::endl;
+            return -1;
+        }
+
+        std::cout << "Введите ID нового склада в виде положительного числа: ";
+        std::cin >> ID_storage;
+        std::cin.ignore(365000, '\n');
+
+        if(ID_storage <= 0) {
+            std::cerr << " ID склада должен быть положительным числом!" << std::endl;
+            return -1;
+        }
+
+        if(is_existed_ID_storage(ID_storage)) {
+            std::cerr << "Ошибка: склад с ID " << ID_storage << " уже существует!" << std::endl;
+            return -1;
+        }
+
+        if(save_storage_to_database(name_storage, ID_storage)) {
+            std::cout << "Склад '" << name_storage << "' с ID " << ID_storage << " успешно создан!" << std::endl;
+            result = ID_storage;
+        } else {
+            result = -1;
+        }
+    }
+    else if(type_storages == 2) {
+        result = load_storage_from_database();
+    }
+    else {
+        std::cerr << "Ошибка: неверный выбор (1 или 2)!" << std::endl;
+        return -1;
+    }
+
+    return result;
+}
+bool Storage::save_storage_to_database(const std::string& storage_name, const std::size_t& ID) {
+    std::ofstream storage_database("StorageDatabase.txt", std::ios::app);
+    if(!storage_database.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return false;
+    }
+
+    storage_database << ID << "|" << storage_name << std::endl;
+    storage_database.close();
+    std::cout << "Склад '" << storage_name << "' с ID '" << ID << "' создан успешно" << std::endl;
+    return true;
+}
+
+int Storage::load_storage_from_database() {
+    if(!std::filesystem::exists("StorageDatabase.txt")) {
+        std::cerr << "База данных складов не найдена" << std::endl;
+        return -1;
+    }
+
+    std::ifstream storage_database("StorageDatabase.txt");
+    if(!storage_database.is_open()) {
+        std::cerr << "Ошибка открытия файла" << std::endl;
+        return -1;
+    }
+
+    std::string name_storage, line;
+    std::map<int, std::string> get_storages;
+
+    std::cout << "Список складов:\n";
+
+    while(std::getline(storage_database, line)) {
+        if(line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string id_str, name;
+
+        if(std::getline(ss, id_str, '|') && std::getline(ss, name)) {
+            try {
+                int id = std::stoi(id_str);
+                get_storages[id] = name;
+                std::cout << "ID: " << id << " | Название: " << name << std::endl;
+            } catch(...) {
+                continue;
+            }
+        }
+    }
+    storage_database.close();
+
+    if(get_storages.empty()) {
+        std::cerr << "Нет доступных складов" << std::endl;
+        return -1;
+    }
+    std::cout << "Выберите ID склада: ";
+
+    int selected_id;
+    std::cin >> selected_id;
+    std::cin.ignore(365000, '\n');
+
+    if(get_storages.find(selected_id) != get_storages.end()) {
+        std::cout << "Выбран склад: " << get_storages[selected_id] << " (ID: " << selected_id << ")" << std::endl;
+        return selected_id;
+    } else {
+        std::cerr << "Склад с ID " << selected_id << " не существует" << std::endl;
+        return -1;
+    }
+}
+void Storage::start(const std::string& get_status) {
+    if(get_status == "superadmin") {
+        if(select_storage() == -1)
+            return;
+        list_superadmin_actions();
+    } else if(get_status == "admin") {
+        list_admin_actions();
+    } else {
+        list_similar_user_actions();
+    }
 }
 void Storage::add_product() {
     Product new_product;
@@ -226,7 +471,7 @@ bool Storage::validate_dates(const std::string& begin_date, const std::string& e
     }
     auto get_end_date = parse_date(end_date);
     auto today = std::chrono::system_clock::now();
-    auto days_left = duration_cast<std::chrono::days>(get_end_date - today).count();
+    auto days_left = std::chrono::duration_cast<std::chrono::days>(get_end_date - today).count();
     if (days_left <= 30 && days_left > 0) {
         std::cout << "Срок годности истекает через " << days_left << " дней!\n";
     }

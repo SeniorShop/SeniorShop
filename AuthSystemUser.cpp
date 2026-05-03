@@ -112,13 +112,13 @@ void AuthSystemUser::save_to_file(User& add_user) {
     out_file.close();
 }
 
-void AuthSystemUser::register_user() {
+std::string AuthSystemUser::register_user() {
     std::string username, password;
     std::size_t choice_status, choice_to_continue;
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка регистрации пользователя" << std::endl;
-        return;
+        return "";
     }
 
     std::cout << "Логин: ";
@@ -126,12 +126,12 @@ void AuthSystemUser::register_user() {
 
     if (!is_valid_username(username)) {
         std::cerr << "Неверный логин (должен быть 5-20 символов, только буквы и цифры)" << std::endl;
-        return;
+        return "";
     }
 
     if (user_exists(username)) {
         std::cerr << "Пользователь с таким логином уже существует" << std::endl;
-        return;
+        return "";
     }
 
     std::cout << "Пароль: ";
@@ -139,17 +139,14 @@ void AuthSystemUser::register_user() {
 
     if (!is_valid_pass(password)) {
         std::cerr << "Неверный пароль (минимум 8 символов, минимум 3 не буквенно-цифровых символа)" << std::endl;
-        return;
+        return "";
     }
 
     std::string statuses[]{"user", "admin", "superadmin"};
     std::cout << "1) Обычный пользователь\n2) Администратор\n3) Супер-администратор\nВыберите статус: ";
     std::cin >> choice_status;
 
-    if(choice_status == 3)
-        is_super_admin = 1;
-
-    if(choice_status < 1 || choice_status > 3) return;
+    if(choice_status < 1 || choice_status > 3) return "";
 
     User add_user;
     add_user.username = username;
@@ -159,14 +156,7 @@ void AuthSystemUser::register_user() {
     save_to_file(add_user);
     Logger::log_attempt(username, true);
     std::cout << "Регистрация прошла успешно" << std::endl;
-
-    std::cout << "Для возвращения в пункт системы входа напишите 0, 1 - для работы со складом\n";
-    std::cin >> choice_to_continue;
-
-    if(choice_to_continue == 1)
-        start_storage.start();
-    else
-        return;
+    return add_user.status;
 }
 
 void AuthSystemUser::show_all_users() {
@@ -192,29 +182,29 @@ void AuthSystemUser::login() {
         if (user.username == username && user.password == password) {
             Logger::log_attempt(username, true);
             std::cout << "Добро пожаловать, " << username << "!" << std::endl;
-            start_storage.start();
+            start_storage.start(user.status);
         }
     }
 
     Logger::log_attempt(username, false);
     std::cout << "Неверный логин или пароль" << std::endl;
-    start_storage.start();
+    return;
 }
 
-bool AuthSystemUser::is_super_admin_exists() {
+bool AuthSystemUser::is_super_admin_exists() const {
     for (const auto& user : users) {
         if (user.status == "superadmin")
             return true;
     }
     return false;
 }
-void AuthSystemUser::remove_user() {
+void AuthSystemUser::remove_user(const std::string& get_definite_status) {
     if (!check_bot.verify()) {
         std::cerr << "Ошибка смены статуса пользователя" << std::endl;
         return;
     }
 
-    if(is_super_admin != 1) {
+    if(get_definite_status != "supadmin") {
         std::cerr << "Редактировать персонал может только суперпользователь" << std::endl;
         return;
     }
@@ -360,14 +350,14 @@ void AuthSystemUser::user_status_change() {
     save_to_file(get_user);
 }
 
-void AuthSystemUser::change_user() {
+void AuthSystemUser::change_user(const std::string& get_status) {
 
     if(!check_bot.verify()) {
         std::cerr << "Ошибка смены пользователя" << std::endl;
         return;
     }
 
-    if(is_super_admin != 1) {
+    if(get_status == "supadmin") {
         std::cerr << "Редактировать персонал может только суперпользователь" << std::endl;
         return;
     }
