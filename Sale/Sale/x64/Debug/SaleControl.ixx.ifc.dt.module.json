@@ -1,0 +1,22 @@
+{
+    "version": 1,
+    "revision": 0,
+    "rules": [
+        {
+            "primary-output": "x64\\Debug\\SaleControl.obj",
+            "outputs": [
+                "x64\\Debug\\SaleControl.ixx.ifc.dt.module.json",
+                "x64\\Debug\\SaleControl.ixx.ifc.dt.d.json",
+                "x64\\Debug\\SaleControl.ifc"
+            ],
+            "provides": [
+                {
+                    "logical-name": "SaleControl",
+                    "source-path": "c:\\users\\brawl\\source\\repos\\sale\\sale\\salecontrol.ixx",
+                    "is-interface": true
+                }
+            ],
+            "requires": []
+        }
+    ]
+}

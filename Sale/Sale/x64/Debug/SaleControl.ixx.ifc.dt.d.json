@@ -1,0 +1,10 @@
+{
+    "Version": "1.2",
+    "Data": {
+        "Source": "c:\\users\\brawl\\source\\repos\\sale\\sale\\salecontrol.ixx",
+        "ProvidedModule": "SaleControl",
+        "Includes": [],
+        "ImportedModules": [],
+        "ImportedHeaderUnits": []
+    }
+}

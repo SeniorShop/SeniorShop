@@ -1,0 +1,22 @@
+﻿  Product.cpp
+C:\Users\Brawl\Downloads\Product.cpp(115,23): error C2398: Элемент "1": для преобразования из "int" в "unsigned int" требуется сужающее преобразование
+C:\Users\Brawl\Downloads\Product.cpp(116,21): error C2398: Элемент "1": для преобразования из "int" в "unsigned int" требуется сужающее преобразование
+  Storage.cpp
+C:\Users\Brawl\Downloads\Storage.cpp(1,10): error C1083: Не удается открыть файл включение: Storage.h: No such file or directory,
+  Cart.cpp
+C:\Users\Brawl\source\repos\Sale\Sale\Cart.hpp(3,10): error C1083: Не удается открыть файл включение: Product.hpp: No such file or directory,
+  (компиляция исходного файла "Cart.cpp")
+  
+  SaleControl.cpp
+C:\Users\Brawl\source\repos\Sale\Sale\SaleService.hpp(2,10): error C1083: Не удается открыть файл включение: Storage.hpp: No such file or directory,
+  (компиляция исходного файла "SaleControl.cpp")
+  
+  SaleService.cpp
+C:\Users\Brawl\source\repos\Sale\Sale\SaleService.hpp(2,10): error C1083: Не удается открыть файл включение: Storage.hpp: No such file or directory,
+  (компиляция исходного файла "SaleService.cpp")
+  
+  SaleUI.cpp
+C:\Users\Brawl\source\repos\Sale\Sale\Cart.hpp(3,10): error C1083: Не удается открыть файл включение: Product.hpp: No such file or directory,
+  (компиляция исходного файла "SaleUI.cpp")
+  
+  Создание кода...
