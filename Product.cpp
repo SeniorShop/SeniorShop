@@ -1,4 +1,4 @@
-#include "Product.h";
+#include "Product.h"
 
 Product::Product(const Product& other) {
     this->name = other.name;
@@ -11,8 +11,19 @@ Product::Product(const Product& other) {
     this->manufacturer = other.manufacturer;
     this->country = other.country;
 }
-Product::Product() = default;
+Product::Product() : name (), category(), price(0.0), article(0), begin_date(), end_date(), count(0), manufacturer(), country() {}
 bool Product::operator==(const Product& other) const {
     return name == other.name && category == other.category && article == other.article;
 }
+
+//void setColor(int color)
+//{
+//    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//    SetConsoleTextAttribute(hConsole, color);
+//}
+
+//void resetColor()
+//{
+//    setColor(7);
+//}
 

@@ -1,4 +1,6 @@
 #include "Captcha.h"
+#include "Product.h"
+ 
 
 void Captcha::generate() {
 
@@ -11,28 +13,25 @@ void Captcha::generate() {
     std::uniform_int_distribution<std::size_t> dist(0, charset.size() - 1);
 
     code.clear();
-    for (int i = 0; i < charset.size() - 1; ++i)
+    for (int i = 0; i < 5; ++i)
         code.push_back(charset[dist(gen)]);
 
 }
 
 bool Captcha::verify() {
-    std::size_t attempt = 0;
-    std::string user_input;
-
-    while(attempt < 5) {
-        if(attempt >= 5) return false;
+ 
+    std::string chooseCapha;
+    for (int attemp = 0; attemp < 5; ++attemp)
+    {
         generate();
-        std::cout << "Введите код: " << code << "\n";
-        std::cin >> user_input;
-        if(user_input != code)
-            std::cerr << "Неверный код. Повторите попытку\n";
-        else
-            break;
-        attempt++;
-    }
+        std::cout << "Введите капчу: " << code << "\n";
+        Getline(chooseCapha);
+        if (chooseCapha == code) return true;
+        std::cerr << "Ошибка! Неверный код. Осталось попыток: " << (4 - attemp) << "\n";
 
-    return true;
+
+    }
+    return false;
 }
 
 
