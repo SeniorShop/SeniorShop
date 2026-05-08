@@ -1,6 +1,5 @@
 #ifndef USER_H
 #define USER_H
-#include <iostream>
 #include <string>
 
 struct User {
@@ -16,4 +15,4 @@ struct User {
     bool operator==(const User& other) const;
 };
 
-#endif // USER_H
+#endif

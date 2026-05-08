@@ -1,8 +1,6 @@
-#ifndef _CAPTCHA_H
-#define _CAPTCHA_H
-#include <iostream>
+#ifndef CAPTCHA_H
+#define CAPTCHA_H
 #include <string>
-#include <random>
 
 class Captcha {
     std::string code;
