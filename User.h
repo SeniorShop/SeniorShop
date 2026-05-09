@@ -1,19 +1,22 @@
 #ifndef USER_H
 #define USER_H
-#include <iostream>
+
 #include <string>
+#include <sstream>
 
 struct User {
     std::string username;
     std::string password;
     std::string status;
-    void set_name(const std::string& set_name);
-    void set_password(const std::string& set_password);
-    void set_status(const std::string& set_status);
-    std::string get_name() const;
-    std::string get_password() const;
-    std::string get_status() const;
+
+    User();
+    User(const std::string& name, const std::string& pass, const std::string& st);
+
+    std::string serialize() const;
+
+    static User deserialize(const std::string& line);
+
     bool operator==(const User& other) const;
 };
 
-#endif // USER_H
+#endif
