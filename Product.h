@@ -3,9 +3,6 @@
 #include <iostream>
 #include <string>
 
-//void setColor(int color);
-//void resetColor();
-
 inline void Getline(std::string& str) {
     std::getline(std::cin, str, '\n');
     if (std::cin.fail()) {
