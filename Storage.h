@@ -16,9 +16,12 @@ public:
     void save_to_file(const std::string& product_database);
     void add_product();
     void show_all();
-    void start();
+    void start(const std::string&userStatus);
     void check_expired_products();
     void show_valid_products();
+    void super_admin_menu();
+    void admin_menu();
+    void user_menu();
 private:
     bool check_characteristics(const Product& analyse_product);
     bool is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str);
