@@ -1,36 +1,36 @@
 #ifndef AUTH_SYSTEM_USER_HPP
 #define AUTH_SYSTEM_USER_HPP
-#include "Logger.h"
+
 #include "User.h"
+#include "Logger.h"
 #include "Captcha.h"
 #include "Storage.h"
-#include <iostream>
-#include <unordered_set>
-#include <filesystem>
+#include <vector>
+#include <string>
 
 class AuthSystemUser {
-    Storage start_storage;
+    Storage storage;
     Captcha check_bot;
     std::vector<User> users;
-    std::ofstream write_to;
-    std::ifstream read_from;
+    User* currentUser_ = nullptr;
+
     bool is_valid_username(const std::string& username) const;
     bool is_valid_pass(const std::string& password) const;
-    bool is_valid_current_status(const std::string& current_status) const;
-    bool is_super_admin = 0;
     bool user_exists(const std::string& username) const;
-    void user_pass_change();
-    void user_status_change();
     void load_from_file();
-    void save_to_file(User& add_user);
+    void save_to_file();
+
 public:
     AuthSystemUser();
+
+    User* login();
     void register_user();
-    void login();
-    void change_user();
     void show_all_users();
-    bool is_super_admin_exists();
     void remove_user();
+    void change_user();
+
+    User* getCurrentUser() const { return currentUser_; }
+    Storage& get_storage() { return storage; }
 };
 
-#endif 
+#endif
