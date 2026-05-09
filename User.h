@@ -6,7 +6,7 @@
 #include <sstream>
 class User
 {
-	// !!! Нужно пересмотреть и подумать над типом public 
+	// !!! пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ public 
 public:
 	std::string username;
 	std::string password;
@@ -19,7 +19,7 @@ public:
 	{
 		return username + "|" + password + "|" + status;
 	}
-	// восстановление из файла
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
 	static std::unique_ptr<User> deserialize(const std::string& line);
 
 	virtual std::unique_ptr<User> clone() const = 0;

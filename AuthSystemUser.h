@@ -10,12 +10,12 @@
 #include <iostream>
 
 class AuthSystemUser {
-    Storage start_storage;                      //экземпляр склада (используется только для запуска)
-    Captcha check_bot;                          //капча для входа
-    std::vector<std::unique_ptr<User>> users;   // полиморфное хранилище
-    User* currentUser_ = nullptr;               // вошедший пользователь
+    Storage start_storage;                      //пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ)
+    Captcha check_bot;                          //пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    std::vector<std::unique_ptr<User>> users;   // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
+    User* currentUser_ = nullptr;               // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 
-    // Вспомогательные методы
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
     bool is_valid_username(const std::string& username) const;
     bool is_valid_pass(const std::string& password) const;
     bool user_exists(const std::string& username) const;
@@ -23,18 +23,18 @@ class AuthSystemUser {
     void load_from_file();
     void save_to_file();
 
-    // Внутренние методы редактирования (вызываются из change_user)
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ change_user)
     void user_pass_change();
     void user_status_change();
 
 public:
     AuthSystemUser();
 
-    User* login();              // возвращает указатель на вошедшего пользователя (nullptr при ошибке)
-    void register_user();       // создание нового пользователя  !! superadmin
-    void change_user();         // изменение существующего пользователя !! superadmin
-    void show_all_users();      // просмотр всех пользователей // superadmin или admin
-    void remove_user();         // удаление пользователя !! superadmin
+    User* login();              // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ (nullptr пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ)
+    void register_user();       // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ  !! superadmin
+    void change_user();         // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ !! superadmin
+    void show_all_users();      // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ // superadmin пїЅпїЅпїЅ admin
+    void remove_user();         // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ !! superadmin
 
     User* getCurrentUser() const { return currentUser_; }
 };
