@@ -1,43 +1,41 @@
 #include "LoginSystem.h"
-#ifdef _WIN32
-#include <Windows.h>
-#elif __linux__
 
-#endif
-#include <iostream>
-#include <string>
-#include <vector>
-#include <fstream>
+void LoginSystem::launch() {
+    std::size_t choice_option;
+    std::cout << "1) Регистрация\n2) Авторизация\n3) Смена пользователя\n4) Показать всех пользователей\n5) Выход\nВыберите опцию: ";
+    std::cin >> choice_option;
 
-void LoginSystem::launch()
-{
-    std::string choose;
-
-    while (true) {
-        std::cout << "\n\n\n\t\t\tАпрельское возвращение\n\n\n";
-        std::cout << "1 - Вход\n2- Выход\nВыбор: ";
-        Getline(choose);
-        if (choose == "1")
-        {
-            User* loggerUser = asu.login();
-            
-                if (loggerUser)
-                {
-                    get_start.start(loggerUser->status);
-                }
-        }
-        else if (choose == "2")
-        {
-            exit_button();
-        }
-        else
-        {
-            std::cerr << "Неверный выбор!\n";
-        }
+    switch(choice_option) {
+    case 1:
+        registration_button();
+        break;
+    case 2:
+        authorization_button();
+        break;
+    case 3:
+        change_user_button();
+        break;
+    case 4:
+        show_all_users_button();
+        break;
+    case 5:
+        exit_button();
+        break;
     }
-    
 }
 
+void LoginSystem::registration_button() {
+    asu.register_user();
+}
+void LoginSystem::authorization_button() {
+    asu.login();
+}
+void LoginSystem::change_user_button() {
+    asu.change_user();
+}
+void LoginSystem::show_all_users_button() {
+    asu.show_all_users();
+}
 void LoginSystem::exit_button() {
     std::cout << "Завершение программы" << std::endl;
     exit(0);

@@ -2,51 +2,18 @@
 #define USER_H
 #include <iostream>
 #include <string>
-#include <memory>
-#include <sstream>
-class User
-{
-	// !!! ����� ������������ � �������� ��� ����� public 
-public:
-	std::string username;
-	std::string password;
-	std::string status; // superadmin, admin, user
-	User() = default;
-	User(const std::string& name, const std::string& pass, const std::string& currentSt) : username(name), password(pass), status(currentSt) {}
-	virtual ~User() = default;
 
-	virtual std::string serialize() const
-	{
-		return username + "|" + password + "|" + status;
-	}
-	// �������������� �� �����
-	static std::unique_ptr<User> deserialize(const std::string& line);
-
-	virtual std::unique_ptr<User> clone() const = 0;
-
-	bool operator==(const User& other) const
-	{
-		return username == other.username && password == other.password && status == other.status;
-	}
-
-};
-
-class SuperAdminUser final : public User {
-public:
-	SuperAdminUser();
-	std::unique_ptr<User> clone() const override;
-};
-
-class AdminUser : public User {
-public:
-	AdminUser(const std::string& name, const std::string& pass);
-	std::unique_ptr<User> clone() const override;
-};
-
-class RegularUser : public User {
-public:
-	RegularUser(const std::string& name, const std::string& pass);
-	std::unique_ptr<User> clone() const override;
+struct User {
+    std::string username;
+    std::string password;
+    std::string status;
+    void set_name(const std::string& set_name);
+    void set_password(const std::string& set_password);
+    void set_status(const std::string& set_status);
+    std::string get_name() const;
+    std::string get_password() const;
+    std::string get_status() const;
+    bool operator==(const User& other) const;
 };
 
 #endif // USER_H
