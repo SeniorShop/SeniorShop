@@ -15,9 +15,7 @@ add_executable(SeniorShop Main.cpp
     Captcha.h Captcha.cpp
     Storage.h Storage.cpp
     SellActiv.h SellActiv.cpp
-    Supply.h Supply.cpp
-    SupplyManager.h SupplyManager.cpp
-)
+    methodsSuperAdmin.h methodsSuperAdmin.cpp)
 
 include(GNUInstallDirs)
 install(TARGETS SeniorShop

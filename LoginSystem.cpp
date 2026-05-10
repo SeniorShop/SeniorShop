@@ -1,30 +1,45 @@
 #include "LoginSystem.h"
-#include "Product.h"
-#include <iostream>
+#ifdef _WIN32
+#include <Windows.h>
+#elif __linux__
 
-void LoginSystem::launch() {
+#endif
+#include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
+
+void LoginSystem::launch()
+{
     std::string choose;
 
     while (true) {
-        std::cout << "\n\n\n\t\t\tÐ¡Ð˜Ð¡Ð¢Ð•ÐœÐ Ð’Ð¥ÐžÐ”Ð\n\n\n";
-        std::cout << "1 - Ð’Ñ…Ð¾Ð´\n";
-        std::cout << "2 - Ð ÐµÐ³Ð¸ÑÑ‚Ñ€Ð°Ñ†Ð¸Ñ\n";
-        std::cout << "3 - Ð’Ñ‹Ñ…Ð¾Ð´\n";
-        std::cout << "Ð’Ñ‹Ð±Ð¾Ñ€: ";
+        std::cout << "\n\n\n\t\t\tÀïðåëüñêîå âîçâðàùåíèå\n\n\n";
+        std::cout << "1 - Âõîä\n2- Âûõîä\nÂûáîð: ";
         Getline(choose);
-
-        if (choose == "1") {
+        if (choose == "1")
+        {
             User* loggerUser = asu.login();
-            if (loggerUser) {
-                asu.get_storage().start(loggerUser->status, asu);
+
+            if (loggerUser)
+            {
+                get_start.setAuthSystem(&asu);
+                get_start.start(loggerUser->status);
             }
-        } else if (choose == "2") {
-            asu.register_user();
-        } else if (choose == "3") {
-            std::cout << "Ð—Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹" << std::endl;
-            return;
-        } else {
-            std::cerr << "ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ð²Ñ‹Ð±Ð¾Ñ€\n";
+        }
+        else if (choose == "2")
+        {
+            exit_button();
+        }
+        else
+        {
+            std::cerr << "Íåâåðíûé âûáîð!\n";
         }
     }
+
+}
+
+void LoginSystem::exit_button() {
+    std::cout << "Çàâåðøåíèå ïðîãðàììû" << std::endl;
+    exit(0);
 }

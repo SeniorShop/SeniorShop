@@ -1,187 +1,321 @@
 #include "AuthSystemUser.h"
-#include "Product.h"
-#include <fstream>
-#include <sstream>
+#include <filesystem>
 #include <algorithm>
+#include <unordered_set>
+
 
 AuthSystemUser::AuthSystemUser() {
     load_from_file();
-    if (users.empty()) {
-        users.emplace_back("SuperAdmin", "admin***123", "superadmin");
+    //Если в файле нет суперадмина, то создаём его с фиксированными данными !! SuperAdmin", "admin***123", "superadmin
+    bool superExists = false;
+    for (const auto& u : users) {
+        if (u->status == "superadmin") {
+            superExists = true;
+            break;
+        }
+    }
+    if (!superExists) {
+        users.push_back(std::make_unique<SuperAdminUser>());
         save_to_file();
     }
 }
 
+// Загрузка из файла 
+void AuthSystemUser::load_from_file() {
+    users.clear();
+    std::ifstream in_file("Users.txt");
+    if (!in_file.is_open()) {
+        std::cerr << "Ошибка открытия файла Users.txt" << std::endl;
+        return;
+    }
+    std::string line;
+    while (std::getline(in_file, line)) {
+        if (line.empty()) continue;
+        auto user = User::deserialize(line);
+        if (user) {
+            users.push_back(std::move(user));
+        }
+    }
+    in_file.close();
+}
+
+
+void AuthSystemUser::save_to_file() {
+    std::ofstream out_file("Users.txt", std::ios::trunc);
+    if (!out_file.is_open()) {
+        std::cerr << "Ошибка открытия файла Users.txt для записи" << std::endl;
+        return;
+    }
+    for (const auto& u : users) {
+        out_file << u->serialize() << '\n';
+    }
+    out_file.close();
+}
+
+
+
 bool AuthSystemUser::is_valid_username(const std::string& username) const {
     if (username.size() < 5 || username.size() > 20) return false;
+
+    std::unordered_set<char> allowed;
+    for (char c = 'A'; c <= 'Z'; ++c) allowed.insert(c);
+    for (char c = 'a'; c <= 'z'; ++c) allowed.insert(c);
+    for (char c = '0'; c <= '9'; ++c) allowed.insert(c);
+
     for (char c : username) {
-        if (!std::isalnum(c)) return false;
+        if (!allowed.count(c)) {
+            std::cerr << "Имя пользователя содержит недопустимый символ" << std::endl;
+            return false;
+        }
     }
     return true;
 }
 
+
 bool AuthSystemUser::is_valid_pass(const std::string& password) const {
     if (password.size() < 8) return false;
-    int special = 0;
-    std::string specials = "!@#$%^&*()_+-=[]{};':\",./<>?\\|`~";
+
+
+    std::unordered_set<char> allowed;
+    for (char c = '!'; c <= '~'; ++c) allowed.insert(c);
+
     for (char c : password) {
-        if (specials.find(c) != std::string::npos) special++;
+        if (!allowed.count(c)) {
+            std::cerr << "Некорректные символы в пароле" << std::endl;
+            return false;
+        }
     }
-    return special >= 3;
+
+    // Спецсимволы
+    std::unordered_set<char> specials = {
+        '!','@','#','%','^','&','*','(',')','-','_','=','+','/','?',
+        '|','\\','\"','\'',',','.','>','<','~','`',':',';','{','}','[',']'
+    };
+
+    size_t specialCount = 0;
+    for (char c : password) {
+        if (specials.count(c)) ++specialCount;
+    }
+    if (specialCount < 3) {
+        std::cerr << "Пароль должен содержать не менее 3 специальных символов" << std::endl;
+        return false;
+    }
+    return true;
 }
+
 
 bool AuthSystemUser::user_exists(const std::string& username) const {
     for (const auto& u : users) {
-        if (u.username == username) return true;
+        if (u->username == username) return true;
     }
     return false;
 }
 
-void AuthSystemUser::load_from_file() {
-    users.clear();
-    std::ifstream file("Users.txt");
-    if (!file.is_open()) return;
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty()) continue;
-        users.push_back(User::deserialize(line));
-    }
-}
-
-void AuthSystemUser::save_to_file() {
-    std::ofstream file("Users.txt", std::ios::trunc);
-    if (!file.is_open()) return;
-    for (const auto& u : users) {
-        file << u.serialize() << "\n";
-    }
-}
-
 User* AuthSystemUser::login() {
     std::string username, password;
-    std::cout << "Р›РѕРіРёРЅ: ";
+    std::cout << "Введите логин: ";
     Getline(username);
-    std::cout << "РџР°СЂРѕР»СЊ: ";
+    std::cout << "Введите пароль: ";
     Getline(password);
 
     if (!check_bot.verify()) {
-        std::cerr << "РћС€РёР±РєР° Р°РІС‚РѕСЂРёР·Р°С†РёРё (РєР°РїС‡Р°)\n";
+        std::cerr << "Ошибка авторизации (капча)" << std::endl;
         return nullptr;
     }
 
     for (auto& u : users) {
-        if (u.username == username && u.password == password) {
+        if (u->username == username && u->password == password) {
             Logger::log_attempt(username, true);
-            std::cout << "Р”РѕР±СЂРѕ РїРѕР¶Р°Р»РѕРІР°С‚СЊ, " << username << "!\n";
-            currentUser_ = &u;
+            std::cout << "Добро пожаловать, " << username << "!" << std::endl;
+            currentUser_ = u.get();
             return currentUser_;
         }
     }
 
     Logger::log_attempt(username, false);
-    std::cout << "РќРµРІРµСЂРЅС‹Р№ Р»РѕРіРёРЅ РёР»Рё РїР°СЂРѕР»СЊ\n";
+    std::cout << "Неверный логин или пароль" << std::endl;
     return nullptr;
 }
 
+
 void AuthSystemUser::register_user() {
+
+    if (!currentUser_ || currentUser_->status != "superadmin") {
+        std::cerr << "Только суперадминистратор может создавать новых пользователей" << std::endl;
+        return;
+    }
+
     std::string username, password;
-    int role_choice;
-
-    std::cout << "Р›РѕРіРёРЅ: ";
+    std::cout << "Введите логин нового пользователя: ";
     Getline(username);
-    if (!is_valid_username(username)) return;
+
+    if (!is_valid_username(username)) {
+        std::cerr << "Логин должен быть от 5 до 20 символов, только буквы и цифры" << std::endl;
+        return;
+    }
+
     if (user_exists(username)) {
-        std::cerr << "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓР¶Рµ СЃСѓС‰РµСЃС‚РІСѓРµС‚\n";
+        std::cerr << "Пользователь с таким логином уже существует" << std::endl;
         return;
     }
 
-    std::cout << "РџР°СЂРѕР»СЊ: ";
+    std::cout << "Введите пароль: ";
     Getline(password);
-    if (!is_valid_pass(password)) return;
 
-    std::cout << "Р’С‹Р±РµСЂРёС‚Рµ СЂРѕР»СЊ:\n";
-    std::cout << "1 - РћР±С‹С‡РЅС‹Р№ РїРѕР»СЊР·РѕРІР°С‚РµР»СЊ\n";
-    std::cout << "2 - РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ\n";
-    std::cout << "3 - РЎСѓРїРµСЂ-Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂ\n";
-    std::cout << "Р’С‹Р±РѕСЂ: ";
-    Getline(role_choice);
-
-    std::string status;
-    if (role_choice == 1) status = "user";
-    else if (role_choice == 2) status = "admin";
-    else if (role_choice == 3) status = "superadmin";
-    else {
-        std::cerr << "РќРµРІРµСЂРЅС‹Р№ РІС‹Р±РѕСЂ\n";
+    if (!is_valid_pass(password)) {
+        std::cerr << "Пароль должен быть не менее 8 символов и содержать минимум 3 спецсимвола" << std::endl;
         return;
     }
 
-    users.emplace_back(username, password, status);
+    std::cout << "Выберите статус:\n1 - Обычный пользователь\n2 - Администратор\nВыбор: ";
+    std::string choose;
+    Getline(choose);
+
+    if (choose != "1" && choose != "2") // добавить выход exit
+    {
+        std::cerr << "Ошибка! Неверный выбор\n";
+        return;
+    }
+
+
+    std::unique_ptr<User> newUser;
+    if (choose == "1")
+    {
+        newUser = std::make_unique<RegularUser>(username, password);
+
+    }
+    else if (choose == "2")
+    {
+        newUser = std::make_unique<AdminUser>(username, password);
+    }
+
+
+
+    users.push_back(std::move(newUser));
     save_to_file();
     Logger::log_attempt(username, true);
-    std::cout << "Р РµРіРёСЃС‚СЂР°С†РёСЏ СѓСЃРїРµС€РЅР°!\n";
-    return;
+    std::cout << "Пользователь успешно зарегистрирован." << std::endl;
 }
+
 
 void AuthSystemUser::show_all_users() {
+    system("cls");
+    std::cout << "Список пользователей:" << std::endl;
     for (const auto& u : users) {
-        std::cout << "Р›РѕРіРёРЅ: " << u.username << ", РЎС‚Р°С‚СѓСЃ: " << u.status << "\n";
+        std::cout << "Логин: " << u->username
+            << ", Статус: " << u->status << std::endl;
     }
 }
 
-void AuthSystemUser::remove_user() {
-    if (!currentUser_ || currentUser_->status != "superadmin") {
-        std::cerr << "РўРѕР»СЊРєРѕ СЃСѓРїРµСЂР°РґРјРёРЅ РјРѕР¶РµС‚ СѓРґР°Р»СЏС‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№\n";
-        return;
-    }
-
-    std::string username;
-    std::cout << "Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ СѓРґР°Р»РµРЅРёСЏ: ";
-    Getline(username);
-
-    auto it = std::find_if(users.begin(), users.end(),
-                           [&](const User& u) { return u.username == username; });
-
-    if (it != users.end()) {
-        if (it->status == "superadmin") {
-            std::cerr << "РќРµР»СЊР·СЏ СѓРґР°Р»РёС‚СЊ СЃСѓРїРµСЂР°РґРјРёРЅР°\n";
-            return;
-        }
-        users.erase(it);
-        save_to_file();
-        std::cout << "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ СѓРґР°Р»С‘РЅ\n";
-    } else {
-        std::cerr << "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ\n";
-    }
-}
 
 void AuthSystemUser::change_user() {
+    system("cls");
     if (!currentUser_ || currentUser_->status != "superadmin") {
-        std::cerr << "РўРѕР»СЊРєРѕ СЃСѓРїРµСЂР°РґРјРёРЅ РјРѕР¶РµС‚ РёР·РјРµРЅСЏС‚СЊ РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№\n";
+        std::cerr << "Только superadmin может изменять пользователей" << std::endl;
         return;
     }
 
-    std::string username;
-    std::cout << "Р›РѕРіРёРЅ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РґР»СЏ РёР·РјРµРЅРµРЅРёСЏ: ";
-    Getline(username);
+    std::cout << "1. Изменить пароль\n2. Изменить статус\nВыбор: ";
+    std::string choose;
+    Getline(choose);
+
+    if (choose == "1") {
+        user_pass_change();
+    }
+    else if (choose == "2") {
+        user_status_change();
+    }
+    else {
+        std::cerr << "Ошибка! Неверный выбор" << std::endl;
+        return;
+    }
+}
+
+void AuthSystemUser::user_pass_change() {
+    system("cls");
+    std::string name, password, status, new_password;
+    std::cout << "Введите логин пользователя: ";
+    Getline(name);
+    std::cout << "Введите текущий пароль: ";
+    Getline(password);
+    std::cout << "Введите текущий статус: ";
+    Getline(status);
 
     for (auto& u : users) {
-        if (u.username == username) {
-            std::string new_pass, new_status;
-            std::cout << "РќРѕРІС‹Р№ РїР°СЂРѕР»СЊ (РѕСЃС‚Р°РІСЊ РїСѓСЃС‚С‹Рј, С‡С‚РѕР±С‹ РЅРµ РјРµРЅСЏС‚СЊ): ";
-            Getline(new_pass);
-            if (!new_pass.empty()) {
-                if (is_valid_pass(new_pass)) u.password = new_pass;
-                else std::cerr << "РџР°СЂРѕР»СЊ РЅРµ РїСЂРёРЅСЏС‚\n";
+        if (u->username == name && u->password == password && u->status == status) {
+            std::cout << "Введите новый пароль: ";
+            std::cin >> new_password;
+            if (!is_valid_pass(new_password)) {
+                std::cerr << "Новый пароль не соответствует требованиям" << std::endl;
+                return;
             }
-
-            std::cout << "РќРѕРІС‹Р№ СЃС‚Р°С‚СѓСЃ (user/admin, РѕСЃС‚Р°РІСЊ РїСѓСЃС‚С‹Рј, С‡С‚РѕР±С‹ РЅРµ РјРµРЅСЏС‚СЊ): ";
-            Getline(new_status);
-            if (!new_status.empty() && (new_status == "user" || new_status == "admin")) {
-                u.status = new_status;
-            }
+            u->password = new_password;
             save_to_file();
-            std::cout << "Р”Р°РЅРЅС‹Рµ РѕР±РЅРѕРІР»РµРЅС‹\n";
+            std::cout << "Пароль успешно изменён." << std::endl;
             return;
         }
     }
-    std::cerr << "РџРѕР»СЊР·РѕРІР°С‚РµР»СЊ РЅРµ РЅР°Р№РґРµРЅ\n";
+    std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
+}
+
+void AuthSystemUser::user_status_change() {
+    std::string name, password, status, new_status;
+    std::cout << "Введите логин пользователя: ";
+    Getline(name);
+    std::cout << "Введите пароль: ";
+    Getline(password);
+    std::cout << "Введите текущий статус: ";
+    Getline(status);
+
+    for (auto& u : users) {
+        if (u->username == name && u->password == password && u->status == status) {
+
+            if (u->status == "superadmin") {
+                std::cerr << "Нельзя изменить статус суперадминистратора" << std::endl;
+                return;
+            }
+            std::cout << "Введите новый статус (admin/user): ";
+            std::cin >> new_status;
+            if (new_status != "admin" && new_status != "user") {
+                std::cerr << "Недопустимый статус" << std::endl;
+                return;
+            }
+            u->status = new_status;
+            save_to_file();
+            std::cout << "Статус успешно изменён." << std::endl;
+            return;
+        }
+    }
+    std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
+}
+
+
+void AuthSystemUser::remove_user() {
+    system("cls");
+    if (!currentUser_ || currentUser_->status != "superadmin") {
+        std::cerr << "Только суперадминистратор может удалять пользователей" << std::endl;
+        return;
+    }
+
+    std::string name, password, status;
+    std::cout << "Введите логин пользователя: ";
+    Getline(name);
+    std::cout << "Введите пароль: ";
+    Getline(password);
+    std::cout << "Введите статус: ";
+    Getline(status);
+
+    for (auto it = users.begin(); it != users.end(); ++it) {
+        if ((*it)->username == name && (*it)->password == password && (*it)->status == status) {
+            if ((*it)->status == "superadmin") {
+                std::cerr << "Нельзя удалить суперадминистратора" << std::endl;
+                return;
+            }
+            users.erase(it);
+            save_to_file();
+            std::cout << "Пользователь успешно удалён." << std::endl;
+            return;
+        }
+    }
+    std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
 }

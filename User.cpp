@@ -1,22 +1,44 @@
 #include "User.h"
+#include <iostream>
+#include <memory>
+#include <sstream>
 
-User::User() = default;
-User::User(const std::string& name, const std::string& pass, const std::string& st)
-    : username(name), password(pass), status(st) {}
-
-std::string User::serialize() const {
-    return username + "|" + password + "|" + status;
+SuperAdminUser::SuperAdminUser()
+    : User("SuperAdmin", "admin***123", "superadmin") {
 }
 
-User User::deserialize(const std::string& line) {
-    std::stringstream ss(line);
-    User u;
-    std::getline(ss, u.username, '|');
-    std::getline(ss, u.password, '|');
-    std::getline(ss, u.status);
-    return u;
+std::unique_ptr<User> SuperAdminUser::clone() const {
+    return std::make_unique<SuperAdminUser>(*this);
 }
 
-bool User::operator==(const User& other) const {
-    return username == other.username;
+AdminUser::AdminUser(const std::string& name, const std::string& pass)
+    : User(name, pass, "admin") {
+}
+
+std::unique_ptr<User> AdminUser::clone() const {
+    return std::make_unique<AdminUser>(*this);
+}
+
+RegularUser::RegularUser(const std::string& name, const std::string& pass)
+    : User(name, pass, "user") {
+}
+
+std::unique_ptr<User> RegularUser::clone() const {
+    return std::make_unique<RegularUser>(*this);
+}
+
+std::unique_ptr<User> User::deserialize(const std::string& line) {
+    std::istringstream ss(line);
+    std::string name, pass, currentSt;
+    if (std::getline(ss, name, '|') &&
+        std::getline(ss, pass, '|') &&
+        std::getline(ss, currentSt)) {
+        if (currentSt == "superadmin")
+            return std::make_unique<SuperAdminUser>();
+        else if (currentSt == "admin")
+            return std::make_unique<AdminUser>(name, pass);
+        else if (currentSt == "user")
+            return std::make_unique<RegularUser>(name, pass);
+    }
+    return nullptr;
 }
