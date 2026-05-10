@@ -6,7 +6,7 @@
 
 AuthSystemUser::AuthSystemUser() {
     load_from_file();
-    //Åñëè â ôàéëå íåò ñóïåğàäìèíà, òî ñîçäà¸ì åãî ñ ôèêñèğîâàííûìè äàííûìè !! SuperAdmin", "admin***123", "superadmin
+    //Ğ•ÑĞ»Ğ¸ Ğ² Ñ„Ğ°Ğ¹Ğ»Ğµ Ğ½ĞµÑ‚ ÑÑƒĞ¿ĞµÑ€Ğ°Ğ´Ğ¼Ğ¸Ğ½Ğ°, Ñ‚Ğ¾ ÑĞ¾Ğ·Ğ´Ğ°Ñ‘Ğ¼ ĞµĞ³Ğ¾ Ñ Ñ„Ğ¸ĞºÑĞ¸Ñ€Ğ¾Ğ²Ğ°Ğ½Ğ½Ñ‹Ğ¼Ğ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğ¼Ğ¸ !! SuperAdmin", "admin***123", "superadmin
     bool superExists = false;
     for (const auto& u : users) {
         if (u->status == "superadmin") {
@@ -20,12 +20,12 @@ AuthSystemUser::AuthSystemUser() {
     }
 }
 
-// Çàãğóçêà èç ôàéëà 
+// Ğ—Ğ°Ğ³Ñ€ÑƒĞ·ĞºĞ° Ğ¸Ğ· Ñ„Ğ°Ğ¹Ğ»Ğ° 
 void AuthSystemUser::load_from_file() {
     users.clear();
     std::ifstream in_file("Users.txt");
     if (!in_file.is_open()) {
-        std::cerr << "Îøèáêà îòêğûòèÿ ôàéëà Users.txt" << std::endl;
+        std::cerr << "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚Ğ¸Ñ Ñ„Ğ°Ğ¹Ğ»Ğ° Users.txt" << std::endl;
         return;
     }
     std::string line;
@@ -43,7 +43,7 @@ void AuthSystemUser::load_from_file() {
 void AuthSystemUser::save_to_file() {
     std::ofstream out_file("Users.txt", std::ios::trunc);
     if (!out_file.is_open()) {
-        std::cerr << "Îøèáêà îòêğûòèÿ ôàéëà Users.txt äëÿ çàïèñè" << std::endl;
+        std::cerr << "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ¾Ñ‚ĞºÑ€Ñ‹Ñ‚Ğ¸Ñ Ñ„Ğ°Ğ¹Ğ»Ğ° Users.txt Ğ´Ğ»Ñ Ğ·Ğ°Ğ¿Ğ¸ÑĞ¸" << std::endl;
         return;
     }
     for (const auto& u : users) {
@@ -64,7 +64,7 @@ bool AuthSystemUser::is_valid_username(const std::string& username) const {
 
     for (char c : username) {
         if (!allowed.count(c)) {
-            std::cerr << "Èìÿ ïîëüçîâàòåëÿ ñîäåğæèò íåäîïóñòèìûé ñèìâîë" << std::endl;
+            std::cerr << "Ğ˜Ğ¼Ñ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ¸Ñ‚ Ğ½ĞµĞ´Ğ¾Ğ¿ÑƒÑÑ‚Ğ¸Ğ¼Ñ‹Ğ¹ ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»" << std::endl;
             return false;
         }
     }
@@ -75,18 +75,18 @@ bool AuthSystemUser::is_valid_username(const std::string& username) const {
 bool AuthSystemUser::is_valid_pass(const std::string& password) const {
     if (password.size() < 8) return false;
 
-
+  
     std::unordered_set<char> allowed;
     for (char c = '!'; c <= '~'; ++c) allowed.insert(c);
 
     for (char c : password) {
         if (!allowed.count(c)) {
-            std::cerr << "Íåêîğğåêòíûå ñèìâîëû â ïàğîëå" << std::endl;
+            std::cerr << "ĞĞµĞºĞ¾Ñ€Ñ€ĞµĞºÑ‚Ğ½Ñ‹Ğµ ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ñ‹ Ğ² Ğ¿Ğ°Ñ€Ğ¾Ğ»Ğµ" << std::endl;
             return false;
         }
     }
 
-    // Ñïåöñèìâîëû
+    // Ğ¡Ğ¿ĞµÑ†ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ñ‹
     std::unordered_set<char> specials = {
         '!','@','#','%','^','&','*','(',')','-','_','=','+','/','?',
         '|','\\','\"','\'',',','.','>','<','~','`',':',';','{','}','[',']'
@@ -97,7 +97,7 @@ bool AuthSystemUser::is_valid_pass(const std::string& password) const {
         if (specials.count(c)) ++specialCount;
     }
     if (specialCount < 3) {
-        std::cerr << "Ïàğîëü äîëæåí ñîäåğæàòü íå ìåíåå 3 ñïåöèàëüíûõ ñèìâîëîâ" << std::endl;
+        std::cerr << "ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ°Ñ‚ÑŒ Ğ½Ğµ Ğ¼ĞµĞ½ĞµĞµ 3 ÑĞ¿ĞµÑ†Ğ¸Ğ°Ğ»ÑŒĞ½Ñ‹Ñ… ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ²" << std::endl;
         return false;
     }
     return true;
@@ -113,76 +113,76 @@ bool AuthSystemUser::user_exists(const std::string& username) const {
 
 User* AuthSystemUser::login() {
     std::string username, password;
-    std::cout << "Ââåäèòå ëîãèí: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ»Ğ¾Ğ³Ğ¸Ğ½: ";
     Getline(username);
-    std::cout << "Ââåäèòå ïàğîëü: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
     Getline(password);
 
     if (!check_bot.verify()) {
-        std::cerr << "Îøèáêà àâòîğèçàöèè (êàï÷à)" << std::endl;
+        std::cerr << "ĞÑˆĞ¸Ğ±ĞºĞ° Ğ°Ğ²Ñ‚Ğ¾Ñ€Ğ¸Ğ·Ğ°Ñ†Ğ¸Ğ¸ (ĞºĞ°Ğ¿Ñ‡Ğ°)" << std::endl;
         return nullptr;
     }
 
     for (auto& u : users) {
         if (u->username == username && u->password == password) {
             Logger::log_attempt(username, true);
-            std::cout << "Äîáğî ïîæàëîâàòü, " << username << "!" << std::endl;
+            std::cout << "Ğ”Ğ¾Ğ±Ñ€Ğ¾ Ğ¿Ğ¾Ğ¶Ğ°Ğ»Ğ¾Ğ²Ğ°Ñ‚ÑŒ, " << username << "!" << std::endl;
             currentUser_ = u.get();
             return currentUser_;
         }
     }
 
     Logger::log_attempt(username, false);
-    std::cout << "Íåâåğíûé ëîãèí èëè ïàğîëü" << std::endl;
+    std::cout << "ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ Ğ»Ğ¾Ğ³Ğ¸Ğ½ Ğ¸Ğ»Ğ¸ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ" << std::endl;
     return nullptr;
 }
 
 
 void AuthSystemUser::register_user() {
-
+    
     if (!currentUser_ || currentUser_->status != "superadmin") {
-        std::cerr << "Òîëüêî ñóïåğàäìèíèñòğàòîğ ìîæåò ñîçäàâàòü íîâûõ ïîëüçîâàòåëåé" << std::endl;
+        std::cerr << "Ğ¢Ğ¾Ğ»ÑŒĞºĞ¾ ÑÑƒĞ¿ĞµÑ€Ğ°Ğ´Ğ¼Ğ¸Ğ½Ğ¸ÑÑ‚Ñ€Ğ°Ñ‚Ğ¾Ñ€ Ğ¼Ğ¾Ğ¶ĞµÑ‚ ÑĞ¾Ğ·Ğ´Ğ°Ğ²Ğ°Ñ‚ÑŒ Ğ½Ğ¾Ğ²Ñ‹Ñ… Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹" << std::endl;
         return;
     }
 
     std::string username, password;
-    std::cout << "Ââåäèòå ëîãèí íîâîãî ïîëüçîâàòåëÿ: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ»Ğ¾Ğ³Ğ¸Ğ½ Ğ½Ğ¾Ğ²Ğ¾Ğ³Ğ¾ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ: ";
     Getline(username);
 
     if (!is_valid_username(username)) {
-        std::cerr << "Ëîãèí äîëæåí áûòü îò 5 äî 20 ñèìâîëîâ, òîëüêî áóêâû è öèôğû" << std::endl;
+        std::cerr << "Ğ›Ğ¾Ğ³Ğ¸Ğ½ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ Ğ±Ñ‹Ñ‚ÑŒ Ğ¾Ñ‚ 5 Ğ´Ğ¾ 20 ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ², Ñ‚Ğ¾Ğ»ÑŒĞºĞ¾ Ğ±ÑƒĞºĞ²Ñ‹ Ğ¸ Ñ†Ğ¸Ñ„Ñ€Ñ‹" << std::endl;
         return;
     }
 
     if (user_exists(username)) {
-        std::cerr << "Ïîëüçîâàòåëü ñ òàêèì ëîãèíîì óæå ñóùåñòâóåò" << std::endl;
+        std::cerr << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ñ Ñ‚Ğ°ĞºĞ¸Ğ¼ Ğ»Ğ¾Ğ³Ğ¸Ğ½Ğ¾Ğ¼ ÑƒĞ¶Ğµ ÑÑƒÑ‰ĞµÑÑ‚Ğ²ÑƒĞµÑ‚" << std::endl;
         return;
     }
 
-    std::cout << "Ââåäèòå ïàğîëü: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
     Getline(password);
 
     if (!is_valid_pass(password)) {
-        std::cerr << "Ïàğîëü äîëæåí áûòü íå ìåíåå 8 ñèìâîëîâ è ñîäåğæàòü ìèíèìóì 3 ñïåöñèìâîëà" << std::endl;
+        std::cerr << "ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ Ğ´Ğ¾Ğ»Ğ¶ĞµĞ½ Ğ±Ñ‹Ñ‚ÑŒ Ğ½Ğµ Ğ¼ĞµĞ½ĞµĞµ 8 ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ¾Ğ² Ğ¸ ÑĞ¾Ğ´ĞµÑ€Ğ¶Ğ°Ñ‚ÑŒ Ğ¼Ğ¸Ğ½Ğ¸Ğ¼ÑƒĞ¼ 3 ÑĞ¿ĞµÑ†ÑĞ¸Ğ¼Ğ²Ğ¾Ğ»Ğ°" << std::endl;
         return;
     }
 
-    std::cout << "Âûáåğèòå ñòàòóñ:\n1 - Îáû÷íûé ïîëüçîâàòåëü\n2 - Àäìèíèñòğàòîğ\nÂûáîğ: ";
+    std::cout << "Ğ’Ñ‹Ğ±ĞµÑ€Ğ¸Ñ‚Ğµ ÑÑ‚Ğ°Ñ‚ÑƒÑ:\n1 - ĞĞ±Ñ‹Ñ‡Ğ½Ñ‹Ğ¹ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ\n2 - ĞĞ´Ğ¼Ğ¸Ğ½Ğ¸ÑÑ‚Ñ€Ğ°Ñ‚Ğ¾Ñ€\nĞ’Ñ‹Ğ±Ğ¾Ñ€: ";
     std::string choose;
     Getline(choose);
 
-    if (choose != "1" && choose != "2") // äîáàâèòü âûõîä exit
+    if (choose != "1" && choose != "2") // Ğ´Ğ¾Ğ±Ğ°Ğ²Ğ¸Ñ‚ÑŒ Ğ²Ñ‹Ñ…Ğ¾Ğ´ exit
     {
-        std::cerr << "Îøèáêà! Íåâåğíûé âûáîğ\n";
+        std::cerr << "ĞÑˆĞ¸Ğ±ĞºĞ°! ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ Ğ²Ñ‹Ğ±Ğ¾Ñ€\n";
         return;
     }
 
-
+ 
     std::unique_ptr<User> newUser;
     if (choose == "1")
     {
         newUser = std::make_unique<RegularUser>(username, password);
-
+       
     }
     else if (choose == "2")
     {
@@ -194,31 +194,29 @@ void AuthSystemUser::register_user() {
     users.push_back(std::move(newUser));
     save_to_file();
     Logger::log_attempt(username, true);
-    std::cout << "Ïîëüçîâàòåëü óñïåøíî çàğåãèñòğèğîâàí." << std::endl;
+    std::cout << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ·Ğ°Ñ€ĞµĞ³Ğ¸ÑÑ‚Ñ€Ğ¸Ñ€Ğ¾Ğ²Ğ°Ğ½." << std::endl;
 }
 
 
 void AuthSystemUser::show_all_users() {
-    system("cls");
-    std::cout << "Ñïèñîê ïîëüçîâàòåëåé:" << std::endl;
+    std::cout << "Ğ¡Ğ¿Ğ¸ÑĞ¾Ğº Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹:" << std::endl;
     for (const auto& u : users) {
-        std::cout << "Ëîãèí: " << u->username
-            << ", Ñòàòóñ: " << u->status << std::endl;
+        std::cout << "Ğ›Ğ¾Ğ³Ğ¸Ğ½: " << u->username
+            << ", Ğ¡Ñ‚Ğ°Ñ‚ÑƒÑ: " << u->status << std::endl;
     }
 }
 
 
 void AuthSystemUser::change_user() {
-    system("cls");
     if (!currentUser_ || currentUser_->status != "superadmin") {
-        std::cerr << "Òîëüêî superadmin ìîæåò èçìåíÿòü ïîëüçîâàòåëåé" << std::endl;
+        std::cerr << "Ğ¢Ğ¾Ğ»ÑŒĞºĞ¾ superadmin Ğ¼Ğ¾Ğ¶ĞµÑ‚ Ğ¸Ğ·Ğ¼ĞµĞ½ÑÑ‚ÑŒ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹" << std::endl;
         return;
     }
 
-    std::cout << "1. Èçìåíèòü ïàğîëü\n2. Èçìåíèòü ñòàòóñ\nÂûáîğ: ";
+    std::cout << "1. Ğ˜Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ\n2. Ğ˜Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ ÑÑ‚Ğ°Ñ‚ÑƒÑ\nĞ’Ñ‹Ğ±Ğ¾Ñ€: ";
     std::string choose;
     Getline(choose);
-
+  
     if (choose == "1") {
         user_pass_change();
     }
@@ -226,96 +224,95 @@ void AuthSystemUser::change_user() {
         user_status_change();
     }
     else {
-        std::cerr << "Îøèáêà! Íåâåğíûé âûáîğ" << std::endl;
+        std::cerr << "ĞÑˆĞ¸Ğ±ĞºĞ°! ĞĞµĞ²ĞµÑ€Ğ½Ñ‹Ğ¹ Ğ²Ñ‹Ğ±Ğ¾Ñ€" << std::endl;
         return;
     }
 }
 
 void AuthSystemUser::user_pass_change() {
-    system("cls");
-    std::string name, password, status, new_password;
-    std::cout << "Ââåäèòå ëîãèí ïîëüçîâàòåëÿ: ";
+  
+    std::string name, password , status, new_password;
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ»Ğ¾Ğ³Ğ¸Ğ½ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ: ";
     Getline(name);
-    std::cout << "Ââåäèòå òåêóùèé ïàğîëü: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ñ‚ĞµĞºÑƒÑ‰Ğ¸Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
     Getline(password);
-    std::cout << "Ââåäèòå òåêóùèé ñòàòóñ: ";
-    Getline(status);
-
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ñ‚ĞµĞºÑƒÑ‰Ğ¸Ğ¹ ÑÑ‚Ğ°Ñ‚ÑƒÑ: ";
+     Getline(status);
+    
     for (auto& u : users) {
         if (u->username == name && u->password == password && u->status == status) {
-            std::cout << "Ââåäèòå íîâûé ïàğîëü: ";
+            std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ½Ğ¾Ğ²Ñ‹Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
             std::cin >> new_password;
             if (!is_valid_pass(new_password)) {
-                std::cerr << "Íîâûé ïàğîëü íå ñîîòâåòñòâóåò òğåáîâàíèÿì" << std::endl;
+                std::cerr << "ĞĞ¾Ğ²Ñ‹Ğ¹ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ Ğ½Ğµ ÑĞ¾Ğ¾Ñ‚Ğ²ĞµÑ‚ÑÑ‚Ğ²ÑƒĞµÑ‚ Ñ‚Ñ€ĞµĞ±Ğ¾Ğ²Ğ°Ğ½Ğ¸ÑĞ¼" << std::endl;
                 return;
             }
             u->password = new_password;
             save_to_file();
-            std::cout << "Ïàğîëü óñïåøíî èçìåí¸í." << std::endl;
+            std::cout << "ĞŸĞ°Ñ€Ğ¾Ğ»ÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ¸Ğ·Ğ¼ĞµĞ½Ñ‘Ğ½." << std::endl;
             return;
         }
     }
-    std::cerr << "Ïîëüçîâàòåëü íå íàéäåí èëè äàííûå íå ñîâïàäàşò" << std::endl;
+    std::cerr << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½ Ğ¸Ğ»Ğ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ½Ğµ ÑĞ¾Ğ²Ğ¿Ğ°Ğ´Ğ°ÑÑ‚" << std::endl;
 }
 
 void AuthSystemUser::user_status_change() {
     std::string name, password, status, new_status;
-    std::cout << "Ââåäèòå ëîãèí ïîëüçîâàòåëÿ: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ»Ğ¾Ğ³Ğ¸Ğ½ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ: ";
     Getline(name);
-    std::cout << "Ââåäèòå ïàğîëü: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
     Getline(password);
-    std::cout << "Ââåäèòå òåêóùèé ñòàòóñ: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ñ‚ĞµĞºÑƒÑ‰Ğ¸Ğ¹ ÑÑ‚Ğ°Ñ‚ÑƒÑ: ";
     Getline(status);
 
     for (auto& u : users) {
         if (u->username == name && u->password == password && u->status == status) {
-
+            
             if (u->status == "superadmin") {
-                std::cerr << "Íåëüçÿ èçìåíèòü ñòàòóñ ñóïåğàäìèíèñòğàòîğà" << std::endl;
+                std::cerr << "ĞĞµĞ»ÑŒĞ·Ñ Ğ¸Ğ·Ğ¼ĞµĞ½Ğ¸Ñ‚ÑŒ ÑÑ‚Ğ°Ñ‚ÑƒÑ ÑÑƒĞ¿ĞµÑ€Ğ°Ğ´Ğ¼Ğ¸Ğ½Ğ¸ÑÑ‚Ñ€Ğ°Ñ‚Ğ¾Ñ€Ğ°" << std::endl;
                 return;
             }
-            std::cout << "Ââåäèòå íîâûé ñòàòóñ (admin/user): ";
+            std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ½Ğ¾Ğ²Ñ‹Ğ¹ ÑÑ‚Ğ°Ñ‚ÑƒÑ (admin/user): ";
             std::cin >> new_status;
             if (new_status != "admin" && new_status != "user") {
-                std::cerr << "Íåäîïóñòèìûé ñòàòóñ" << std::endl;
+                std::cerr << "ĞĞµĞ´Ğ¾Ğ¿ÑƒÑÑ‚Ğ¸Ğ¼Ñ‹Ğ¹ ÑÑ‚Ğ°Ñ‚ÑƒÑ" << std::endl;
                 return;
             }
             u->status = new_status;
             save_to_file();
-            std::cout << "Ñòàòóñ óñïåøíî èçìåí¸í." << std::endl;
+            std::cout << "Ğ¡Ñ‚Ğ°Ñ‚ÑƒÑ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ Ğ¸Ğ·Ğ¼ĞµĞ½Ñ‘Ğ½." << std::endl;
             return;
         }
     }
-    std::cerr << "Ïîëüçîâàòåëü íå íàéäåí èëè äàííûå íå ñîâïàäàşò" << std::endl;
+    std::cerr << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½ Ğ¸Ğ»Ğ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ½Ğµ ÑĞ¾Ğ²Ğ¿Ğ°Ğ´Ğ°ÑÑ‚" << std::endl;
 }
 
 
 void AuthSystemUser::remove_user() {
-    system("cls");
     if (!currentUser_ || currentUser_->status != "superadmin") {
-        std::cerr << "Òîëüêî ñóïåğàäìèíèñòğàòîğ ìîæåò óäàëÿòü ïîëüçîâàòåëåé" << std::endl;
+        std::cerr << "Ğ¢Ğ¾Ğ»ÑŒĞºĞ¾ ÑÑƒĞ¿ĞµÑ€Ğ°Ğ´Ğ¼Ğ¸Ğ½Ğ¸ÑÑ‚Ñ€Ğ°Ñ‚Ğ¾Ñ€ Ğ¼Ğ¾Ğ¶ĞµÑ‚ ÑƒĞ´Ğ°Ğ»ÑÑ‚ÑŒ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ĞµĞ¹" << std::endl;
         return;
     }
 
     std::string name, password, status;
-    std::cout << "Ââåäèòå ëîãèí ïîëüçîâàòåëÿ: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ»Ğ¾Ğ³Ğ¸Ğ½ Ğ¿Ğ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»Ñ: ";
     Getline(name);
-    std::cout << "Ââåäèòå ïàğîëü: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ Ğ¿Ğ°Ñ€Ğ¾Ğ»ÑŒ: ";
     Getline(password);
-    std::cout << "Ââåäèòå ñòàòóñ: ";
+    std::cout << "Ğ’Ğ²ĞµĞ´Ğ¸Ñ‚Ğµ ÑÑ‚Ğ°Ñ‚ÑƒÑ: ";
     Getline(status);
 
     for (auto it = users.begin(); it != users.end(); ++it) {
         if ((*it)->username == name && (*it)->password == password && (*it)->status == status) {
             if ((*it)->status == "superadmin") {
-                std::cerr << "Íåëüçÿ óäàëèòü ñóïåğàäìèíèñòğàòîğà" << std::endl;
+                std::cerr << "ĞĞµĞ»ÑŒĞ·Ñ ÑƒĞ´Ğ°Ğ»Ğ¸Ñ‚ÑŒ ÑÑƒĞ¿ĞµÑ€Ğ°Ğ´Ğ¼Ğ¸Ğ½Ğ¸ÑÑ‚Ñ€Ğ°Ñ‚Ğ¾Ñ€Ğ°" << std::endl;
                 return;
             }
             users.erase(it);
             save_to_file();
-            std::cout << "Ïîëüçîâàòåëü óñïåøíî óäàë¸í." << std::endl;
+            std::cout << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ ÑƒÑĞ¿ĞµÑˆĞ½Ğ¾ ÑƒĞ´Ğ°Ğ»Ñ‘Ğ½." << std::endl;
             return;
         }
     }
-    std::cerr << "Ïîëüçîâàòåëü íå íàéäåí èëè äàííûå íå ñîâïàäàşò" << std::endl;
+    std::cerr << "ĞŸĞ¾Ğ»ÑŒĞ·Ğ¾Ğ²Ğ°Ñ‚ĞµĞ»ÑŒ Ğ½Ğµ Ğ½Ğ°Ğ¹Ğ´ĞµĞ½ Ğ¸Ğ»Ğ¸ Ğ´Ğ°Ğ½Ğ½Ñ‹Ğµ Ğ½Ğµ ÑĞ¾Ğ²Ğ¿Ğ°Ğ´Ğ°ÑÑ‚" << std::endl;
 }

@@ -14,18 +14,18 @@ void LoginSystem::launch()
     std::string choose;
 
     while (true) {
-        std::cout << "\n\n\n\t\t\tÀïðåëüñêîå âîçâðàùåíèå\n\n\n";
-        std::cout << "1 - Âõîä\n2- Âûõîä\nÂûáîð: ";
+        std::cout << "\n\n\n\t\t\tÐÐ¿Ñ€ÐµÐ»ÑŒÑÐºÐ¾Ðµ Ð²Ð¾Ð·Ð²Ñ€Ð°Ñ‰ÐµÐ½Ð¸Ðµ\n\n\n";
+        std::cout << "1 - Ð’Ñ…Ð¾Ð´\n2- Ð’Ñ‹Ñ…Ð¾Ð´\nÐ’Ñ‹Ð±Ð¾Ñ€: ";
         Getline(choose);
         if (choose == "1")
         {
             User* loggerUser = asu.login();
-
-            if (loggerUser)
-            {
-                get_start.setAuthSystem(&asu);
-                get_start.start(loggerUser->status);
-            }
+            
+                if (loggerUser)
+                {
+                    get_start.setAuthSystem(&asu);
+                    get_start.start(loggerUser->status);
+                }
         }
         else if (choose == "2")
         {
@@ -33,13 +33,13 @@ void LoginSystem::launch()
         }
         else
         {
-            std::cerr << "Íåâåðíûé âûáîð!\n";
+            std::cerr << "ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ð²Ñ‹Ð±Ð¾Ñ€!\n";
         }
     }
-
+    
 }
 
 void LoginSystem::exit_button() {
-    std::cout << "Çàâåðøåíèå ïðîãðàììû" << std::endl;
+    std::cout << "Ð—Ð°Ð²ÐµÑ€ÑˆÐµÐ½Ð¸Ðµ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹" << std::endl;
     exit(0);
 }

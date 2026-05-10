@@ -127,13 +127,13 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
     else if (prize >= 96 && prize <= 100) {
         total_sum = 0;
         std::cout << "ДЖЕКПОТ: Покупка бесплатно!" << std::endl;
-    }
+    }    
     else {
         std::cout << "Увы, в этот раз без приза" << std::endl;
         total_sum += 1000;
         std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-    }
+    }    
 
     total_sum -= discount;
     if (total_sum < 0) total_sum = 0;

@@ -19,15 +19,24 @@ public:
     void load_from_file(const std::string& product_database);
     void save_to_file(const std::string& product_database);
     void add_product();
-    void show_all();
+    void show_all();                               
+    void show_all_from_file(const std::string& filename); 
     void start(const std::string& userStatus);
     void check_expired_products();
     void show_valid_products();
     void super_admin_menu();
     void admin_menu();
     void user_menu();
+
+
+    //void remove_product();          // списание товара
+    //void change_price();            // изменение цены
+    //void edit_storage_menu();       // подменю редактирования склада
+    //void report();                  // отчёт
+    //void supplies();                
+
 private:
-    bool check_characteristics(const Product& analyse_product);
+    
     bool is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str);
     bool validate_dates(const std::string& begin_date, const std::string& end_date);
     bool is_expired(const std::string& end_date_str);
@@ -35,4 +44,4 @@ private:
     std::string format_field(std::string str, std::size_t width) const;
 };
 
-#endif // STORAGE_H
+#endif

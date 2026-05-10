@@ -1,6 +1,6 @@
 #include "Captcha.h"
 #include "Product.h"
-
+ 
 
 void Captcha::generate() {
 
@@ -19,15 +19,15 @@ void Captcha::generate() {
 }
 
 bool Captcha::verify() {
-
+ 
     std::string chooseCapha;
     for (int attemp = 0; attemp < 5; ++attemp)
     {
         generate();
-        std::cout << "Ââåäèòå êàï÷ó: " << code << "\n";
+        std::cout << "Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÐºÐ°Ð¿Ñ‡Ñƒ: " << code << "\n";
         Getline(chooseCapha);
         if (chooseCapha == code) return true;
-        std::cerr << "Îøèáêà! Íåâåðíûé êîä. Îñòàëîñü ïîïûòîê: " << (4 - attemp) << "\n";
+        std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°! ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ ÐºÐ¾Ð´. ÐžÑÑ‚Ð°Ð»Ð¾ÑÑŒ Ð¿Ð¾Ð¿Ñ‹Ñ‚Ð¾Ðº: " << (4 - attemp) << "\n";
 
 
     }

@@ -11,7 +11,7 @@ Product::Product(const Product& other) {
     this->manufacturer = other.manufacturer;
     this->country = other.country;
 }
-Product::Product() : name(), category(), price(0.0), article(0), begin_date(), end_date(), count(0), manufacturer(), country() {}
+Product::Product() : name (), category(), price(0.0), article(0), begin_date(), end_date(), count(0), manufacturer(), country() {}
 bool Product::operator==(const Product& other) const {
     return name == other.name && category == other.category && article == other.article;
 }

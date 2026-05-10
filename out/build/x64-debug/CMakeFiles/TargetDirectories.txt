@@ -1,0 +1,6 @@
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/SeniorShop.dir
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/edit_cache.dir
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/rebuild_cache.dir
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/list_install_components.dir
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/install.dir
+C:/Users/admin/Videos/ShopFIx-master/SeniorShop-Fixing/out/build/x64-debug/CMakeFiles/install/local.dir

@@ -1,15 +1,15 @@
 #include "Logger.h"
 
 void Logger::log_attempt(const std::string& username, bool success) {
-    std::ofstream log_file("Logs.txt", std::ios::app); //дозапись
+    std::ofstream log_file("Logs.txt", std::ios::app); //РґРѕР·Р°РїРёСЃСЊ
     if (!log_file.is_open()) {
-        std::cerr << "Ошибка открытия файла логов" << std::endl;
+        std::cerr << "РћС€РёР±РєР° РѕС‚РєСЂС‹С‚РёСЏ С„Р°Р№Р»Р° Р»РѕРіРѕРІ" << std::endl;
         return;
     }
     auto now = std::chrono::system_clock::now();
     std::string time_buffer = std::format("{:%Y-%m-%d %H:%M:%S}", now);
     log_file << time_buffer
-        << " | Имя пользователя: " << username
-        << " | Результат: " << (success ? "true" : "false")
+        << " | РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ: " << username
+        << " | Р РµР·СѓР»СЊС‚Р°С‚: " << (success ? "true" : "false")
         << std::endl;
 }

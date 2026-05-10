@@ -4,6 +4,7 @@
 #include <iomanip>
 #include "AuthSystemUser.h"
 #include "methodsSuperAdmin.h"
+#include <cctype>
 
 void Storage::setAuthSystem(AuthSystemUser* auth)
 {
@@ -11,26 +12,26 @@ void Storage::setAuthSystem(AuthSystemUser* auth)
 }
 
 void Storage::load_from_file(const std::string& product_database) {
-    std::ifstream input(product_database);
-    if (!input.is_open()) {
-        std::cerr << "Îøèáêà îòêðûòèÿ ôàéëà '" << product_database << "'" << std::endl;
-        return;
+        std::ifstream input(product_database);
+        if (!input.is_open()) {
+           
+            return;
+        }
+        goods.clear();
+        Product product;
+        while (input >> product.name >> product.category >> product.price
+               >> product.article >> product.begin_date >> product.end_date
+               >> product.count >> product.manufacturer >> product.country) {
+            goods.push_back(product);
+        }
+        input.close();
+        std::cout << "Ð‘Ñ‹Ð»Ð¾ ÑÑ‡Ð¸Ñ‚Ð°Ð½Ð¾ Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ñ Ð±Ð°Ð·Ñ‹ Ð´Ð°Ð½Ð½Ñ‹Ñ…: " << goods.size() << std::endl;
     }
-    goods.clear();
-    Product product;
-    while (input >> product.name >> product.category >> product.price
-        >> product.article >> product.begin_date >> product.end_date
-        >> product.count >> product.manufacturer >> product.country) {
-        goods.push_back(product);
-    }
-    input.close();
-    std::cout << "Áûëî ñ÷èòàíî òîâàðîâ ñ áàçû äàííûõ: " << goods.size() << std::endl;
-}
 
 void Storage::save_to_file(const std::string& product_database) {
     std::ofstream output(product_database);
     if (!output.is_open()) {
-        std::cerr << "Îøèáêà îòêðûòèÿ ôàéëà" << std::endl;
+         std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¾Ñ‚ÐºÑ€Ñ‹Ñ‚Ð¸Ñ Ñ„Ð°Ð¹Ð»Ð°" << std::endl;
         return;
     }
     for (const auto& write_product : goods) {
@@ -39,167 +40,98 @@ void Storage::save_to_file(const std::string& product_database) {
             << write_product.count << ' ' << write_product.manufacturer << ' ' << write_product.country << '\n';
     }
     output.close();
-    std::cout << "Áûëî çàïèñàíî " << goods.size() << " òîâàðîâ â áàçó äàííûõ" << std::endl;
+    std::cout << "Ð‘Ñ‹Ð»Ð¾ Ð·Ð°Ð¿Ð¸ÑÐ°Ð½Ð¾ " << goods.size() << " Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð² Ð±Ð°Ð·Ñƒ Ð´Ð°Ð½Ð½Ñ‹Ñ…" << std::endl;
 }
 void Storage::super_admin_menu() {
     while (true)
     {
-        std::cout << "Ñïèñîê äåéñòâèé äëÿ ñóïåð àäìèíà:\n";
-        std::cout << "1) Äîáàâèòü ïðîäàæó\n";
-        std::cout << "2) Ïîêàçàòü ñêëàä\n";
-        std::cout << "3) Ïîïîëíèòü ñêëàä\n";
-        std::cout << "4) Ñïèñàòü òîâàð ñî ñêëàäà\n";
-        std::cout << "5) Èçìåíèòü öåíó òîâàðà\n";
-        std::cout << "6) Ðåäàêòèðîâàòü ñêëàä\n";
-        std::cout << "7) Ðåäàêòèðîâàòü ïåðñîíàë\n";
-        std::cout << "8) Îò÷åò\n";
-        std::cout << "9) Ïîñòàâêè\n";
-        std::cout << "0) Âûõîä\n";
-        std::cout << "Âûáåðèòå äåéñòâèå: ";
+        std::cout << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹ Ð´Ð»Ñ ÑÑƒÐ¿ÐµÑ€ Ð°Ð´Ð¼Ð¸Ð½Ð°:\n";
+        std::cout << "1) Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ñƒ\n";
+        std::cout << "2) ÐŸÐ¾ÐºÐ°Ð·Ð°Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "3) ÐŸÐ¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "4) Ð¡Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ñ‚Ð¾Ð²Ð°Ñ€ ÑÐ¾ ÑÐºÐ»Ð°Ð´Ð°\n";
+        std::cout << "5) Ð˜Ð·Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ñ†ÐµÐ½Ñƒ Ñ‚Ð¾Ð²Ð°Ñ€Ð°\n";
+        std::cout << "6) Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "7) Ð ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ñ‚ÑŒ Ð¿ÐµÑ€ÑÐ¾Ð½Ð°Ð»\n";
+        std::cout << "8) ÐžÑ‚Ñ‡ÐµÑ‚\n";
+        std::cout << "9) ÐŸÐ¾ÑÑ‚Ð°Ð²ÐºÐ¸\n";
+        std::cout << "0) Ð’Ñ‹Ñ…Ð¾Ð´\n";
+        std::cout << "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ: ";
         std::string choose;
         Getline(choose);
         if (choose.size() != 1 || choose[0] < '0' || choose[0] > '9') {
-            std::cerr << "Îøèáêà! Ââåäèòå îäíó öèôðó îò 0 äî 9.\n";
+            std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°! Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¾Ð´Ð½Ñƒ Ñ†Ð¸Ñ„Ñ€Ñƒ Ð¾Ñ‚ 0 Ð´Ð¾ 9.\n";
             system("pause");
             continue;
         }
-        if (choose == "0")
-        {
-            // âûõîä
-        }
-        else if (choose == "1")
-        {
-            // ïðîäàæè
-        }
-        else if (choose == "2")
-        {
-            show_all();
-        }
-        else if (choose == "3")
-        {
-            add_product();
-
-        }
-        else if (choose == "4")
-        {
-
-        }
-        else if (choose == "5")
-        {
-
-        }
-        else if (choose == "6")
-        {
-
-        }
-        else if (choose == "7")
-        {
-            StorageUserMethod(authSystem);
-        }
-        else if (choose == "8")
-        {
-
-        }
-        else if (choose == "9")
-        {
-
-        }
-
+    
+        if (choose == "0") break;   // Ð²Ñ‹Ñ…Ð¾Ð´
+        else if (choose == "1") { /* Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ð° */ }
+        else if (choose == "2") show_all_from_file("Product.txt");
+        else if (choose == "3") add_product();
+        else if (choose == "4") { /* ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ */ }
+        else if (choose == "5") { /* Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ†ÐµÐ½Ñ‹ */ }
+        else if (choose == "6") { /* Ñ€ÐµÐ´Ð°ÐºÑ‚Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ ÑÐºÐ»Ð°Ð´Ð° â€“ Ð¿Ð¾ÐºÐ° Ð¿ÑƒÑÑ‚Ð¾ */ }
+        else if (choose == "7") StorageUserMethod(authSystem);
+        else if (choose == "8") { /* Ð¾Ñ‚Ñ‡Ñ‘Ñ‚ */ }
+        else if (choose == "9") { /* Ð¿Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ */ }
+        else std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð²Ð²Ð¾Ð´Ð°\n";
     }
 }
 void Storage::admin_menu() {
     while (true)
     {
-
-
-        std::cout << "Ñïèñîê äåéñòâèé äëÿ àäìèíà:\n";
-        std::cout << "1) Íà÷àòü ïðîäàæó\n";
-        std::cout << "2) Ïîêàçàòü ñêëàä\n";
-        std::cout << "3) Ïîïîëíèòü ñêëàä\n";
-        std::cout << "4) Ïîïîëíèòü òîâàð\n";
-        std::cout << "5) Ñïèñàòü òîâàð\n";
-        std::cout << "6) Îò÷åò\n";
-        std::cout << "7) Ïîñòàâêè\n";
-        std::cout << "0) Âûõîä\n";;
-        std::cout << "Âûáåðèòå äåéñòâèå: ";
+        std::cout << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹ Ð´Ð»Ñ Ð°Ð´Ð¼Ð¸Ð½Ð°:\n";
+        std::cout << "1) ÐÐ°Ñ‡Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ñƒ\n";
+        std::cout << "2) ÐŸÐ¾ÐºÐ°Ð·Ð°Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "3) ÐŸÐ¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "4) ÐŸÐ¾Ð¿Ð¾Ð»Ð½Ð¸Ñ‚ÑŒ Ñ‚Ð¾Ð²Ð°Ñ€\n";
+        std::cout << "5) Ð¡Ð¿Ð¸ÑÐ°Ñ‚ÑŒ Ñ‚Ð¾Ð²Ð°Ñ€\n";
+        std::cout << "6) ÐžÑ‚Ñ‡ÐµÑ‚\n";
+        std::cout << "7) ÐŸÐ¾ÑÑ‚Ð°Ð²ÐºÐ¸\n";
+        std::cout << "0) Ð’Ñ‹Ñ…Ð¾Ð´\n";;
+        std::cout << "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ: ";
         std::string choose;
         Getline(choose);
-        if (choose.size() != 1 || choose[0] < '0' || choose[0] > '9') {
-            std::cerr << "Îøèáêà! Ââåäèòå îäíó öèôðó îò 0 äî 9.\n";
+        if (choose.size() != 1 || choose[0] < '0' || choose[0] > '7') {
+            std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°! Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¾Ð´Ð½Ñƒ Ñ†Ð¸Ñ„Ñ€Ñƒ Ð¾Ñ‚ 0 Ð´Ð¾ 7.\n";
             system("pause");
             continue;
         }
-        if (choose == "0")
-        {
-            // âûõîä
-        }
-        else if (choose == "1")
-        {
-            // ïðîäàæè
-        }
-        else if (choose == "2")
-        {
-            show_all();
-        }
-        else if (choose == "3")
-        {
-            add_product();
-        }
-        else if (choose == "4")
-        {
-
-        }
-        else if (choose == "5")
-        {
-
-        }
-        else if (choose == "6")
-        {
-
-        }
-        else if (choose == "7")
-        {
-
-        }
+        if (choose == "0") break;
+        else if (choose == "1") { /* Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ð° */ }
+        else if (choose == "2") show_all_from_file("Product.txt");
+        else if (choose == "3") add_product();
+        else if (choose == "4") { /* ÑÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ */ }
+        else if (choose == "5") { /* Ð¸Ð·Ð¼ÐµÐ½ÐµÐ½Ð¸Ðµ Ñ†ÐµÐ½Ñ‹ */ }
+        else if (choose == "6") { /* Ð¾Ñ‚Ñ‡Ñ‘Ñ‚ */ }
+        else if (choose == "7") { /* Ð¿Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ */ }
+        else std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð²Ð²Ð¾Ð´Ð°\n";
     }
 }
 void Storage::user_menu() {
     while (true)
     {
-        std::cout << "Ñïèñîê äåéñòâèé äëÿ ïîëüçîâàòåëÿ:\n";
-        std::cout << "1) Íà÷àòü ïðîäàæó\n";
-        std::cout << "2) Ïîêàçàòü ñêëàä\n";
-        std::cout << "3) Îò÷åò\n";
-        std::cout << "4) Ïîñòàâêè\n";
-        std::cout << "0) Âûõîä\n";
-        std::cout << "Âûáåðèòå äåéñòâèå: ";
+        std::cout << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ð¹ Ð´Ð»Ñ Ð¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ñ‚ÐµÐ»Ñ:\n";
+        std::cout << "1) ÐÐ°Ñ‡Ð°Ñ‚ÑŒ Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ñƒ\n";
+        std::cout << "2) ÐŸÐ¾ÐºÐ°Ð·Ð°Ñ‚ÑŒ ÑÐºÐ»Ð°Ð´\n";
+        std::cout << "3) ÐžÑ‚Ñ‡ÐµÑ‚\n";
+        std::cout << "4) ÐŸÐ¾ÑÑ‚Ð°Ð²ÐºÐ¸\n";
+        std::cout << "0) Ð’Ñ‹Ñ…Ð¾Ð´\n";
+        std::cout << "Ð’Ñ‹Ð±ÐµÑ€Ð¸Ñ‚Ðµ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ðµ: ";
         std::string choose;
         Getline(choose);
-        if (choose.size() != 1 || choose[0] < '0' || choose[0] > '9') {
-            std::cerr << "Îøèáêà! Ââåäèòå îäíó öèôðó îò 0 äî 9.\n";
+        if (choose.size() != 1 || choose[0] < '0' || choose[0] > '4') {
+            std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°! Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¾Ð´Ð½Ñƒ Ñ†Ð¸Ñ„Ñ€Ñƒ Ð¾Ñ‚ 0 Ð´Ð¾ 4.\n";
             system("pause");
             continue;
         }
-        if (choose == "0")
-        {
-            // âûõîä
-        }
-        else if (choose == "1")
-        {
-            // ïðîäàæè
-        }
-        else if (choose == "2")
-        {
-            show_all();
-        }
-        else if (choose == "3")
-        {
-
-        }
-        else if (choose == "4")
-        {
-
-        }
+        if (choose == "0") break;
+        else if (choose == "1") { /* Ð¿Ñ€Ð¾Ð´Ð°Ð¶Ð° */ }
+        else if (choose == "2") show_all_from_file("Product.txt");
+        else if (choose == "3") { /* Ð¾Ñ‚Ñ‡Ñ‘Ñ‚ */ }
+        else if (choose == "4") { /* Ð¿Ð¾ÑÑ‚Ð°Ð²ÐºÐ¸ */ }
+        else std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð²Ð²Ð¾Ð´Ð°\n";
     }
 }
 void Storage::start(const std::string& userStatus)
@@ -207,8 +139,8 @@ void Storage::start(const std::string& userStatus)
     load_from_file("Product.txt");
     while (true)
     {
-
-
+  
+   
         if (userStatus == "superadmin")
         {
             super_admin_menu();
@@ -221,75 +153,33 @@ void Storage::start(const std::string& userStatus)
         {
             user_menu();
         }
-        std::cout << "Âûáîð äåéñòâèÿ: ";
+        std::cout << "Ð’Ñ‹Ð±Ð¾Ñ€ Ð´ÐµÐ¹ÑÑ‚Ð²Ð¸Ñ: ";
         std::string choose;
         Getline(choose);
-
+          
     }
 }
 
-void Storage::add_product() {
-    Product new_product;
 
-    std::cout << "Äîáàâëåíèå òîâàðà\n";
-    std::cout << "Íàçâàíèå: ";
-    Getline(new_product.name);
-    std::cout << "Êàòåãîðèÿ: ";
-    Getline(new_product.category);
-    std::cout << "Öåíà: ";
-    std::cin >> new_product.price;
-    std::cout << "Àðòèêëü: ";
-    std::cin >> new_product.article;
-    std::cin.ignore();
 
-    bool dates_valid = false;
-    while (!dates_valid) {
-        std::cout << "Íà÷àëî ñðîêà ãîäíîñòè (ÄÄ.ÌÌ.ÃÃÃÃ): ";
-        Getline(new_product.begin_date);
-        std::cout << "Îêîí÷àíèå ñðîêà ãîäíîñòè (ÄÄ.ÌÌ.ÃÃÃÃ): ";
-        Getline(new_product.end_date);
-
-        if (!validate_dates(new_product.begin_date, new_product.end_date)) {
-            std::cout << "Ïîæàëóéñòà, ââåäèòå êîððåêòíûå äàòû çàíîâî.\n";
-        }
-        else {
-            dates_valid = true;
-        }
-    }
-
-    std::cout << "Êîëè÷åñòâî: ";
-    std::cin >> new_product.count;
-    std::cin.ignore();
-    std::cout << "Ïðîèçâîäèòåëü: ";
-    Getline(new_product.manufacturer);
-    std::cout << "Ñòðàíà ïðîèçâîäñòâà: ";
-    Getline(new_product.country);
-
-    if (!check_characteristics(new_product)) return;
-
-    goods.push_back(new_product);
-    std::cout << "Òîâàð '" << new_product.name << "' äîáàâëåí" << std::endl;
-
-    save_to_file("Product.txt");
+void Storage::show_all() 
+{
+  
+if (goods.empty()) {
+    std::cout << "Ð¡ÐºÐ»Ð°Ð´ Ð¿ÑƒÑÑ‚." << std::endl;
+    return;
 }
-
-void Storage::show_all() {
-    if (goods.empty()) {
-        std::cout << "Ñêëàä ïóñò." << std::endl;
-        return;
-    }
-
-    // Êîíñòàíòû øèðèíû êîëîíîê
+    // ÐšÐ¾Ð½ÑÑ‚Ð°Ð½Ñ‚Ñ‹ ÑˆÐ¸Ñ€Ð¸Ð½Ñ‹ ÐºÐ¾Ð»Ð¾Ð½Ð¾Ðº
     const int w_ID = 4, w_name = 16, w_cat = 14, w_price = 10, w_count = 8, w_art = 12;
 
     std::cout << "\n" << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n";
     std::cout << std::left
         << std::setw(w_ID) << "ID"
-        << std::setw(w_name) << "Íàçâàíèå"
-        << std::setw(w_cat) << "Êàòåãîðèÿ"
-        << std::setw(w_price) << "Öåíà"
-        << std::setw(w_count) << "Êîë-âî"
-        << std::setw(w_art) << "Àðòèêëü" << "\n";
+        << std::setw(w_name) << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ"
+        << std::setw(w_cat) << "ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ"
+        << std::setw(w_price) << "Ð¦ÐµÐ½Ð°"
+        << std::setw(w_count) << "ÐšÐ¾Ð»-Ð²Ð¾"
+        << std::setw(w_art) << "ÐÑ€Ñ‚Ð¸ÐºÐ»ÑŒ" << "\n";
     std::cout << std::setfill('-') << std::setw(80) << "" << std::setfill(' ') << "\n";
 
     for (std::size_t i = 0; i < goods.size(); ++i) {
@@ -305,36 +195,43 @@ void Storage::show_all() {
     }
     std::cout << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n\n";
 }
+
+void Storage::show_all_from_file(const std::string& filename)
+{
+    load_from_file(filename);
+    show_all();
+}
+
+
 void Storage::show_valid_products() {
     if (goods.empty()) {
-        std::cerr << "Ñïèñîê òîâàðîâ ïóñòîé" << std::endl;
+        std::cerr << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð¿ÑƒÑÑ‚Ð¾Ð¹" << std::endl;
         return;
     }
     int valid_count = 0;
     for (size_t i = 0; i < goods.size(); ++i) {
         if (!is_expired(goods[i].end_date)) {
             const auto& p = goods[i];
-            std::cout << i + 1 << " | Íàçâàíèå: " << p.name
-                << " | Êàòåãîðèÿ: " << p.category
-                << " | Öåíà: " << p.price
-                << " | Àðòèêëü: " << p.article
-                << " | Ãîäåí äî: " << p.end_date
-                << " | Êîëè÷åñòâî: " << p.count
-                << " | Ïðîèçâîäèòåëü: " << p.manufacturer
-                << " | Ñòðàíà: " << p.country << '\n';
+            std::cout << i + 1 << " | ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ: " << p.name
+                        << " | ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ: " << p.category
+                        << " | Ð¦ÐµÐ½Ð°: " << p.price
+                        << " | ÐÑ€Ñ‚Ð¸ÐºÐ»ÑŒ: " << p.article
+                        << " | Ð“Ð¾Ð´ÐµÐ½ Ð´Ð¾: " << p.end_date
+                        << " | ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾: " << p.count
+                        << " | ÐŸÑ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ: " << p.manufacturer
+                        << " | Ð¡Ñ‚Ñ€Ð°Ð½Ð°: " << p.country << '\n';
             valid_count++;
         }
     }
     if (valid_count == 0) {
-        std::cout << "Íåò ãîäíûõ òîâàðîâ íà ñêëàäå\n";
-    }
-    else {
-        std::cout << "Âñåãî ãîäíûõ òîâàðîâ: " << valid_count << "\n";
+        std::cout << "ÐÐµÑ‚ Ð³Ð¾Ð´Ð½Ñ‹Ñ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð½Ð° ÑÐºÐ»Ð°Ð´Ðµ\n";
+    } else {
+        std::cout << "Ð’ÑÐµÐ³Ð¾ Ð³Ð¾Ð´Ð½Ñ‹Ñ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð²: " << valid_count << "\n";
     }
 }
 void Storage::check_expired_products() {
     if (goods.empty()) {
-        std::cerr << "Ñïèñîê òîâàðîâ ïóñòîé" << std::endl;
+        std::cerr << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð¿ÑƒÑÑ‚Ð¾Ð¹" << std::endl;
         return;
     }
     int expired_count = 0;
@@ -342,18 +239,17 @@ void Storage::check_expired_products() {
     for (size_t i = 0; i < goods.size(); ++i) {
         if (is_expired(goods[i].end_date)) {
             const auto& p = goods[i];
-            std::cout << "Òîâàð ïðîñðî÷åí: " << p.name
-                << "(Àðòèêëü: " << p.article
-                << ", Ãîäåí äî: " << p.end_date << ")\n";
+            std::cout << "Ð¢Ð¾Ð²Ð°Ñ€ Ð¿Ñ€Ð¾ÑÑ€Ð¾Ñ‡ÐµÐ½: " << p.name
+                        << "(ÐÑ€Ñ‚Ð¸ÐºÐ»ÑŒ: " << p.article
+                        << ", Ð“Ð¾Ð´ÐµÐ½ Ð´Ð¾: " << p.end_date << ")\n";
             expired_count++;
         }
     }
 
     if (expired_count == 0) {
-        std::cout << "Ïðîñðî÷åííûõ òîâàðîâ íåò\n";
-    }
-    else {
-        std::cout << "Âñåãî ïðîñðî÷åííûõ òîâàðîâ: " << expired_count << "\n";
+        std::cout << "ÐŸÑ€Ð¾ÑÑ€Ð¾Ñ‡ÐµÐ½Ð½Ñ‹Ñ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð² Ð½ÐµÑ‚\n";
+    } else {
+        std::cout << "Ð’ÑÐµÐ³Ð¾ Ð¿Ñ€Ð¾ÑÑ€Ð¾Ñ‡ÐµÐ½Ð½Ñ‹Ñ… Ñ‚Ð¾Ð²Ð°Ñ€Ð¾Ð²: " << expired_count << "\n";
     }
 }
 
@@ -370,7 +266,7 @@ std::chrono::sys_days Storage::parse_date(const std::string& date_str) {
 
     return std::chrono::sys_days(
         std::chrono::year(year) / std::chrono::month(month) / std::chrono::day(day)
-    );
+        );
 }
 std::string Storage::format_field(std::string str, std::size_t width) const {
     if (str.length() > width) {
@@ -385,9 +281,8 @@ bool Storage::is_expired(const std::string& end_date_str) {
         auto end_date = parse_date(end_date_str);
 
         return end_date < today;
-    }
-    catch (...) {
-        std::cerr << "Îøèáêà ïàðñèíãà äàòû: " << end_date_str << std::endl;
+    } catch (...) {
+        std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ° Ð¿Ð°Ñ€ÑÐ¸Ð½Ð³Ð° Ð´Ð°Ñ‚Ñ‹: " << end_date_str << std::endl;
         return true;
     }
 }
@@ -397,14 +292,13 @@ bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::
         auto end_date = parse_date(end_date_str);
 
         if (begin_date > end_date) {
-            std::cerr << "Äàòà íà÷àëà íå ìîæåò áûòü ïîçæå äàòû îêîí÷àíèÿ!\n";
+            std::cerr << "Ð”Ð°Ñ‚Ð° Ð½Ð°Ñ‡Ð°Ð»Ð° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿Ð¾Ð·Ð¶Ðµ Ð´Ð°Ñ‚Ñ‹ Ð¾ÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ñ!\n";
             return false;
         }
 
         return true;
-    }
-    catch (...) {
-        std::cerr << "Íåâåðíûé ôîðìàò äàòû! Èñïîëüçóéòå ÄÄ.ÌÌ.ÃÃÃÃ\n";
+    } catch (...) {
+        std::cerr << "ÐÐµÐ²ÐµÑ€Ð½Ñ‹Ð¹ Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚ Ð´Ð°Ñ‚Ñ‹! Ð˜ÑÐ¿Ð¾Ð»ÑŒÐ·ÑƒÐ¹Ñ‚Ðµ Ð”Ð”.ÐœÐœ.Ð“Ð“Ð“Ð“\n";
         return false;
     }
 }
@@ -416,72 +310,170 @@ bool Storage::validate_dates(const std::string& begin_date, const std::string& e
         auto today = std::chrono::system_clock::now();
         auto get_end_date = parse_date(end_date);
         auto days_ago = std::chrono::duration_cast<std::chrono::days>(today - get_end_date).count();
-        std::cerr << "Îøèáêà: Òîâàð ïðîñðî÷åí íà " << days_ago
-            << " äíåé (ñðîê ãîäíîñòè èñòåê " << end_date << ")\n";
+        std::cerr << "ÐžÑˆÐ¸Ð±ÐºÐ°: Ð¢Ð¾Ð²Ð°Ñ€ Ð¿Ñ€Ð¾ÑÑ€Ð¾Ñ‡ÐµÐ½ Ð½Ð° " << days_ago
+                    << " Ð´Ð½ÐµÐ¹ (ÑÑ€Ð¾Ðº Ð³Ð¾Ð´Ð½Ð¾ÑÑ‚Ð¸ Ð¸ÑÑ‚ÐµÐº " << end_date << ")\n";
         return false;
     }
     auto get_end_date = parse_date(end_date);
     auto today = std::chrono::system_clock::now();
     auto days_left = duration_cast<std::chrono::days>(get_end_date - today).count();
     if (days_left <= 30 && days_left > 0) {
-        std::cout << "Ñðîê ãîäíîñòè èñòåêàåò ÷åðåç " << days_left << " äíåé!\n";
+        std::cout << "Ð¡Ñ€Ð¾Ðº Ð³Ð¾Ð´Ð½Ð¾ÑÑ‚Ð¸ Ð¸ÑÑ‚ÐµÐºÐ°ÐµÑ‚ Ñ‡ÐµÑ€ÐµÐ· " << days_left << " Ð´Ð½ÐµÐ¹!\n";
     }
     return true;
 }
-bool Storage::check_characteristics(const Product& analyse_product) {
-    auto exist = std::find(goods.begin(), goods.end(), analyse_product);
-    if (exist != goods.end()) {
-        std::cerr << "Òîâàð óæå åñòü\n";
-        return false;
+void Storage::add_product() {
+    Product new_product;
+
+    
+    while (true) {
+        std::cout << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ñ‚Ð¾Ð²Ð°Ñ€Ð° (Ð¿ÑƒÑÑ‚Ð°Ñ ÑÑ‚Ñ€Ð¾ÐºÐ° Ð¸Ð»Ð¸ 'exit' Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹): ";
+        Getline(new_product.name);
+        if (new_product.name.empty() || new_product.name == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        if (new_product.name.size() > 60) {
+            std::cerr << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð»Ð¸Ð½Ð½Ð¾Ðµ (Ð¼Ð°ÐºÑÐ¸Ð¼ÑƒÐ¼ 60 ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð²).\n";
+            continue;
+        }
+        break;
     }
 
-    std::unordered_set<char> available_symbols;
-    for (char s = 'A'; s < 'Z'; ++s) available_symbols.insert(s);
-    for (char s = '0'; s <= '9'; ++s) available_symbols.insert(s);
-    available_symbols.insert('.');
-    available_symbols.insert('-');
-
-    for (auto check_name : analyse_product.name) {
-        if (!available_symbols.count(check_name)) {
-            std::cerr << "Íàçâàíèå òîâàðà èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
+   
+    while (true) {
+        std::cout << "ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ (Ð¿ÑƒÑÑ‚Ð°Ñ ÑÑ‚Ñ€Ð¾ÐºÐ° Ð¸Ð»Ð¸ 'exit' Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹): ";
+        Getline(new_product.category);
+        if (new_product.category.empty() || new_product.category == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
         }
-    }
-    for (auto& check_category : analyse_product.category) {
-        if (!available_symbols.count(check_category)) {
-            std::cerr << "Êàòåãîðèÿ òîâàðà èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
+        if (new_product.category.size() > 50) {
+            std::cerr << "ÐšÐ°Ñ‚ÐµÐ³Ð¾Ñ€Ð¸Ñ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð»Ð¸Ð½Ð½Ð°Ñ (Ð¼Ð°ÐºÑÐ¸Ð¼ÑƒÐ¼ 50 ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð²).\n";
+            continue;
         }
-    }
-    for (auto& check_manufacturer : analyse_product.manufacturer) {
-        if (!available_symbols.count(check_manufacturer)) {
-            std::cerr << "Èìÿ ïðîèçâîäèòåëÿ èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
-        }
-    }
-    for (auto& check_begin_date : analyse_product.begin_date) {
-        if (!available_symbols.count(check_begin_date)) {
-            std::cerr << "Äàòà íà÷àëà ïîñòàâêè èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
-        }
-    }
-    for (auto& check_country : analyse_product.country) {
-        if (!available_symbols.count(check_country)) {
-            std::cerr << "Ñòðàíà ïðîèçâîäñòâà ïîñòàâêè èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
-        }
-    }
-    for (auto& check_end_date : analyse_product.end_date) {
-        if (!available_symbols.count(check_end_date)) {
-            std::cerr << "Äàòà îêîí÷àíèÿ ïîñòàâêè èìååò íåäåéñòâèòåëüíûé ñèìâîë\n";
-            return false;
-        }
-    }
-    if (analyse_product.price <= 0.0 || analyse_product.count <= 0 || analyse_product.article <= 0) {
-        std::cerr << "Öåíà/Êîëè÷åñòâî/Àðòèêëü òîâàðà íå ìîæåò áûòü îòðèöàòåëüíûì èëè íóëåâûì\n";
-        return false;
+        break;
     }
 
-    return true;
+    // ---- Ð¦Ð•ÐÐ ----
+    while (true) {
+        std::cout << "Ð¦ÐµÐ½Ð° (0 â€“ Ð¾Ñ‚Ð¼ÐµÐ½Ð°): ";
+        std::cin >> new_product.price;
+        std::cin.ignore();
+        if (std::cin.fail() || new_product.price < 0) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cerr << "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð°Ñ Ñ†ÐµÐ½Ð°. Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ð¿Ð¾Ð»Ð¾Ð¶Ð¸Ñ‚ÐµÐ»ÑŒÐ½Ð¾Ðµ Ñ‡Ð¸ÑÐ»Ð¾.\n";
+            continue;
+        }
+        if (new_product.price == 0) {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        if (new_product.price > 10000) {
+            std::cerr << "Ð¦ÐµÐ½Ð° Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð¿Ñ€ÐµÐ²Ñ‹ÑˆÐ°Ñ‚ÑŒ 10000.\n";
+            continue;
+        }
+        break;
+    }
+
+    // ---- ÐÐ Ð¢Ð˜ÐšÐ£Ð› ----
+    while (true) {
+        std::cout << "ÐÑ€Ñ‚Ð¸ÐºÑƒÐ» (Ñ†ÐµÐ»Ð¾Ðµ Ñ‡Ð¸ÑÐ»Ð¾, 0 - Ð¾Ñ‚Ð¼ÐµÐ½Ð°): ";
+        std::cin >> new_product.article;
+        std::cin.ignore();
+        if (std::cin.fail() || new_product.article < 0) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cerr << "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ð¹ Ð°Ñ€Ñ‚Ð¸ÐºÑƒÐ».\n";
+            continue;
+        }
+        if (new_product.article == 0) {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        break;
+    }
+
+    
+    bool dates_valid = false;
+    while (!dates_valid) {
+        std::cout << "ÐÐ°Ñ‡Ð°Ð»Ð¾ ÑÑ€Ð¾ÐºÐ° Ð³Ð¾Ð´Ð½Ð¾ÑÑ‚Ð¸ (Ð”Ð”.ÐœÐœ.Ð“Ð“Ð“Ð“): ";
+        Getline(new_product.begin_date);
+        if (new_product.begin_date.empty() || new_product.begin_date == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+
+        std::cout << "ÐžÐºÐ¾Ð½Ñ‡Ð°Ð½Ð¸Ðµ ÑÑ€Ð¾ÐºÐ° Ð³Ð¾Ð´Ð½Ð¾ÑÑ‚Ð¸ (Ð”Ð”.ÐœÐœ.Ð“Ð“Ð“Ð“): ";
+        Getline(new_product.end_date);
+        if (new_product.end_date.empty() || new_product.end_date == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+
+        if (!validate_dates(new_product.begin_date, new_product.end_date)) {
+            std::cout << "ÐŸÐ¾Ð¶Ð°Ð»ÑƒÐ¹ÑÑ‚Ð°, Ð²Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ñ‹Ðµ Ð´Ð°Ñ‚Ñ‹ Ð·Ð°Ð½Ð¾Ð²Ð¾.\n";
+            continue;
+        }
+        dates_valid = true;
+    }
+
+
+    while (true) {
+        std::cout << "ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ (Ð¼Ð°ÐºÑÐ¸Ð¼ÑƒÐ¼ 199, 0 â€“ Ð¾Ñ‚Ð¼ÐµÐ½Ð°): ";
+        std::cin >> new_product.count;
+        std::cin.ignore();
+        if (std::cin.fail() || new_product.count < 0) {
+            std::cin.clear();
+            std::cin.ignore(10000, '\n');
+            std::cerr << "ÐÐµÐºÐ¾Ñ€Ñ€ÐµÐºÑ‚Ð½Ð¾Ðµ ÐºÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾.\n";
+            continue;
+        }
+        if (new_product.count == 0) {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        if (new_product.count > 199) {
+            std::cerr << "ÐšÐ¾Ð»Ð¸Ñ‡ÐµÑÑ‚Ð²Ð¾ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð±Ð¾Ð»ÑŒÑˆÐµ 199.\n";
+            continue;
+        }
+        break;
+    }
+
+   
+    while (true) {
+        std::cout << "ÐŸÑ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»ÑŒ (Ð¿ÑƒÑÑ‚Ð°Ñ ÑÑ‚Ñ€Ð¾ÐºÐ° Ð¸Ð»Ð¸ 'exit' Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹): ";
+        Getline(new_product.manufacturer);
+        if (new_product.manufacturer.empty() || new_product.manufacturer == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        if (new_product.manufacturer.size() > 60) {
+            std::cerr << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ Ð¿Ñ€Ð¾Ð¸Ð·Ð²Ð¾Ð´Ð¸Ñ‚ÐµÐ»Ñ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð»Ð¸Ð½Ð½Ð¾Ðµ (Ð¼Ð°ÐºÑÐ¸Ð¼ÑƒÐ¼ 60 ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð²).\n";
+            continue;
+        }
+        break;
+    }
+
+ 
+    while (true) {
+        std::cout << "Ð¡Ñ‚Ñ€Ð°Ð½Ð° Ð¿Ñ€Ð¾Ð¸Ð·Ð²Ð¾Ð´ÑÑ‚Ð²Ð° (Ð¿ÑƒÑÑ‚Ð°Ñ ÑÑ‚Ñ€Ð¾ÐºÐ° Ð¸Ð»Ð¸ 'exit' Ð´Ð»Ñ Ð¾Ñ‚Ð¼ÐµÐ½Ñ‹): ";
+        Getline(new_product.country);
+        if (new_product.country.empty() || new_product.country == "exit") {
+            std::cerr << "ÐžÐ¿ÐµÑ€Ð°Ñ†Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð¸Ñ Ð¾Ñ‚Ð¼ÐµÐ½ÐµÐ½Ð°.\n";
+            return;
+        }
+        if (new_product.country.size() > 60) {
+            std::cerr << "ÐÐ°Ð·Ð²Ð°Ð½Ð¸Ðµ ÑÑ‚Ñ€Ð°Ð½Ñ‹ ÑÐ»Ð¸ÑˆÐºÐ¾Ð¼ Ð´Ð»Ð¸Ð½Ð½Ð¾Ðµ (Ð¼Ð°ÐºÑÐ¸Ð¼ÑƒÐ¼ 60 ÑÐ¸Ð¼Ð²Ð¾Ð»Ð¾Ð²).\n";
+            continue;
+        }
+        break;
+    }
+    
+
+    goods.push_back(new_product);
+    std::cout << "Ð¢Ð¾Ð²Ð°Ñ€ '" << new_product.name << "' ÑƒÑÐ¿ÐµÑˆÐ½Ð¾ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½.\n";
+
+    save_to_file("Product.txt");
 }
-
