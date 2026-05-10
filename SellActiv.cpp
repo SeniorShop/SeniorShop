@@ -1,6 +1,4 @@
 #include "SellActiv.h"
-#include <iostream>
-#include <random>
 
 PromoManager::PromoManager() : discount_used(false) {
     srand(static_cast<unsigned int>(time(0)));
@@ -8,35 +6,40 @@ PromoManager::PromoManager() : discount_used(false) {
 
 void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
     if (discount_used) {
-        std::cout << "Àêöèÿ óæå èñïîëüçîâàíà â òåêóùåì ÷åêå\n";
+        std::cout << "Ð’Ñ‹ ÑƒÐ¶Ðµ Ð¸ÑÐ¿Ð¾Ð»ÑŒÐ·Ð¾Ð²Ð°Ð»Ð¸ Ð°ÐºÑ†Ð¸ÑŽ Ð´Ð»Ñ ÑÑ‚Ð¾Ð³Ð¾ Ñ‡ÐµÐºÐ°!\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         return;
     }
 
     std::string choice;
-    std::cout << "\n\n\n\t\t\tÂÛÁÎÐ ÀÊÖÈÈ\n\n\n";
-    std::cout << "1. Ñêèäêà 15% (ïðè ïîêóïêå îò 2000 ðóá)\n";
-    std::cout << "2. Ìàòåìàòè÷åñêàÿ çàäà÷à (ñêèäêà 30%)\n";
-    std::cout << "3. Ìÿñíàÿ àêöèÿ (10êã ìÿñà = -200 ðóá)\n";
-    std::cout << "4. Êîëåñî Ôîðòóíû (ó÷àñòèå 1000 ðóá)\n";
-    std::cout << "0. Ïðîïóñòèòü\n";
-    std::cout << "Âûáîð: ";
+    std::cout << "\n\tÐ”ÐžÐ¡Ð¢Ð£ÐŸÐÐ«Ð• ÐÐšÐ¦Ð˜Ð˜\n";
+    std::cout << "1. Ð¡ÐºÐ¸Ð´ÐºÐ° 15% (Ð¿Ñ€Ð¸ Ð¿Ð¾ÐºÑƒÐ¿ÐºÐµ Ð¾Ñ‚ 2000 Ñ€ÑƒÐ±)\n";
+    std::cout << "2. ÐœÐ°Ñ‚ÐµÐ¼Ð°Ñ‚Ð¸Ñ‡ÐµÑÐºÐ°Ñ Ð·Ð°Ð´Ð°Ñ‡Ð° (ÑÐºÐ¸Ð´ÐºÐ° 30%)\n";
+    std::cout << "3. ÐœÑÑÐ½Ð°Ñ Ð°ÐºÑ†Ð¸Ñ (10ÐºÐ³ Ð¼ÑÑÐ° = -200 Ñ€ÑƒÐ±)\n";
+    std::cout << "4. ÐšÐ¾Ð»ÐµÑÐ¾ Ð¤Ð¾Ñ€Ñ‚ÑƒÐ½Ñ‹ (ÑƒÑ‡Ð°ÑÑ‚Ð¸Ðµ 1000 Ñ€ÑƒÐ±)\n";
+    std::cout << "0. ÐŸÑ€Ð¾Ð¿ÑƒÑÑ‚Ð¸Ñ‚ÑŒ\n";
+    std::cout << "Ð’Ñ‹Ð±Ð¾Ñ€: ";
     Getline(choice);
 
     if (choice == "1") {
+        double discount = 0.0;
         if (total_sum >= 2000) {
-            double discount = total_sum * 0.15;
+            discount = total_sum * 0.15;
             total_sum -= discount;
             discount_used = true;
-            std::cout << "Ñêèäêà 15% ïðèìåíåíà!\n";
-        } else {
-            std::cout << "Ñóììà ÷åêà ìåíüøå 2000 ðóá\n";
+            std::cout << "Ð¡ÐºÐ¸Ð´ÐºÐ° 15% Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð°!\n";
         }
-    } else if (choice == "2") {
+        else
+            std::cout << "Ð¡ÑƒÐ¼Ð¼Ð° Ñ‡ÐµÐºÐ° Ð¼ÐµÐ½ÑŒÑˆÐµ 2000 Ñ€ÑƒÐ±.\n";
+
+    }
+    else if (choice == "2") {
         apply_math_quiz(total_sum);
-    } else if (choice == "3") {
+    }
+    else if (choice == "3") {
         apply_meat_promotion(total_sum, cart);
-    } else if (choice == "4") {
+    }
+    else if (choice == "4") {
         apply_wheel_of_fortune(total_sum);
     }
     std::this_thread::sleep_for(std::chrono::milliseconds(1500));
@@ -46,81 +49,94 @@ void PromoManager::apply_math_quiz(double& total_sum) {
     int a = rand() % 50 + 10;
     int b = rand() % 50 + 10;
     int answer;
-    std::cout << "Ðåøèòå ïðèìåð: " << a << " + " << b << " = ";
-    Getline(answer);
+    std::cout << "Ð ÐµÑˆÐ¸Ñ‚Ðµ Ð¿Ñ€Ð¸Ð¼ÐµÑ€: " << a << " + " << b << " = ";
+    std::cin >> answer;
+    std::cin.ignore();
+    double discount = 0.0;
 
     if (answer == (a + b)) {
-        double discount = total_sum * 0.30;
+        discount = total_sum * 0.30;
         total_sum -= discount;
         discount_used = true;
-        std::cout << "Âåðíî! Ñêèäêà 30%!\n";
-    } else {
-        std::cerr << "Íåâåðíî. Àêöèÿ àííóëèðîâàíà\n";
+        std::cout << "Ð’ÐµÑ€Ð½Ð¾! Ð¡ÐºÐ¸Ð´ÐºÐ° 30% Ð²Ð°ÑˆÐ°.\n";
     }
+    else
+        std::cerr << "ÐÐµÐ²ÐµÑ€Ð½Ð¾. ÐÐºÑ†Ð¸Ñ Ð°Ð½Ð½ÑƒÐ»Ð¸Ñ€Ð¾Ð²Ð°Ð½Ð°.\n";
+
 }
 
 void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
     double weight = 0;
     for (const auto& item : cart) {
-        if (item.first == "Ìÿñî" || item.first == "ìÿñî") {
-            weight += item.second;
-        }
+        if (item.first == "ÐœÑÑÐ¾" || item.first == "Ð¼ÑÑÐ¾") weight += item.second;
     }
 
     if (weight >= 10.0) {
         total_sum -= 200;
         discount_used = true;
-        std::cout << "Ìÿñíàÿ àêöèÿ ïðèìåíåíà! Ñïèñàíî 200 ðóá\n";
-    } else {
-        std::cerr << "Íóæíî ìèíèìóì 10 êã ìÿñà (ó âàñ " << weight << " êã)\n";
+        std::cout << "ÐÐºÑ†Ð¸Ñ Ð¿Ñ€Ð¸Ð¼ÐµÐ½ÐµÐ½Ð°! Ð¡Ð¿Ð¸ÑÐ°Ð½Ð¾ 200 Ñ€ÑƒÐ± Ð·Ð° Ð¼ÑÑÐ¾.\n";
     }
+    else
+        std::cerr << "ÐÑƒÐ¶Ð½Ð¾ Ð¼Ð¸Ð½Ð¸Ð¼ÑƒÐ¼ 10 ÐºÐ³ Ð¼ÑÑÐ° (Ñƒ Ð²Ð°Ñ " << weight << ").\n";
+
 }
 
 void PromoManager::apply_wheel_of_fortune(double& total_sum) {
     std::string choice;
-    std::cout << "\n\n\n\t\t\tÊÎËÅÑÎ ÔÎÐÒÓÍÛ\n\n\n";
-    std::cout << "Ñòîèìîñòü ó÷àñòèÿ: 1000 ðóáëåé (äîáàâëÿåòñÿ ê ñóììå ÷åêà â ñëó÷àå ïðîèãðûøà)\n";
-    std::cout << "Õîòèòå ó÷àñòâîâàòü?\n1 - Äà\n2 - Íåò\nÂûáîð: ";
+
+    std::cout << "\nÐÐ°Ñˆ Ð¼Ð°Ð³Ð°Ð·Ð¸Ð½ Ñ€Ð°Ð´, Ñ‡Ñ‚Ð¾ Ð²Ñ‹ Ð¿Ñ€Ð¸Ð½ÑÐ»Ð¸ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ðµ Ð² Ð½Ð°ÑˆÐµÐ¹ Ð°ÐºÑ†Ð¸Ð¸\n";
+    std::cout << "\t\tÐšÐžÐ›Ð•Ð¡Ðž Ð¤ÐžÐ Ð¢Ð£ÐÐ« \n";
+    std::cout << "Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ñ: 1000 Ñ€ÑƒÐ±Ð»ÐµÐ¹(Ð´Ð¾Ð±Ð°Ð²ÑÑ‚ÑÑ Ðº ÑÑƒÐ¼Ð¼Ðµ Ñ‡ÐµÐºÐ° Ð² ÑÐ»ÑƒÑ‡Ð°Ðµ Ð¿Ñ€Ð¾Ð¸Ð³Ñ€Ñ‹ÑˆÐ°)\n";
+    std::cout << "Ð’Ð¾Ð·Ð¼Ð¾Ð¶Ð½Ñ‹Ðµ Ð¿Ñ€Ð¸Ð·Ñ‹:\n";
+    std::cout << "1. Ð¡ÐºÐ¸Ð´ÐºÐ° 10% Ð½Ð° Ð¿Ð¾ÐºÑƒÐ¿ÐºÑƒ\n";
+    std::cout << "2. Ð¡ÐºÐ¸Ð´ÐºÐ° 20% Ð½Ð° Ð¿Ð¾ÐºÑƒÐ¿ÐºÑƒ\n";
+    std::cout << "3. Ð¡ÐºÐ¸Ð´ÐºÐ° 30% Ð½Ð° Ð¿Ð¾ÐºÑƒÐ¿ÐºÑƒ\n";
+    std::cout << "4. Ð¡ÐºÐ¸Ð´ÐºÐ° 50% Ð½Ð° Ð¿Ð¾ÐºÑƒÐ¿ÐºÑƒ\n";
+    std::cout << "5. Ð‘ÐµÑÐ¿Ð»Ð°Ñ‚Ð½Ð°Ñ Ð¿Ð¾ÐºÑƒÐ¿ÐºÐ° (Ð²ÑÐµ Ñ‚Ð¾Ð²Ð°Ñ€Ñ‹ Ð±ÐµÑÐ¿Ð»Ð°Ñ‚Ð½Ð¾!)\n\n\n";
+
+    std::cout << "Ð¥Ð¾Ñ‚Ð¸Ñ‚Ðµ ÑƒÑ‡Ð°ÑÑ‚Ð²Ð¾Ð²Ð°Ñ‚ÑŒ?\n1 - Ð”Ð°\n2 - ÐÐµÑ‚\nÐ’Ð²Ð¾Ð´: ";
     Getline(choice);
 
-    if (choice != "1") {
-        std::cout << "Îòêàç îò ó÷àñòèÿ\n";
+    if (choice == "2") {
+        std::cout << "ÐžÑ‚ÐºÐ°Ð· Ð¾Ñ‚ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ñ\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
         return;
     }
+    else if (choice != "1")
+        return;
+
+    double discount = 0.0;
 
     int prize = rand() % 100 + 1;
-
     if (prize >= 26 && prize <= 50) {
-        double discount = total_sum * 0.10;
-        total_sum -= discount;
-        discount_used = true;
-        std::cout << "Âûèãðûø: Ñêèäêà 10%!\n";
-    } else if (prize >= 51 && prize <= 70) {
-        double discount = total_sum * 0.20;
-        total_sum -= discount;
-        discount_used = true;
-        std::cout << "Âûèãðûø: Ñêèäêà 20%!\n";
-    } else if (prize >= 71 && prize <= 85) {
-        double discount = total_sum * 0.30;
-        total_sum -= discount;
-        discount_used = true;
-        std::cout << "Âûèãðûø: Ñêèäêà 30%!\n";
-    } else if (prize >= 86 && prize <= 95) {
-        double discount = total_sum * 0.50;
-        total_sum -= discount;
-        discount_used = true;
-        std::cout << "Âûèãðûø: Ñêèäêà 50%!\n";
-    } else if (prize >= 96 && prize <= 100) {
+        discount = total_sum * 0.10;
+        std::cout << "Ð’Ð«Ð˜Ð“Ð Ð«Ð¨: Ð¡ÐºÐ¸Ð´ÐºÐ° 10%!" << std::endl;
+    }
+    else if (prize >= 51 && prize <= 70) {
+        discount = total_sum * 0.20;
+        std::cout << "Ð’Ð«Ð˜Ð“Ð Ð«Ð¨: Ð¡ÐºÐ¸Ð´ÐºÐ° 20%!" << std::endl;
+    }
+    else if (prize >= 71 && prize <= 85) {
+        discount = total_sum * 0.30;
+        std::cout << "Ð’Ð«Ð˜Ð“Ð Ð«Ð¨: Ð¡ÐºÐ¸Ð´ÐºÐ° 30%!" << std::endl;
+    }
+    else if (prize >= 86 && prize <= 95) {
+        discount = total_sum * 0.50;
+        std::cout << "Ð’Ð«Ð˜Ð“Ð Ð«Ð¨: Ð¡ÐºÐ¸Ð´ÐºÐ° 50%!" << std::endl;
+    }
+    else if (prize >= 96 && prize <= 100) {
         total_sum = 0;
-        discount_used = true;
-        std::cout << "ÄÆÅÊÏÎÒ! Ïîêóïêà áåñïëàòíî!\n";
-    } else {
-        std::cout << "Óâû, ñåãîäíÿ áåç ïðèçà\n";
+        std::cout << "Ð”Ð–Ð•ÐšÐŸÐžÐ¢: ÐŸÐ¾ÐºÑƒÐ¿ÐºÐ° Ð±ÐµÑÐ¿Ð»Ð°Ñ‚Ð½Ð¾!" << std::endl;
+    }
+    else {
+        std::cout << "Ð£Ð²Ñ‹, Ð² ÑÑ‚Ð¾Ñ‚ Ñ€Ð°Ð· Ð±ÐµÐ· Ð¿Ñ€Ð¸Ð·Ð°" << std::endl;
         total_sum += 1000;
-        std::cout << "Ñòîèìîñòü ó÷àñòèÿ äîáàâëåíà ê ÷åêó. Òåêóùàÿ ñóììà: " << total_sum << " ðóá\n";
+        std::cout << "Ð¡Ñ‚Ð¾Ð¸Ð¼Ð¾ÑÑ‚ÑŒ ÑƒÑ‡Ð°ÑÑ‚Ð¸Ñ Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð° Ðº Ñ‡ÐµÐºÑƒ. Ð¢ÐµÐºÑƒÑ‰Ð°Ñ ÑÑƒÐ¼Ð¼Ð°: " << total_sum << " Ñ€ÑƒÐ±.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
     }
 
+    total_sum -= discount;
     if (total_sum < 0) total_sum = 0;
+
     discount_used = true;
 }
