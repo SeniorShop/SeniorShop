@@ -20,6 +20,8 @@ add_executable(SeniorFixing main.cpp
     Cart.h Cart.cpp
     SaleControl.h SaleControl.cpp
     SaleService.h SaleService.cpp
+    Check.h Check.cpp
+
 )
 
 include(GNUInstallDirs)

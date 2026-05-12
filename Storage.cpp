@@ -1,4 +1,5 @@
 #include "Storage.h"
+#include "Check.h"
 #include <chrono>
 #include <sstream>
 #include <iomanip>
@@ -101,7 +102,9 @@ void Storage::super_admin_menu() {
             StorageUserMethod(authSystem);
             break;
         case '8':
-
+            Check::show_financial_report("checks.txt");
+            std::cout << "Нажмите на кнопку Enter для продолжения: ";
+            std::cin.get();
             break;
         case '9':
             supply_menu();
@@ -251,7 +254,9 @@ void Storage::admin_menu() {
 
             break;
         case '6':
-
+            Check::show_financial_report("checks.txt");
+            std::cout << "Нажмите Enter для продолжения...";
+            std::cin.get();
             break;
         case '7':
             supply_menu();
@@ -316,7 +321,9 @@ void Storage::user_menu() {
             show_all();
             break;
         case '3':
-
+            Check::show_financial_report("checks.txt");
+            std::cout << "Нажмите Enter для продолжения...";
+            std::cin.get();
             break;
         case '4':
             supply_menu();
@@ -340,9 +347,12 @@ void Storage::start(const std::string& user_status) {
         else {
             user_menu();
         }
-        std::cout << "Выбор действия: ";
-        std::string choose;
-        Getline(choose);
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+        return;
     }
 }
 
