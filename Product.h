@@ -1,6 +1,5 @@
 #ifndef PRODUCT_H
 #define PRODUCT_H
-
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -74,6 +73,7 @@ inline bool is_valid_bool(const std::string& str) {
            str == "1" || str == "0";
 }
 
+
 template<typename T>
 void Getline(T& value, bool allow_empty = false) {
     std::string input;
@@ -131,7 +131,7 @@ void Getline(T& value, bool allow_empty = false) {
         }
         else if constexpr (std::is_same_v<T, std::chrono::sys_days>) {
             if (!is_valid_date(input)) {
-                std::cerr << "Ошибка: введите дату в формате (дата.месяц.год)\n";
+                std::cerr << "Ошибка: введите дату в формате ДД.ММ.ГГГГ\n";
                 continue;
             }
             int day, month, year;
@@ -150,18 +150,21 @@ void Getline(T& value, bool allow_empty = false) {
 }
 
 struct Product {
-    std::string name;
-    std::string category;
-    double price;
-    int article;
-    std::string begin_date;
-    std::string end_date;
-    unsigned int count;
-    std::string manufacturer;
-    std::string country;
+    unsigned int id = 0;
+    std::string name = "";
+    std::string category = "";
+    double price = 0.0;
+    int article = 0;
+    std::string begin_date = "";
+    std::string end_date = "";
+    unsigned int count = 0;
+    std::string manufacturer = "";
+    std::string country = "";
 
     Product();
     Product(const Product& other);
+    unsigned int get_id();
+    unsigned int get_count();
     bool operator==(const Product& other) const;
 };
 

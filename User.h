@@ -1,22 +1,51 @@
 #ifndef USER_H
 #define USER_H
-
+#include <iostream>
 #include <string>
+#include <memory>
 #include <sstream>
-
-struct User {
+class User {
+    // !!! Нужно пересмотреть и подумать над типом public
+public:
     std::string username;
     std::string password;
-    std::string status;
+    std::string status; // superadmin, admin, user
+    User() = default;
+    User(const std::string& name, const std::string& pass, const std::string& currentSt) : username(name), password(pass), status(currentSt) {}
+    virtual ~User() = default;
 
-    User();
-    User(const std::string& name, const std::string& pass, const std::string& st);
+    virtual std::string serialize() const
+    {
+        return username + "|" + password + "|" + status;
+    }
+    // восстановление из файла
+    static std::unique_ptr<User> deserialize(const std::string& line);
 
-    std::string serialize() const;
+    virtual std::unique_ptr<User> clone() const = 0;
 
-    static User deserialize(const std::string& line);
+    bool operator==(const User& other) const
+    {
+        return username == other.username && password == other.password && status == other.status;
+    }
 
-    bool operator==(const User& other) const;
 };
 
-#endif
+class SuperAdminUser final : public User {
+public:
+    SuperAdminUser();
+    std::unique_ptr<User> clone() const override;
+};
+
+class AdminUser : public User {
+public:
+    AdminUser(const std::string& name, const std::string& pass);
+    std::unique_ptr<User> clone() const override;
+};
+
+class RegularUser : public User {
+public:
+    RegularUser(const std::string& name, const std::string& pass);
+    std::unique_ptr<User> clone() const override;
+};
+
+#endif // USER_H

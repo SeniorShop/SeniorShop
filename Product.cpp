@@ -1,20 +1,32 @@
 #include "Product.h"
 
-Product::Product()
-    : price(0.0), article(0), count(0) {}
-
 Product::Product(const Product& other) {
-    name = other.name;
-    category = other.category;
-    price = other.price;
-    article = other.article;
-    begin_date = other.begin_date;
-    end_date = other.end_date;
-    count = other.count;
-    manufacturer = other.manufacturer;
-    country = other.country;
+    this->id = other.id;
+    this->name = other.name;
+    this->category = other.category;
+    this->price = other.price;
+    this->article = other.article;
+    this->begin_date = other.begin_date;
+    this->end_date = other.end_date;
+    this->count = other.count;
+    this->manufacturer = other.manufacturer;
+    this->country = other.country;
 }
-
+Product::Product() = default;
 bool Product::operator==(const Product& other) const {
-    return article == other.article;
+    return name == other.name && category == other.category && article == other.article;
 }
+unsigned int Product::get_id() {return id;}
+unsigned int Product::get_count() {return count;}
+
+//void setColor(int color)
+//{
+//    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+//    SetConsoleTextAttribute(hConsole, color);
+//}
+
+//void resetColor()
+//{
+//    setColor(7);
+//}
+

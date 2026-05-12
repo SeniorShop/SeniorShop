@@ -1,15 +1,25 @@
 #include "Storage.h"
-#include "SupplyManager.h"
-#include "AuthSystemUser.h"
+#include <chrono>
+#include <sstream>
 #include <iomanip>
+#include "AuthSystemUser.h"
+#include "MethodSuperAdmin.h"
 #include <algorithm>
-#include <unordered_set>
-#include <fstream>
+#ifdef _WIN32
+#include "Windows.h"
+#else
+#include "stdlib.h"
+#include <thread>
+#endif
 
-void Storage::load_from_file(const std::string& filename) {
-    std::ifstream input(filename);
+void Storage::setAuthSystem(AuthSystemUser* auth) {
+    authSystem = auth;
+}
+
+void Storage::load_from_file(const std::string& product_database) {
+    std::ifstream input(product_database);
     if (!input.is_open()) {
-        std::cerr << "Ошибка открытия файла " << filename << std::endl;
+        std::cerr << "Ошибка открытия файла '" << product_database << "'" << std::endl;
         return;
     }
     goods.clear();
@@ -20,143 +30,137 @@ void Storage::load_from_file(const std::string& filename) {
         goods.push_back(product);
     }
     input.close();
-    std::cout << "Загружено товаров: " << goods.size() << std::endl;
+    std::cout << "Было считано товаров с базы данных: " << goods.size() << std::endl;
 }
 
-void Storage::save_to_file(const std::string& filename) {
-    std::ofstream output(filename);
+void Storage::save_to_file(const std::string& product_database) {
+    std::ofstream output(product_database);
     if (!output.is_open()) {
-        std::cerr << "Ошибка сохранения в файл " << filename << std::endl;
+        std::cerr << "Ошибка открытия файла" << std::endl;
         return;
     }
-    for (const auto& p : goods) {
-        output << p.name << " " << p.category << " " << p.price << " "
-               << p.article << " " << p.begin_date << " " << p.end_date << " "
-               << p.count << " " << p.manufacturer << " " << p.country << "\n";
+    for (const auto& write_product : goods) {
+        output << write_product.name << ' ' << write_product.category << ' ' << write_product.price << ' '
+               << write_product.article << ' ' << write_product.begin_date << ' ' << write_product.end_date << ' '
+               << write_product.count << ' ' << write_product.manufacturer << ' ' << write_product.country << '\n';
     }
     output.close();
-    std::cout << "Сохранено товаров: " << goods.size() << std::endl;
+    std::cout << "Было записано " << goods.size() << " товаров в базу данных" << std::endl;
+}
+void Storage::super_admin_menu() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    bool is_exit = false;
+    while (true) {
+        std::cout << "\n\n\n\t\t\tСПИСОК ДЕЙСТВИЙ ДЛЯ СУПЕР АДМИНА\n\n\n";
+        std::cout << "1) Начать продажу\n";
+        std::cout << "2) Показать склад\n";
+        std::cout << "3) Пополнить склад\n";
+        std::cout << "4) Списать товар со склада\n";
+        std::cout << "5) Изменить цену товара\n";
+        std::cout << "6) Редактировать склад\n";
+        std::cout << "7) Редактировать персонал\n";
+        std::cout << "8) Отчет\n";
+        std::cout << "9) Поставки\n";
+        std::cout << "0) Выход\n";
+        std::cout << "Выберите действие: ";
+        std::string choose;
+        Getline(choose);
+        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+            std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
+            system("pause");
+            continue;
+        }
+
+        switch(choose[0]) {
+        case '0':
+            is_exit = true;
+            break;
+        case '1':
+            start_sales.start();
+            break;
+        case '2':
+            show_all();
+            break;
+        case '3':
+            add_product();
+            break;
+        case '4':
+
+            break;
+        case '5':
+            change_product_price();
+            break;
+        case '6':
+
+            break;
+        case '7':
+            StorageUserMethod(authSystem);
+            break;
+        case '8':
+
+            break;
+        case '9':
+            supply_menu();
+            break;
+        }
+
+        if(is_exit) break;
+
+    }
+    return;
 }
 
-void Storage::add_product() {
-    Product p;
-    std::cout << "Название: ";
-    Getline(p.name, false);
-    std::cout << "Категория: ";
-    Getline(p.category, false);
-    std::cout << "Цена: ";
-    Getline(p.price);
-    std::cout << "Артикль: ";
-    Getline(p.article);
+void Storage::change_product_price() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 
-    bool dates_valid = false;
-    while (!dates_valid) {
-        std::cout << "Начало срока годности (день.месяц.год): ";
-        Getline(p.begin_date);
-        std::cout << "Конец срока годности (день.месяц.год): ";
-        Getline(p.end_date);
-        if (!validate_dates(p.begin_date, p.end_date)) {
-            std::cerr << "Повторите ввод дат\n";
-        } else {
-            dates_valid = true;
-        }
+    if (goods.empty()) {
+        std::cerr << "Список товаров пустой\n";
+        return;
     }
 
-    std::cout << "Количество: ";
-    Getline(p.count);
-    std::cout << "Производитель: ";
-    Getline(p.manufacturer, false);
-    std::cout << "Страна: ";
-    Getline(p.country, false);
+    std::string name, category;
+    std::cout << "Название товара: ";
+    Getline(name);
+    std::cout << "Категория товара: ";
+    Getline(category);
 
-    if (!check_characteristics(p)) return;
+    auto find = std::find_if(goods.begin(), goods.end(),
+                           [&](const Product& p) { return p.name == name && p.category == category; });
 
-    goods.push_back(p);
-    std::cout << "Товар " << p.name << " добавлен" << std::endl;
+    if (find == goods.end()) {
+        std::cerr << "Товар не найден\n";
+        return;
+    }
+
+    std::cout << "Текущая цена '" << find->name << "': " << find->price << " руб.\n";
+    std::cout << "Введите новую цену: ";
+    Getline(find->price);
+
+    if (find->price < 0.0 || find->price > 10000.0) {
+        std::cerr << "Ошибка: цена должна быть от 0 до 10000 руб.\n";
+        return;
+    }
+
+    std::cout << "Цена изменена на " << find->price << " руб.\n";
     save_to_file("Product.txt");
-}
-
-void Storage::show_all() {
-    if (goods.empty()) {
-        std::cout << "Склад пуст" << std::endl;
-        return;
-    }
-
-    const int w_id = 4, w_name = 16, w_cat = 14, w_price = 10, w_count = 8, w_art = 12;
-
-    std::cout << "\n" << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n";
-    std::cout << std::left
-              << std::setw(w_id) << "ID"
-              << std::setw(w_name) << "Название"
-              << std::setw(w_cat) << "Категория"
-              << std::setw(w_price) << "Цена"
-              << std::setw(w_count) << "Кол-во"
-              << std::setw(w_art) << "Артикль" << "\n";
-    std::cout << std::setfill('-') << std::setw(80) << "" << std::setfill(' ') << "\n";
-
-    for (size_t i = 0; i < goods.size(); ++i) {
-        Product& p = goods[i];
-        std::cout << std::left
-                  << std::setw(w_id) << i + 1
-                  << std::setw(w_name) << format_field(p.name, w_name - 1)
-                  << std::setw(w_cat) << format_field(p.category, w_cat - 1)
-                  << std::setw(w_price) << std::fixed << std::setprecision(2) << p.price
-                  << std::setw(w_count) << p.count
-                  << p.article << "\n";
-    }
-    std::cout << std::setfill('=') << std::setw(80) << "" << std::setfill(' ') << "\n\n";
-}
-
-void Storage::show_valid_products() {
-    if (goods.empty()) {
-        std::cout << "Склад пуст" << std::endl;
-        return;
-    }
-
-    int valid_count = 0;
-    for (size_t i = 0; i < goods.size(); ++i) {
-        if (!is_expired(goods[i].end_date)) {
-            std::cout << i + 1 << ". " << goods[i].name
-                      << " (арт. " << goods[i].article
-                      << ", годен до: " << goods[i].end_date
-                      << ", кол-во: " << goods[i].count << ")\n";
-            valid_count++;
-        }
-    }
-
-    if (valid_count == 0) {
-        std::cout << "Нет годных товаров" << std::endl;
-    } else {
-        std::cout << "Всего годных товаров: " << valid_count << std::endl;
-    }
-}
-
-void Storage::check_expired_products() {
-    if (goods.empty()) {
-        std::cout << "Склад пуст" << std::endl;
-        return;
-    }
-
-    int expired_count = 0;
-    for (const auto& p : goods) {
-        if (is_expired(p.end_date)) {
-            std::cout << "Просрочен: " << p.name
-                      << " (арт. " << p.article
-                      << ", годен до: " << p.end_date
-                      << ", кол-во: " << p.count << ")\n";
-            expired_count++;
-        }
-    }
-
-    if (expired_count == 0) {
-        std::cout << "Просроченных товаров нет" << std::endl;
-    } else {
-        std::cout << "Всего просроченных: " << expired_count << std::endl;
-    }
+    return;
 }
 
 void Storage::supply_menu() {
-    int choice;
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    bool is_exit = false;
     while (true) {
         std::cout << "\n\n\n\t\t\tУПРАВЛЕНИЕ ПОСТАВКАМИ\n\n\n";
         std::cout << "1) Создать новые поставки\n";
@@ -166,32 +170,101 @@ void Storage::supply_menu() {
         std::cout << "5) Применить поставку (пополнить склад)\n";
         std::cout << "0) Выход\n";
         std::cout << "Выбор: ";
+        std::string choice;
         Getline(choice);
 
-        switch(choice) {
-        case 1:
+        if(choice.empty() || choice[0] < '0' || choice[0] > '5') {
+            std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
+            system("pause");
+            continue;
+        }
+
+        switch(choice[0]) {
+        case '1':
             supply_manager.create_supplies();
             break;
-        case 2:
+        case '2':
             supply_manager.show_all_supplies();
             break;
-        case 3:
+        case '3':
             supply_manager.change_supply_from_file();
             break;
-        case 4:
+        case '4':
             supply_manager.delete_supply_from_file();
             break;
-        case 5:
+        case '5':
             supply_manager.apply_supply_to_storage(*this);
             break;
-        case 0:
-            return;
+        case '0':
+            is_exit = true;
+            break;
         default:
             std::cerr << "Неверный выбор\n";
         }
+
+        if(is_exit) break;
+
     }
+    return;
 }
 
+void Storage::admin_menu() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    bool is_exit = false;
+    while (true) {
+        std::cout << "\n\n\n\t\t\tСПИСОК ДЕЙСТВИЙ ДЛЯ АДМИНА\n\n\n";
+        std::cout << "1) Начать продажу\n";
+        std::cout << "2) Показать склад\n";
+        std::cout << "3) Пополнить склад\n";
+        std::cout << "4) Пополнить товар\n";
+        std::cout << "5) Списать товар\n";
+        std::cout << "6) Отчет\n";
+        std::cout << "7) Поставки\n";
+        std::cout << "0) Выход\n";;
+        std::cout << "Выберите действие: ";
+        std::string choose;
+        Getline(choose);
+        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+            std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
+            system("pause");
+            continue;
+        }
+
+        switch(choose[0]) {
+        case '1':
+            start_sales.start();
+            break;
+        case '2':
+            show_all();
+            break;
+        case '3':
+            add_product();
+            break;
+        case '4':
+
+            break;
+        case '5':
+
+            break;
+        case '6':
+
+            break;
+        case '7':
+            supply_menu();
+            break;
+        case '0':
+            is_exit = true;
+            break;
+        }
+
+        if(is_exit) break;
+    }
+    return;
+}
 void Storage::add_supply_products(const Supply& supply) {
     for (auto& p : goods) {
         if (p.article == supply.product_name.article) {
@@ -209,223 +282,446 @@ void Storage::add_supply_products(const Supply& supply) {
     save_to_file("Product.txt");
 }
 
-void Storage::super_admin_menu(AuthSystemUser& authSystem) {
-    int choice;
+void Storage::user_menu() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    bool is_exit = false;
     while (true) {
-        std::cout << "\n\n\n\t\t\tМЕНЮ СУПЕР-АДМИНИСТРАТОРА\n\n\n";
-        std::cout << "1) Добавить товар\n";
-        std::cout << "2) Показать все товары\n";
-        std::cout << "3) Показать годные товары\n";
-        std::cout << "4) Проверить просроченные товары\n";
-        std::cout << "5) Управление поставками\n";
-        std::cout << "6) Регистрация нового пользователя\n";
-        std::cout << "7) Показать всех пользователей\n";
-        std::cout << "8) Изменить пользователя\n";
-        std::cout << "9) Удалить пользователя\n";
-        std::cout << "10) Отчет\n";
+        std::cout << "\n\n\n\t\t\tСПИСОК ДЕЙСТВИЙ ДЛЯ ПОЛЬЗОВАТЕЛЯ\n\n\n";
+        std::cout << "1) Начать продажу\n";
+        std::cout << "2) Показать склад\n";
+        std::cout << "3) Отчет\n";
+        std::cout << "4) Поставки\n";
         std::cout << "0) Выход\n";
-        std::cout << "Выбор: ";
-        Getline(choice);
+        std::cout << "Выберите действие: ";
+        std::string choose;
+        Getline(choose);
+        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+            std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
+            system("pause");
+            continue;
+        }
 
-        switch(choice) {
-        case 1:
-            add_product();
+        switch(choose[0]) {
+        case '0':
+            is_exit = true;
             break;
-        case 2:
+        case '1':
+            start_sales.start();
+            break;
+        case '2':
             show_all();
             break;
-        case 3:
-            show_valid_products();
+        case '3':
+
             break;
-        case 4:
-            check_expired_products();
-            break;
-        case 5:
+        case '4':
             supply_menu();
             break;
-        case 6:
-            authSystem.register_user();
-            break;
-        case 7:
-            authSystem.show_all_users();
-            break;
-        case 8:
-            authSystem.change_user();
-            break;
-        case 9:
-            authSystem.remove_user();
-            break;
-        case 10:
-            // реализация позже
-            break;
-        case 0:
-            return;
-        default:
-            std::cerr << "Неверный выбор\n";
         }
+
+        if(is_exit) break;
+
     }
+    return;
 }
-
-void Storage::admin_menu() {
-    int choice;
-    while (true) {
-        std::cout << "\n\n\n\t\t\tМЕНЮ АДМИНИСТРАТОРА\n\n\n";
-        std::cout << "1) Добавить товар\n";
-        std::cout << "2) Показать все товары\n";
-        std::cout << "3) Показать годные товары\n";
-        std::cout << "4) Проверить просроченные товары\n";
-        std::cout << "5) Показать все поставки\n";
-        std::cout << "6) Изменить цену\n";
-        std::cout << "7) Списать товар\n";
-        std::cout << "8) Отчет\n";
-        std::cout << "0) Выход\n";
-        std::cout << "Выбор: ";
-        Getline(choice);
-
-        switch(choice) {
-        case 1:
-            add_product();
-            break;
-        case 2:
-            show_all();
-            break;
-        case 3:
-            show_valid_products();
-            break;
-        case 4:
-            check_expired_products();
-            break;
-        case 5:
-            supply_manager.show_all_supplies();
-            break;
-        case 6:
-            // реализация позже
-            break;
-        case 7:
-            // реализация позже
-            break;
-        case 8:
-            // реализация позже
-            break;
-        case 0:
-            return;
-        default:
-            std::cerr << "Неверный выбор\n";
-        }
-    }
-}
-
-void Storage::user_menu() {
-    int choice;
-    while (true) {
-        std::cout << "\n\n\n\t\t\tМЕНЮ ПОЛЬЗОВАТЕЛЯ\n\n\n";
-        std::cout << "1) Показать все товары\n";
-        std::cout << "2) Показать годные товары\n";
-        std::cout << "0) Выход\n";
-        std::cout << "Выбор: ";
-        Getline(choice);
-
-        switch(choice) {
-        case 1:
-            show_all();
-            break;
-        case 2:
-            show_valid_products();
-            break;
-        case 0:
-            return;
-        default:
-            std::cerr << "Неверный выбор\n";
-        }
-    }
-}
-
-void Storage::start(const std::string& userStatus, AuthSystemUser& authSystem) {
+void Storage::start(const std::string& user_status) {
     load_from_file("Product.txt");
-    if (userStatus == "superadmin") {
-        super_admin_menu(authSystem);
-    } else if (userStatus == "admin") {
-        admin_menu();
-    } else {
-        user_menu();
+    while (true) {
+        if (user_status == "superadmin") {
+            super_admin_menu();
+        }
+        else if (user_status == "admin") {
+            admin_menu();
+        }
+        else {
+            user_menu();
+        }
+        std::cout << "Выбор действия: ";
+        std::string choose;
+        Getline(choose);
+    }
+}
+
+void Storage::add_product() {
+    Product new_product;
+
+    while (true) {
+        std::cout << "Название товара (пустая строка или 'exit' для отмены): ";
+        Getline(new_product.name);
+        if (new_product.name.empty() || new_product.name == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.name.size() > 60) {
+            std::cerr << "Название слишком длинное (максимум 60 символов).\n";
+            continue;
+        }
+        break;
+    }
+
+    while (true) {
+        std::cout << "Категория (пустая строка или 'exit' для отмены): ";
+        Getline(new_product.category);
+        if (new_product.category.empty() || new_product.category == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.category.size() > 50) {
+            std::cerr << "Категория слишком длинная (максимум 50 символов).\n";
+            continue;
+        }
+        break;
+    }
+
+    while (true) {
+        std::cout << "Цена (0 – отмена): ";
+        Getline(new_product.price);
+        if (new_product.price < 0) {
+            std::cerr << "Некорректная цена. Введите положительное число.\n";
+            continue;
+        }
+        if (new_product.price == 0) {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.price > 10000.0) {
+            std::cerr << "Цена не может превышать 10000.\n";
+            continue;
+        }
+        break;
+    }
+
+    while (true) {
+        std::cout << "Артикул (целое число, 0 - отмена): ";
+        Getline(new_product.article);
+        if (new_product.article < 0 ) {
+            std::cerr << "Некорректный артикул\n";
+            continue;
+        }
+        if(new_product.article == 0) {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        break;
+    }
+
+    bool dates_valid = false;
+    while (!dates_valid) {
+        std::cout << "Начало срока годности (ДД.ММ.ГГГГ): ";
+        Getline(new_product.begin_date);
+        if (new_product.begin_date.empty() || new_product.begin_date == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+
+        std::cout << "Окончание срока годности (ДД.ММ.ГГГГ): ";
+        Getline(new_product.end_date);
+        if (new_product.end_date.empty() || new_product.end_date == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+
+        if (!validate_dates(new_product.begin_date, new_product.end_date)) {
+            std::cout << "Пожалуйста, введите корректные даты заново.\n";
+            continue;
+        }
+        dates_valid = true;
+    }
+
+    while (true) {
+        std::cout << "Количество (максимум 199, 0 – отмена): ";
+        Getline(new_product.count);
+        if (new_product.count < 0) {
+            std::cerr << "Некорректное количество.\n";
+            continue;
+        }
+        if(new_product.count == 0) {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.count > 199) {
+            std::cerr << "Количество не может быть больше 199.\n";
+            continue;
+        }
+        break;
+    }
+
+    while (true) {
+        std::cout << "Производитель (пустая строка или 'exit' для отмены): ";
+        Getline(new_product.manufacturer);
+        if (new_product.manufacturer.empty() || new_product.manufacturer == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.manufacturer.size() > 60) {
+            std::cerr << "Название производителя слишком длинное (максимум 60 символов).\n";
+            continue;
+        }
+        break;
+    }
+
+    while (true) {
+        std::cout << "Страна производства (пустая строка или 'exit' для отмены): ";
+        Getline(new_product.country);
+        if (new_product.country.empty() || new_product.country == "exit") {
+            std::cerr << "Операция добавления отменена.\n";
+            return;
+        }
+        if (new_product.country.size() > 55) {
+            std::cerr << "Название страны слишком длинное (максимум 55 символов).\n";
+            continue;
+        }
+        break;
+    }
+
+
+    goods.push_back(new_product);
+    std::cout << "Товар '" << new_product.name << "' успешно добавлен.\n";
+
+    save_to_file("Product.txt");
+}
+
+void Storage::show_all() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
+    goods.erase(std::remove_if(goods.begin(), goods.end(),
+                               [](const Product& p) { return p.count == 0; }), goods.end());
+
+    if (goods.empty()) {
+        std::cout << "Склад пуст." << std::endl;
+        return;
+    }
+
+    const int w_id  = 4;
+    const int w_name = 18;
+    const int w_cat = 14;
+    const int w_price = 10;
+    const int w_count = 8;
+    const int w_art = 10;
+
+    int total_width = w_id + w_name + w_cat + w_price + w_count + w_art + 13;
+
+    std::cout << "\n" << std::setfill('=') << std::setw(total_width) << "" << std::setfill(' ') << "\n";
+
+    std::cout << std::left
+              << "| " << std::setw(w_id)   << "ID"
+              << "| " << std::setw(w_name) << "Название"
+              << "| " << std::setw(w_cat)  << "Категория"
+              << "| " << std::setw(w_price) << "Цена"
+              << "| " << std::setw(w_count) << "Кол-во"
+              << "| " << std::setw(w_art)  << "Артикль" << "|\n";
+
+    std::cout << std::setfill('-') << std::setw(total_width) << "" << std::setfill(' ') << "\n";
+
+    for (size_t i = 0; i < goods.size(); ++i) {
+        const Product& p = goods[i];
+
+        std::cout << std::left
+                  << "| " << std::setw(w_id)   << i + 1
+                  << "| " << std::setw(w_name) << format_field(p.name, w_name - 1)
+                  << "| " << std::setw(w_cat)  << format_field(p.category, w_cat - 1)
+                  << "| " << std::setw(w_price) << std::fixed << std::setprecision(2) << p.price
+                  << "| " << std::setw(w_count) << p.count
+                  << "| " << std::setw(w_art)  << p.article << "|\n";
+    }
+
+    std::cout << std::setfill('=') << std::setw(total_width) << "" << std::setfill(' ') << "\n\n";
+}
+void Storage::show_valid_products() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    if (goods.empty()) {
+        std::cerr << "Список товаров пустой" << std::endl;
+        return;
+    }
+    int valid_count = 0;
+    for (size_t i = 0; i < goods.size(); ++i) {
+        if (!is_expired(goods[i].end_date)) {
+            const auto& p = goods[i];
+            std::cout << i + 1 << " | Название: " << p.name
+                      << " | Категория: " << p.category
+                      << " | Цена: " << p.price
+                      << " | Артикль: " << p.article
+                      << " | Годен до: " << p.end_date
+                      << " | Количество: " << p.count
+                      << " | Производитель: " << p.manufacturer
+                      << " | Страна: " << p.country << '\n';
+            valid_count++;
+        }
+    }
+    if (valid_count == 0) {
+        std::cerr << "Нет годных товаров на складе\n";
+    }
+    else {
+        std::cout << "Всего годных товаров: " << valid_count << "\n";
+    }
+}
+void Storage::check_expired_products() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    if (goods.empty()) {
+        std::cerr << "Список товаров пустой" << std::endl;
+        return;
+    }
+    int expired_count = 0;
+
+    for (size_t i = 0; i < goods.size(); ++i) {
+        if (is_expired(goods[i].end_date)) {
+            const auto& p = goods[i];
+            std::cout << "Товар просрочен: " << p.name
+                      << "(Артикль: " << p.article
+                      << ", Годен до: " << p.end_date << ")\n";
+            expired_count++;
+        }
+    }
+
+    if (expired_count == 0) {
+        std::cout << "Просроченных товаров нет\n";
+    }
+    else {
+        std::cout << "Всего просроченных товаров: " << expired_count << "\n";
     }
 }
 
 std::chrono::sys_days Storage::parse_date(const std::string& date_str) {
     int day, month, year;
-    char dot1, dot2;
-    std::stringstream ss(date_str);
-    ss >> day >> dot1 >> month >> dot2 >> year;
-    if (year < 100) year += 2000;
-    return std::chrono::sys_days{
-        std::chrono::year(year) / std::chrono::month(month) / std::chrono::day(day)
-    };
-}
+    char delim1, delim2;
 
+    std::istringstream ss(date_str);
+    ss >> day >> delim1 >> month >> delim2 >> year;
+
+    if (year < 100) {
+        year += 2000;
+    }
+
+    return std::chrono::sys_days(
+        std::chrono::year(year) / std::chrono::month(month) / std::chrono::day(day)
+        );
+}
 std::string Storage::format_field(std::string str, std::size_t width) const {
     if (str.length() > width) {
         return str.substr(0, width - 2) + "..";
     }
     return str;
 }
-
-bool Storage::is_expired(const std::string& date_str) {
+bool Storage::is_expired(const std::string& end_date_str) {
     try {
-        auto end_date = parse_date(date_str);
         auto now = std::chrono::system_clock::now();
-        return end_date < now;
-    } catch (...) {
+        auto today = now;
+        auto end_date = parse_date(end_date_str);
+
+        return end_date < today;
+    }
+    catch (...) {
+        std::cerr << "Ошибка парсинга даты: " << end_date_str << std::endl;
         return true;
     }
 }
-
-bool Storage::is_date_range_valid(const std::string& begin_str, const std::string& end_str) {
+bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str) {
     try {
-        auto begin = parse_date(begin_str);
-        auto end = parse_date(end_str);
-        return begin <= end;
-    } catch (...) {
-        return false;
-    }
-}
+        auto begin_date = parse_date(begin_date_str);
+        auto end_date = parse_date(end_date_str);
 
-bool Storage::validate_dates(const std::string& begin, const std::string& end) {
-    if (!is_date_range_valid(begin, end)) {
-        std::cerr << "Дата начала не может быть позже даты окончания\n";
-        return false;
-    }
-    if (is_expired(end)) {
-        std::cerr << "Товар уже просрочен\n";
-        return false;
-    }
-    try {
-        auto end_date = parse_date(end);
-        auto now = std::chrono::system_clock::now();
-        auto days_left = std::chrono::duration_cast<std::chrono::days>(end_date - now).count();
-        if (days_left <= 30 && days_left > 0) {
-            std::cout << "Срок годности истекает через " << days_left << " дней\n";
+        if (begin_date > end_date) {
+            std::cerr << "Дата начала не может быть позже даты окончания!\n";
+            return false;
         }
-    } catch (...) {}
+
+        return true;
+    }
+    catch (...) {
+        std::cerr << "Неверный формат даты! Используйте ДД.ММ.ГГГГ\n";
+        return false;
+    }
+}
+bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) {
+    if (!is_date_range_valid(begin_date, end_date)) {
+        return false;
+    }
+    if (is_expired(end_date)) {
+        auto today = std::chrono::system_clock::now();
+        auto get_end_date = parse_date(end_date);
+        auto days_ago = std::chrono::duration_cast<std::chrono::days>(today - get_end_date).count();
+        std::cerr << "Ошибка: Товар просрочен на " << days_ago
+                  << " дней (срок годности истек " << end_date << ")\n";
+        return false;
+    }
+    auto get_end_date = parse_date(end_date);
+    auto today = std::chrono::system_clock::now();
+    auto days_left = duration_cast<std::chrono::days>(get_end_date - today).count();
+    if (days_left <= 30 && days_left > 0) {
+        std::cout << "Срок годности истекает через " << days_left << " дней!\n";
+    }
+    return true;
+}
+bool Storage::check_characteristics(const Product& analyse_product) {
+    auto exist = std::find(goods.begin(), goods.end(), analyse_product);
+    if (exist != goods.end()) {
+        std::cerr << "Товар уже есть\n";
+        return false;
+    }
+
+    std::unordered_set<char> available_symbols;
+    for (char s = 'A'; s < 'Z'; ++s) available_symbols.insert(s);
+    for (char s = '0'; s <= '9'; ++s) available_symbols.insert(s);
+    available_symbols.insert('.');
+    available_symbols.insert('-');
+
+    for (auto check_name : analyse_product.name) {
+        if (!available_symbols.count(check_name)) {
+            std::cerr << "Название товара имеет недействительный символ\n";
+            return false;
+        }
+    }
+    for (auto& check_category : analyse_product.category) {
+        if (!available_symbols.count(check_category)) {
+            std::cerr << "Категория товара имеет недействительный символ\n";
+            return false;
+        }
+    }
+    for (auto& check_manufacturer : analyse_product.manufacturer) {
+        if (!available_symbols.count(check_manufacturer)) {
+            std::cerr << "Имя производителя имеет недействительный символ\n";
+            return false;
+        }
+    }
+    for (auto& check_begin_date : analyse_product.begin_date) {
+        if (!available_symbols.count(check_begin_date)) {
+            std::cerr << "Дата начала поставки имеет недействительный символ\n";
+            return false;
+        }
+    }
+    for (auto& check_country : analyse_product.country) {
+        if (!available_symbols.count(check_country)) {
+            std::cerr << "Страна производства поставки имеет недействительный символ\n";
+            return false;
+        }
+    }
+    for (auto& check_end_date : analyse_product.end_date) {
+        if (!available_symbols.count(check_end_date)) {
+            std::cerr << "Дата окончания поставки имеет недействительный символ\n";
+            return false;
+        }
+    }
+    if (analyse_product.price <= 0.0 || analyse_product.count <= 0 || analyse_product.article <= 0) {
+        std::cerr << "Цена/Количество/Артикль товара не может быть отрицательным или нулевым\n";
+        return false;
+    }
+
     return true;
 }
 
-bool Storage::check_characteristics(const Product& p) {
-    auto it = std::find(goods.begin(), goods.end(), p);
-    if (it != goods.end()) {
-        std::cerr << "Товар с артиклем " << p.article << " уже существует\n";
-        return false;
-    }
-    if (p.price <= 0) {
-        std::cerr << "Цена должна быть положительной\n";
-        return false;
-    }
-    if (p.count == 0) {
-        std::cerr << "Количество должно быть больше 0\n";
-        return false;
-    }
-    if (p.article <= 0) {
-        std::cerr << "Артикль должен быть положительным числом\n";
-        return false;
-    }
-    return true;
-}
