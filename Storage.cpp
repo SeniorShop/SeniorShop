@@ -69,7 +69,7 @@ void Storage::super_admin_menu() {
         std::cout << "Выберите действие: ";
         std::string choose;
         Getline(choose);
-        if (choose.size() != 1 || choose[0] < '0' || choose[0] > '9') {
+        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
