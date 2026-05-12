@@ -1,23 +1,22 @@
 #include "User.h"
 
-void User::set_name(const std::string& set_name) {
-    username = set_name;
+User::User() = default;
+User::User(const std::string& name, const std::string& pass, const std::string& st)
+    : username(name), password(pass), status(st) {}
+
+std::string User::serialize() const {
+    return username + "|" + password + "|" + status;
 }
-void User::set_password(const std::string& set_password) {
-    password = set_password;
+
+User User::deserialize(const std::string& line) {
+    std::stringstream ss(line);
+    User u;
+    std::getline(ss, u.username, '|');
+    std::getline(ss, u.password, '|');
+    std::getline(ss, u.status);
+    return u;
 }
-void User::set_status(const std::string& set_status) {
-    status = set_status;
-}
-std::string User::get_name() const {
-    return username;
-}
-std::string User::get_password() const {
-    return password;
-}
-std::string User::get_status() const {
-    return status;
-}
+
 bool User::operator==(const User& other) const {
-    return this->username == other.username && this->password == other.password && this->status == other.status;
+    return username == other.username;
 }
