@@ -20,7 +20,7 @@ void Check::save_check(const std::string& filename) const {
 void Check::show_financial_report(const std::string& filename) {
     std::ifstream in(filename);
     if (!in.is_open()) {
-        std::cout << "история операций пуста или файл не найден\n";
+        std::cout << "No transactions found\n";
         return;
     }
 
@@ -43,17 +43,16 @@ void Check::show_financial_report(const std::string& filename) {
         }
     }
 
-    std::string winner = "нет";
+    std::string winner = "none";
     double max_s = 0;
     for (auto const& [name, val] : staff_stats) {
         if (val > max_s) { max_s = val; winner = name; }
     }
 
-    system("cls");
-    std::cout << "финансовый отчет\n";
-    std::cout << "выручка: " << total_sales << "\n";
-    std::cout << "убытки: " << total_losses << "\n";
-    std::cout << "прибыль: " << total_sales - total_losses << "\n";
-    std::cout << "лучший сотрудник: " << winner << "\n";
-    if (max_s > 0) std::cout << "премия: " << max_s * 0.05 << "\n";
+    std::cout << "FINANCIAL REPORT\n";
+    std::cout << "Revenue: " << total_sales << "\n";
+    std::cout << "Losses: " << total_losses << "\n";
+    std::cout << "Profit: " << total_sales - total_losses << "\n";
+    std::cout << "Best employee: " << winner << "\n";
+    if (max_s > 0) std::cout << "Bonus: " << max_s * 0.05 << "\n";
 }

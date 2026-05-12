@@ -1,4 +1,7 @@
 #include "SaleService.h"
+#include "Check.h"
+#include <ctime>
+#include <thread>
 #include <iostream>
 #include <fstream>
 
@@ -55,6 +58,7 @@ void SaleService::show_сart(const Cart& cart) {
 }
 
 void SaleService::apply_sale(const Cart& cart) {
+
     for (const auto& item : cart.get_items()) {
         for (auto& p : products) {
             if (p.article == item.product.article) {
@@ -72,6 +76,18 @@ void SaleService::apply_sale(const Cart& cart) {
     }
     file.close();
 
-    std::cout << "Склад обновлён. Товары списаны.\n";
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::string date_str = std::ctime(&now_time);
+    date_str.pop_back();
+
+    for (const auto& item : cart.get_items()) {
+        Check check(TransactionType::Sale, item.product.name, item.product.price,
+                    item.count, "Сотрудник", date_str);
+        check.save_check("checks.txt");
+    }
+
+    std::cout << "Продажа записана в отчёт\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 }
 

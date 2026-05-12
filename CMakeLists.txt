@@ -18,9 +18,10 @@ add_executable(SeniorFixing main.cpp
     Captcha.h Captcha.cpp
     MethodSuperAdmin.h MethodSuperAdmin.cpp
     Cart.h Cart.cpp
-
     SaleControl.h SaleControl.cpp
     SaleService.h SaleService.cpp
+    Check.h Check.cpp
+
 )
 
 include(GNUInstallDirs)
