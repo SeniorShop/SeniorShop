@@ -1,6 +1,7 @@
 #include "Product.h"
 
 Product::Product(const Product& other) {
+    this->id = other.id;
     this->name = other.name;
     this->category = other.category;
     this->price = other.price;
@@ -11,10 +12,12 @@ Product::Product(const Product& other) {
     this->manufacturer = other.manufacturer;
     this->country = other.country;
 }
-Product::Product() : name(), category(), price(0.0), article(0), begin_date(), end_date(), count(0), manufacturer(), country() {}
+Product::Product() = default;
 bool Product::operator==(const Product& other) const {
     return name == other.name && category == other.category && article == other.article;
 }
+unsigned int Product::get_id() {return id;}
+unsigned int Product::get_count() {return count;}
 
 //void setColor(int color)
 //{

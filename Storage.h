@@ -3,6 +3,7 @@
 #include "Product.h"
 #include "Supply.h"
 #include "SupplyManager.h"
+#include "SaleControl.h"
 #include <vector>
 #include <fstream>
 #include <algorithm>
@@ -14,6 +15,7 @@
 class AuthSystemUser;
 
 class Storage {
+    SaleController start_sales;
     SupplyManager supply_manager;
     std::vector<Product> goods;
     AuthSystemUser* authSystem = nullptr;

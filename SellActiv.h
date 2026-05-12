@@ -16,7 +16,6 @@ class PromoManager {
 public:
     PromoManager();
     void show_promo_menu(double& total_sum, const std::vector<std::pair<std::string, double>>& cart);
-
     void reset() { discount_used = false; }
 };
 

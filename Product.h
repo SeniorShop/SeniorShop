@@ -150,18 +150,21 @@ void Getline(T& value, bool allow_empty = false) {
 }
 
 struct Product {
-    std::string name;
-    std::string category;
-    double price;
-    int article;
-    std::string begin_date;
-    std::string end_date;
-    unsigned int count;
-    std::string manufacturer;
-    std::string country;
+    unsigned int id = 0;
+    std::string name = "";
+    std::string category = "";
+    double price = 0.0;
+    int article = 0;
+    std::string begin_date = "";
+    std::string end_date = "";
+    unsigned int count = 0;
+    std::string manufacturer = "";
+    std::string country = "";
 
     Product();
     Product(const Product& other);
+    unsigned int get_id();
+    unsigned int get_count();
     bool operator==(const Product& other) const;
 };
 

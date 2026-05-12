@@ -16,7 +16,12 @@ add_executable(SeniorFixing main.cpp
     User.h User.cpp
     LoginSystem.h LoginSystem.cpp
     Captcha.h Captcha.cpp
-    MethodSuperAdmin.h MethodSuperAdmin.cpp)
+    MethodSuperAdmin.h MethodSuperAdmin.cpp
+    Cart.h Cart.cpp
+
+    SaleControl.h SaleControl.cpp
+    SaleService.h SaleService.cpp
+)
 
 include(GNUInstallDirs)
 install(TARGETS SeniorFixing

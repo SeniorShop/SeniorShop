@@ -46,6 +46,11 @@ void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pai
 }
 
 void PromoManager::apply_math_quiz(double& total_sum) {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     int a = rand() % 50 + 10;
     int b = rand() % 50 + 10;
     int answer;
@@ -66,6 +71,11 @@ void PromoManager::apply_math_quiz(double& total_sum) {
 }
 
 void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     double weight = 0;
     for (const auto& item : cart) {
         if (item.first == "Мясо" || item.first == "мясо") weight += item.second;
@@ -82,10 +92,15 @@ void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std
 }
 
 void PromoManager::apply_wheel_of_fortune(double& total_sum) {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     std::string choice;
 
     std::cout << "\nНаш магазин рад, что вы приняли участие в нашей акции\n";
-    std::cout << "\t\tКОЛЕСО ФОРТУНЫ \n";
+    std::cout << "\n\n\n\t\t\tКОЛЕСО ФОРТУНЫ \n\n\n";
     std::cout << "Стоимость участия: 1000 рублей(добавятся к сумме чека в случае проигрыша)\n";
     std::cout << "Возможные призы:\n";
     std::cout << "1. Скидка 10% на покупку\n";

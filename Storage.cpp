@@ -56,7 +56,7 @@ void Storage::super_admin_menu() {
     bool is_exit = false;
     while (true) {
         std::cout << "\n\n\n\t\t\tСПИСОК ДЕЙСТВИЙ ДЛЯ СУПЕР АДМИНА\n\n\n";
-        std::cout << "1) Добавить продажу\n";
+        std::cout << "1) Начать продажу\n";
         std::cout << "2) Показать склад\n";
         std::cout << "3) Пополнить склад\n";
         std::cout << "4) Списать товар со склада\n";
@@ -80,7 +80,7 @@ void Storage::super_admin_menu() {
             is_exit = true;
             break;
         case '1':
-
+            start_sales.start();
             break;
         case '2':
             show_all();
@@ -236,7 +236,7 @@ void Storage::admin_menu() {
 
         switch(choose[0]) {
         case '1':
-
+            start_sales.start();
             break;
         case '2':
             show_all();
@@ -310,7 +310,7 @@ void Storage::user_menu() {
             is_exit = true;
             break;
         case '1':
-
+            start_sales.start();
             break;
         case '2':
             show_all();
@@ -491,6 +491,9 @@ void Storage::show_all() {
 #else
     system("clear");
 #endif
+
+    goods.erase(std::remove_if(goods.begin(), goods.end(),
+                               [](const Product& p) { return p.count == 0; }), goods.end());
 
     if (goods.empty()) {
         std::cout << "Склад пуст." << std::endl;
