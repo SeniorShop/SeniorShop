@@ -1,30 +1,46 @@
 #include "LoginSystem.h"
-#include "Product.h"
+#ifdef _WIN32
+#include <Windows.h>
+#else
+#include <stdlib.h>
+#endif
+
 #include <iostream>
+#include <string>
+#include <vector>
+#include <fstream>
 
 void LoginSystem::launch() {
     std::string choose;
 
     while (true) {
-        std::cout << "\n\n\n\t\t\tСИСТЕМА ВХОДА\n\n\n";
-        std::cout << "1 - Вход\n";
-        std::cout << "2 - Регистрация\n";
-        std::cout << "3 - Выход\n";
-        std::cout << "Выбор: ";
+        std::cout << "\n\n\n\t\t\tАпрельское возвращение\n\n\n";
+        std::cout << "1 - Вход\n2- Выход\nВыбор: ";
         Getline(choose);
-
         if (choose == "1") {
             User* loggerUser = asu.login();
+
             if (loggerUser) {
-                asu.get_storage().start(loggerUser->status, asu);
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+                get_start.setAuthSystem(&asu);
+                get_start.start(loggerUser->status);
             }
-        } else if (choose == "2") {
-            asu.register_user();
-        } else if (choose == "3") {
-            std::cout << "Завершение программы" << std::endl;
-            return;
-        } else {
-            std::cerr << "Неверный выбор\n";
+        }
+        else if (choose == "2") {
+            exit_button();
+        }
+        else {
+            std::cerr << "Неверный выбор!\n";
         }
     }
+
+}
+
+void LoginSystem::exit_button() {
+    std::cout << "Завершение программы" << std::endl;
+    exit(0);
 }
