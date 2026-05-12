@@ -173,7 +173,7 @@ void Storage::supply_menu() {
         std::string choice;
         Getline(choice);
 
-        if(choice.size() != 1 || choice[0] < '0' || choice[0] > '5') {
+        if(choice.empty() || choice[0] < '0' || choice[0] > '5') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
