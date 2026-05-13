@@ -426,3 +426,7 @@ build/
 #Resurses
 Logs.txt
 Users.txt
+
+#Visual Studio
+.vs/
+out/
