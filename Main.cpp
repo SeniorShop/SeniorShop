@@ -10,8 +10,8 @@
 
 int main() {
 #ifdef _WIN32
-    SetConsoleCP();
-    SetConsoleOutputCP(1251);
+    SetConsoleCP(CP_UTF8);
+    SetConsoleOutputCP(CP_UTF8);
 #elif __linux__
     std::setlocale(LC_ALL, "ru_RU.UTF-8");
 #else

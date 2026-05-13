@@ -2,10 +2,10 @@
 #include <filesystem>
 #include <algorithm>
 #include <unordered_set>
+#include <thread>
 #ifdef _WIN32
 #include "Windows.h"
 #else
-#include <thread>
 #include <stdlib.h>
 #endif
 
