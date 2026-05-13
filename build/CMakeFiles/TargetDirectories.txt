@@ -1,0 +1,7 @@
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/SeniorShop.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/edit_cache.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/rebuild_cache.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/list_install_components.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/install.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/install/local.dir
+/home/fr1zb3e/SeniorShop/build/CMakeFiles/install/strip.dir

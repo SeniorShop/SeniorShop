@@ -1,0 +1,1 @@
+/usr/bin/c++ -Wl,--dependency-file=CMakeFiles/SeniorShop.dir/link.d CMakeFiles/SeniorShop.dir/Main.cpp.o CMakeFiles/SeniorShop.dir/AuthSystemUser.cpp.o CMakeFiles/SeniorShop.dir/User.cpp.o CMakeFiles/SeniorShop.dir/Logger.cpp.o CMakeFiles/SeniorShop.dir/LoginSystem.cpp.o CMakeFiles/SeniorShop.dir/Captcha.cpp.o -o SeniorShop
