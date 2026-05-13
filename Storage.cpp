@@ -8,6 +8,7 @@
 #include <algorithm>
 #ifdef _WIN32
 #include "Windows.h"
+#include <thread>
 #else
 #include "stdlib.h"
 #include <thread>
@@ -90,13 +91,13 @@ void Storage::super_admin_menu() {
             add_product();
             break;
         case '4':
-
+            // реализация будет позже
             break;
         case '5':
             change_product_price();
             break;
         case '6':
-
+            // реализация будет позже
             break;
         case '7':
             StorageUserMethod(authSystem);
@@ -114,6 +115,11 @@ void Storage::super_admin_menu() {
         if(is_exit) break;
 
     }
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     return;
 }
 
@@ -129,6 +135,8 @@ void Storage::change_product_price() {
         return;
     }
 
+    show_all();
+
     std::string name, category;
     std::cout << "Название товара: ";
     Getline(name);
@@ -136,7 +144,7 @@ void Storage::change_product_price() {
     Getline(category);
 
     auto find = std::find_if(goods.begin(), goods.end(),
-                           [&](const Product& p) { return p.name == name && p.category == category; });
+                             [&](const Product& p) { return p.name == name && p.category == category; });
 
     if (find == goods.end()) {
         std::cerr << "Товар не найден\n";
@@ -144,17 +152,25 @@ void Storage::change_product_price() {
     }
 
     std::cout << "Текущая цена '" << find->name << "': " << find->price << " руб.\n";
-    std::cout << "Введите новую цену: ";
-    Getline(find->price);
 
-    if (find->price < 0.0 || find->price > 10000.0) {
+    double new_price;
+    std::cout << "Введите новую цену: ";
+    Getline(new_price);
+
+    if (new_price < 0.0 || new_price > 10000.0) {
         std::cerr << "Ошибка: цена должна быть от 0 до 10000 руб.\n";
         return;
     }
 
+    find->price = new_price;
     std::cout << "Цена изменена на " << find->price << " руб.\n";
     save_to_file("Product.txt");
-    return;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void Storage::supply_menu() {
@@ -208,6 +224,11 @@ void Storage::supply_menu() {
         if(is_exit) break;
 
     }
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     return;
 }
 
@@ -248,14 +269,14 @@ void Storage::admin_menu() {
             add_product();
             break;
         case '4':
-
+            // реализация будет позже
             break;
         case '5':
-
+            // реализация будет позже
             break;
         case '6':
             Check::show_financial_report("checks.txt");
-            std::cout << "Нажмите Enter для продолжения...";
+            std::cout << "Нажмите Enter для продолжения: ";
             std::cin.get();
             break;
         case '7':
@@ -322,7 +343,7 @@ void Storage::user_menu() {
             break;
         case '3':
             Check::show_financial_report("checks.txt");
-            std::cout << "Нажмите Enter для продолжения...";
+            std::cout << "Нажмите Enter для продолжения: ";
             std::cin.get();
             break;
         case '4':
@@ -333,6 +354,11 @@ void Storage::user_menu() {
         if(is_exit) break;
 
     }
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     return;
 }
 void Storage::start(const std::string& user_status) {
@@ -491,8 +517,13 @@ void Storage::add_product() {
 
     goods.push_back(new_product);
     std::cout << "Товар '" << new_product.name << "' успешно добавлен.\n";
-
     save_to_file("Product.txt");
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void Storage::show_all() {
