@@ -62,6 +62,11 @@ void SaleController::start() {
             }
         }
         else if (cmd == "exit") {
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             break;
         }
         else {
