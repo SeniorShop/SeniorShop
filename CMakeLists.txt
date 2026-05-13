@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(SeniorFixing LANGUAGES CXX)
+project(SeniorShop LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-add_executable(SeniorFixing main.cpp
+add_executable(SeniorShop Main.cpp
     Storage.h Storage.cpp
     Supply.h Supply.cpp
     SupplyManager.h SupplyManager.cpp
@@ -25,7 +25,7 @@ add_executable(SeniorFixing main.cpp
 )
 
 include(GNUInstallDirs)
-install(TARGETS SeniorFixing
+install(TARGETS SeniorShop
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
