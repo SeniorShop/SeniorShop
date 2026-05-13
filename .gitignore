@@ -421,4 +421,4 @@ FodyWeavers.xsd
 .vscode/
 
 #CMake
-.build/
+build/
