@@ -80,57 +80,89 @@ void SupplyManager::add_to_file(const Supply& s) {
 
 void SupplyManager::create_supplies() {
     int count;
-    std::cout << "Сколько поставок записать: ";
+    std::cout << "Сколько поставок записать от 1 до 5: ";
     Getline(count);
+
+    if (count < 1 || count > 5) {
+        std::cerr << "Ошибка: количество поставок должно быть от 1 до 10\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+        return;
+    }
 
     for (int i = 0; i < count; ++i) {
         Supply s;
-        std::cout << "Поставка под номером: " << (i + 1) << "\n";
+        std::cout << "\n\n\n\t\t\tПоставка под номером: " << (i + 1) << "\n\n\n";
 
-        std::cout << "Номер поставки: ";
-        Getline(s.number_supply);
+        unsigned int new_number;
+        while (true) {
+            std::cout << "Номер поставки: ";
+            Getline(new_number);
+
+            bool exists = false;
+            for (const auto& existing : supplies) {
+                if (existing.number_supply == new_number) {
+                    exists = true;
+                    std::cerr << "Ошибка: поставка с номером " << new_number << " уже существует\n";
+                    break;
+                }
+            }
+            if (!exists) break;
+        }
+        s.number_supply = new_number;
+
         std::cout << "От кого поставка (поставщик): ";
         Getline(s.name_user, false);
 
         std::string d;
-        std::cout << "Дата выгрузки (день.месяц.год): ";
+        std::cout << "Дата выгрузки (ДД.ММ.ГГГГ): ";
         Getline(d);
         s.date = Supply::string_to_date(d);
-        std::cout << "Дата принятия (день.месяц.год): ";
+        std::cout << "Дата принятия (ДД.ММ.ГГГГ): ";
         Getline(d);
         s.date_acception = Supply::string_to_date(d);
-        std::cout << "Дата обработки (день.месяц.год): ";
+        std::cout << "Дата обработки (ДД.ММ.ГГГГ): ";
         Getline(d);
         s.date_processing = Supply::string_to_date(d);
-
         std::cout << "Кто взял поставку (ФИО пользователя): ";
         Getline(s.responsible_person, false);
 
-        std::cout << "Товар в поставке:\n";
-        std::cout << "  Название: ";
-        Getline(s.product_name.name, false);
-        std::cout << "  Категория: ";
-        Getline(s.product_name.category, false);
-        std::cout << "  Цена: ";
-        Getline(s.product_name.price);
-        std::cout << "  Артикль: ";
-        Getline(s.product_name.article);
-        std::cout << "  Начало срока (день.месяц.год): ";
-        Getline(s.product_name.begin_date);
-        std::cout << "  Конец срока (день.месяц.год): ";
-        Getline(s.product_name.end_date);
-        std::cout << "  Количество: ";
-        Getline(s.product_name.count);
-        std::cout << "  Производитель: ";
-        Getline(s.product_name.manufacturer, false);
-        std::cout << "  Страна: ";
-        Getline(s.product_name.country, false);
+        std::cout << "Добавление товаров в поставку (0 для завершения):\n";
+        while (true) {
+            Product p;
+            std::cout << "Название товара (0 - завершить): ";
+            Getline(p.name);
+            if (p.name == "0") break;
+
+            std::cout << "Категория: ";
+            Getline(p.category, false);
+            std::cout << "Цена: ";
+            Getline(p.price);
+            std::cout << "Артикль: ";
+            Getline(p.article);
+            std::cout << "Начало срока (ДД.ММ.ГГГГ): ";
+            Getline(p.begin_date);
+            std::cout << "Конец срока (ДД.ММ.ГГГГ): ";
+            Getline(p.end_date);
+            std::cout << "Количество: ";
+            Getline(p.count);
+            std::cout << "Производитель: ";
+            Getline(p.manufacturer, false);
+            std::cout << "Страна: ";
+            Getline(p.country, false);
+
+            s.product_name = p;
+            supplies.push_back(s);
+            add_to_file(s);
+        }
 
         s.is_actually = true;
         s.status = "Ожидается";
 
-        supplies.push_back(s);
-        add_to_file(s);
         std::cout << "Поставка под номером: " << s.number_supply << " добавлена\n";
     }
     std::cout << "Добавлено поставок: " << count << std::endl;
@@ -139,6 +171,12 @@ void SupplyManager::create_supplies() {
 void SupplyManager::show_all_supplies() {
     if (supplies.empty()) {
         std::cout << "Нет поставок\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
     for (const auto& s : supplies) {
@@ -172,6 +210,12 @@ void SupplyManager::change_supply_from_file() {
         }
     }
     std::cerr << "Поставка не найдена\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void SupplyManager::delete_supply_from_file() {
@@ -184,6 +228,12 @@ void SupplyManager::delete_supply_from_file() {
 
     if (it == supplies.end()) {
         std::cerr << "Поставка не найдена\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -220,4 +270,10 @@ void SupplyManager::apply_supply_to_storage(Storage& storage) {
         }
     }
     std::cerr << "Поставка не найдена или не актуальна\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }

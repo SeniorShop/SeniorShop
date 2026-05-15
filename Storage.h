@@ -4,6 +4,7 @@
 #include "Supply.h"
 #include "SupplyManager.h"
 #include "SaleControl.h"
+#include "Check.h"
 #include <vector>
 #include <fstream>
 #include <algorithm>
@@ -19,8 +20,9 @@ class Storage {
     SupplyManager supply_manager;
     std::vector<Product> goods;
     AuthSystemUser* authSystem = nullptr;
+    Check get_check;
 public:
-    void setAuthSystem(AuthSystemUser* auth);
+    void set_auth_system(AuthSystemUser* auth);
     void load_from_file(const std::string& product_database);
     void save_to_file(const std::string& product_database);
     void add_product();
