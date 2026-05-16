@@ -1,8 +1,9 @@
 #ifndef CHECK_H
 #define CHECK_H
-
+#include "Product.h"
 #include <string>
 #include <vector>
+#include <thread>
 
 enum class TransactionType {
     Sale = 0,
@@ -22,7 +23,12 @@ struct Check {
     Check(TransactionType type, std::string name, double price, int count, std::string emp_name, std::string date);
 
     void save_check(const std::string& filename) const;
-    static void show_financial_report(const std::string& filename);
+    void show_financial_report(const std::string& filename);
+    void show_sales_documents(const std::string& filename);
+    void show_logs();
+    void show_writeoffs(const std::string& filename);
+    void show_supplies();
+    void show_full_financial_report(const std::string& filename);
 };
 
 #endif

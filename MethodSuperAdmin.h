@@ -3,7 +3,7 @@
 
 class AuthSystemUser;
 
-void StorageUserMethod(AuthSystemUser* auth);
+void storage_user_method(AuthSystemUser* auth);
 
 #endif // METHOD_SYPER_ADMIN_H
 

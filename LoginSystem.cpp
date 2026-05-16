@@ -26,7 +26,7 @@ void LoginSystem::launch() {
 #else
                 system("clear");
 #endif
-                get_start.setAuthSystem(&asu);
+                get_start.set_auth_system(&asu);
                 get_start.start(loggerUser->status);
             }
         }

@@ -1,6 +1,5 @@
 #ifndef SUPPLY_H
 #define SUPPLY_H
-
 #include <string>
 #include <chrono>
 #include "Product.h"

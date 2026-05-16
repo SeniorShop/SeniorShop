@@ -29,7 +29,6 @@ void AuthSystemUser::load_from_file() {
     users.clear();
     std::ifstream in_file("Users.txt");
     if (!in_file.is_open()) {
-        std::cerr << "Ошибка открытия файла Users.txt" << std::endl;
         return;
     }
     std::string line;
@@ -145,8 +144,20 @@ void AuthSystemUser::register_user() {
 
     if (!currentUser_ || currentUser_->status != "superadmin") {
         std::cerr << "Только суперадминистратор может создавать новых пользователей" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
+
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 
     std::string username, password;
     std::cout << "Введите логин нового пользователя: ";
@@ -196,27 +207,30 @@ void AuthSystemUser::register_user() {
     save_to_file();
     Logger::log_attempt(username, true);
     std::cout << "Пользователь успешно зарегистрирован." << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
 #ifdef _WIN32
     system("cls");
 #else
     system("clear");
 #endif
 }
-
 
 void AuthSystemUser::show_all_users() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-    std::cout << "Список пользователей:" << std::endl;
-    for (const auto& u : users) {
-        std::cout << "Логин: " << u->username
-                  << ", Статус: " << u->status << std::endl;
-    }
-}
+    std::cout << "\n\n\n\t\t\tСПИСОК ПОЛЬЗОВАТЕЛЕЙ\n\n\n";
+    std::cout << std::left
+              << std::setw(25) << "Логин"
+              << std::setw(15) << "Статус"
+              << "\n";
+    std::cout << std::string(40, '-') << "\n";
 
+    for (const auto& u : users) {
+        std::cout << std::left
+                  << std::setw(25) << u->username
+                  << std::setw(15) << u->status
+                  << "\n";
+    }
+    std::cout << std::string(40, '-') << "\n";
+}
 
 void AuthSystemUser::change_user() {
 #ifdef _WIN32
@@ -261,7 +275,12 @@ void AuthSystemUser::change_user() {
 }
 
 void AuthSystemUser::user_pass_change() {
+#ifdef _WIN32
     system("cls");
+#else
+    system("clear");
+#endif
+
     std::string name, password, status, new_password;
     std::cout << "Введите логин пользователя: ";
     Getline(name);
@@ -294,16 +313,12 @@ void AuthSystemUser::user_pass_change() {
         std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
 #ifdef _WIN32
         Sleep(1000);
+        system("cls");
 #else
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        system("clear");
 #endif
     }
-
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
     return;
 }
 
@@ -346,16 +361,13 @@ void AuthSystemUser::user_status_change() {
         std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
 #ifdef _WIN32
         Sleep(1000);
+        system("cls");
 #else
         std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        system("clear");
 #endif
     }
 
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
     return;
 }
 
@@ -396,18 +408,14 @@ void AuthSystemUser::remove_user() {
     }
 
     if(!success) {
+        std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
 #ifdef _WIN32
         Sleep(1000);
+        system("cls");
 #else
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        system("clear");
 #endif
-        std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
     }
-
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
     return;
 }

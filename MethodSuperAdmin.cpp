@@ -9,7 +9,7 @@
 #include <thread>
 #endif
 
-void StorageUserMethod(AuthSystemUser* auth) {
+void storage_user_method(AuthSystemUser* auth) {
     std::string choose;
 #ifdef _WIN32
     system("cls");

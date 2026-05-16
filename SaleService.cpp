@@ -6,7 +6,7 @@
 #include <fstream>
 
 std::vector<Product> SaleService::load() {
-    std::vector<Product> products;
+    products.clear();
     std::ifstream file("Product.txt");
 
     Product p;
@@ -24,8 +24,29 @@ std::vector<Product> SaleService::load() {
     return products;
 }
 
+void SaleService::refresh() {
+    products.clear();
+    std::ifstream file("Product.txt");
+
+    Product p;
+    unsigned int index = 1;
+    while (file >> p.name >> p.category >> p.price
+           >> p.article >> p.begin_date >> p.end_date
+           >> p.count >> p.manufacturer >> p.country) {
+        if (p.count > 0) {
+            p.id = index++;
+            products.push_back(p);
+        }
+    }
+    file.close();
+}
+
+const std::vector<Product>& SaleService::get_products() const {
+    return products;
+}
+
 bool SaleService::add_to_cart(Cart& cart, unsigned int id, unsigned int count) {
-    std::vector<Product> products = load();
+    refresh();
 
     if (id < 1 || id > products.size()) {
         std::cout << "Ошибка: неверный ID товара\n";
@@ -58,6 +79,7 @@ void SaleService::show_сart(const Cart& cart) {
 }
 
 void SaleService::apply_sale(const Cart& cart) {
+    refresh();
 
     for (const auto& item : cart.get_items()) {
         for (auto& p : products) {
@@ -89,5 +111,9 @@ void SaleService::apply_sale(const Cart& cart) {
 
     std::cout << "Продажа записана в отчёт\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
-

@@ -14,7 +14,7 @@
 #include <thread>
 #endif
 
-void Storage::setAuthSystem(AuthSystemUser* auth) {
+void Storage::set_auth_system(AuthSystemUser* auth) {
     authSystem = auth;
 }
 
@@ -100,10 +100,10 @@ void Storage::super_admin_menu() {
             // реализация будет позже
             break;
         case '7':
-            StorageUserMethod(authSystem);
+            storage_user_method(authSystem);
             break;
         case '8':
-            Check::show_financial_report("checks.txt");
+            get_check.show_financial_report("Checks.txt");
             std::cout << "Нажмите на кнопку Enter для продолжения: ";
             std::cin.get();
             break;
@@ -132,6 +132,12 @@ void Storage::change_product_price() {
 
     if (goods.empty()) {
         std::cerr << "Список товаров пустой\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -275,7 +281,7 @@ void Storage::admin_menu() {
             // реализация будет позже
             break;
         case '6':
-            Check::show_financial_report("checks.txt");
+            get_check.show_financial_report("Checks.txt");
             std::cout << "Нажмите Enter для продолжения: ";
             std::cin.get();
             break;
@@ -342,7 +348,7 @@ void Storage::user_menu() {
             show_all();
             break;
         case '3':
-            Check::show_financial_report("checks.txt");
+            get_check.show_financial_report("Checks.txt");
             std::cout << "Нажмите Enter для продолжения: ";
             std::cin.get();
             break;
@@ -363,26 +369,21 @@ void Storage::user_menu() {
 }
 void Storage::start(const std::string& user_status) {
     load_from_file("Product.txt");
-    while (true) {
-        if (user_status == "superadmin") {
-            super_admin_menu();
-        }
-        else if (user_status == "admin") {
-            admin_menu();
-        }
-        else {
-            user_menu();
-        }
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
-        return;
+    if (user_status == "superadmin") {
+        super_admin_menu();
+    } else if (user_status == "admin") {
+        admin_menu();
+    } else {
+        user_menu();
     }
 }
 
 void Storage::add_product() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     Product new_product;
 
     while (true) {
@@ -404,6 +405,12 @@ void Storage::add_product() {
         Getline(new_product.category);
         if (new_product.category.empty() || new_product.category == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
         if (new_product.category.size() > 50) {
@@ -422,6 +429,12 @@ void Storage::add_product() {
         }
         if (new_product.price == 0) {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
         if (new_product.price > 10000.0) {
@@ -440,6 +453,12 @@ void Storage::add_product() {
         }
         if(new_product.article == 0) {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
         break;
@@ -537,7 +556,13 @@ void Storage::show_all() {
                                [](const Product& p) { return p.count == 0; }), goods.end());
 
     if (goods.empty()) {
-        std::cout << "Склад пуст." << std::endl;
+        std::cout << "Склад пуст.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -640,18 +665,18 @@ void Storage::check_expired_products() {
 
 std::chrono::sys_days Storage::parse_date(const std::string& date_str) {
     int day, month, year;
-    char delim1, delim2;
+    char dot1, dot2;
 
     std::istringstream ss(date_str);
-    ss >> day >> delim1 >> month >> delim2 >> year;
+    ss >> day >> dot1 >> month >> dot2 >> year;
 
     if (year < 100) {
         year += 2000;
     }
 
-    return std::chrono::sys_days(
+    return std::chrono::sys_days{
         std::chrono::year(year) / std::chrono::month(month) / std::chrono::day(day)
-        );
+    };
 }
 std::string Storage::format_field(std::string str, std::size_t width) const {
     if (str.length() > width) {
@@ -661,13 +686,13 @@ std::string Storage::format_field(std::string str, std::size_t width) const {
 }
 bool Storage::is_expired(const std::string& end_date_str) {
     try {
-        auto now = std::chrono::system_clock::now();
-        auto today = now;
         auto end_date = parse_date(end_date_str);
+        auto now = std::chrono::system_clock::now();
+
+        auto today = std::chrono::floor<std::chrono::days>(now);
 
         return end_date < today;
-    }
-    catch (...) {
+    } catch (...) {
         std::cerr << "Ошибка парсинга даты: " << end_date_str << std::endl;
         return true;
     }
@@ -690,76 +715,94 @@ bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::
     }
 }
 bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) {
+    if (begin_date.length() != 10 || end_date.length() != 10) {
+        std::cerr << "Ошибка: дата должна быть в формате ДД.ММ.ГГГГ\n";
+        return false;
+    }
+    if (begin_date[2] != '.' || begin_date[5] != '.' ||
+        end_date[2] != '.' || end_date[5] != '.') {
+        std::cerr << "Ошибка: используйте разделитель '.'\n";
+        return false;
+    }
+
     if (!is_date_range_valid(begin_date, end_date)) {
         return false;
     }
-    if (is_expired(end_date)) {
-        auto today = std::chrono::system_clock::now();
-        auto get_end_date = parse_date(end_date);
-        auto days_ago = std::chrono::duration_cast<std::chrono::days>(today - get_end_date).count();
-        std::cerr << "Ошибка: Товар просрочен на " << days_ago
-                  << " дней (срок годности истек " << end_date << ")\n";
+
+    auto now = std::chrono::system_clock::now();
+    auto today = std::chrono::floor<std::chrono::days>(now);
+    auto end = parse_date(end_date);
+
+    if (end < today) {
+        auto days_ago = std::chrono::duration_cast<std::chrono::days>(today - end).count();
+        std::cerr << "Ошибка: Товар просрочен на " << days_ago << " дней\n";
         return false;
     }
-    auto get_end_date = parse_date(end_date);
-    auto today = std::chrono::system_clock::now();
-    auto days_left = duration_cast<std::chrono::days>(get_end_date - today).count();
+
+    auto days_left = std::chrono::duration_cast<std::chrono::days>(end - today).count();
     if (days_left <= 30 && days_left > 0) {
         std::cout << "Срок годности истекает через " << days_left << " дней!\n";
     }
+
     return true;
 }
-bool Storage::check_characteristics(const Product& analyse_product) {
-    auto exist = std::find(goods.begin(), goods.end(), analyse_product);
+
+bool Storage::check_characteristics(const Product& p) {
+    auto exist = std::find(goods.begin(), goods.end(), p);
     if (exist != goods.end()) {
         std::cerr << "Товар уже есть\n";
         return false;
     }
 
-    std::unordered_set<char> available_symbols;
-    for (char s = 'A'; s < 'Z'; ++s) available_symbols.insert(s);
-    for (char s = '0'; s <= '9'; ++s) available_symbols.insert(s);
-    available_symbols.insert('.');
-    available_symbols.insert('-');
+    std::unordered_set<char> allowed_chars;
+    for (char c = 'A'; c <= 'Z'; ++c) allowed_chars.insert(c);
+    for (char c = 'a'; c <= 'z'; ++c) allowed_chars.insert(c);
+    for (char c = '0'; c <= '9'; ++c) allowed_chars.insert(c);
+    allowed_chars.insert(' ');
+    allowed_chars.insert('.');
+    allowed_chars.insert('-');
 
-    for (auto check_name : analyse_product.name) {
-        if (!available_symbols.count(check_name)) {
-            std::cerr << "Название товара имеет недействительный символ\n";
+    for (char c : p.name) {
+        if (allowed_chars.find(c) == allowed_chars.end()) {
+            std::cerr << "Название содержит недопустимые символы. Разрешены: буквы, цифры, пробел, точка, дефис\n";
             return false;
         }
     }
-    for (auto& check_category : analyse_product.category) {
-        if (!available_symbols.count(check_category)) {
-            std::cerr << "Категория товара имеет недействительный символ\n";
+
+    for (char c : p.category) {
+        if (allowed_chars.find(c) == allowed_chars.end()) {
+            std::cerr << "Категория содержит недопустимые символы. Разрешены: буквы, цифры, пробел, точка, дефис\n";
             return false;
         }
     }
-    for (auto& check_manufacturer : analyse_product.manufacturer) {
-        if (!available_symbols.count(check_manufacturer)) {
-            std::cerr << "Имя производителя имеет недействительный символ\n";
+
+    for (char c : p.manufacturer) {
+        if (allowed_chars.find(c) == allowed_chars.end()) {
+            std::cerr << "Производитель содержит недопустимые символы. Разрешены: буквы, цифры, пробел, точка, дефис\n";
             return false;
         }
     }
-    for (auto& check_begin_date : analyse_product.begin_date) {
-        if (!available_symbols.count(check_begin_date)) {
-            std::cerr << "Дата начала поставки имеет недействительный символ\n";
+
+    for (char c : p.country) {
+        if (allowed_chars.find(c) == allowed_chars.end()) {
+            std::cerr << "Страна содержит недопустимые символы. Разрешены: буквы, цифры, пробел, точка, дефис\n";
             return false;
         }
     }
-    for (auto& check_country : analyse_product.country) {
-        if (!available_symbols.count(check_country)) {
-            std::cerr << "Страна производства поставки имеет недействительный символ\n";
-            return false;
-        }
+
+    if (p.name.empty() || p.category.empty() || p.manufacturer.empty() || p.country.empty()) {
+        std::cerr << "Все текстовые поля должны быть заполнены\n";
+        return false;
     }
-    for (auto& check_end_date : analyse_product.end_date) {
-        if (!available_symbols.count(check_end_date)) {
-            std::cerr << "Дата окончания поставки имеет недействительный символ\n";
-            return false;
-        }
+
+    if (p.name.length() > 60 || p.category.length() > 50 ||
+        p.manufacturer.length() > 60 || p.country.length() > 55) {
+        std::cerr << "Превышена максимальная длина поля\n";
+        return false;
     }
-    if (analyse_product.price <= 0.0 || analyse_product.count <= 0 || analyse_product.article <= 0) {
-        std::cerr << "Цена/Количество/Артикль товара не может быть отрицательным или нулевым\n";
+
+    if (p.price <= 0.0 || p.count == 0 || p.article <= 0) {
+        std::cerr << "Цена/Количество/Артикль должны быть положительными\n";
         return false;
     }
 
