@@ -6,12 +6,13 @@
 #include <cctype>
 #include <chrono>
 #include <type_traits>
+#include <thread>
 
 inline bool is_valid_int(const std::string& str) {
     if (str.empty()) return false;
-    size_t start = (str[0] == '-') ? 1 : 0;
+    std::size_t start = (str[0] == '-') ? 1 : 0;
     if (start >= str.length()) return false;
-    for (size_t i = start; i < str.length(); ++i) {
+    for (std::size_t i = start; i < str.length(); ++i) {
         if (!std::isdigit(str[i])) return false;
     }
     return true;
@@ -28,9 +29,9 @@ inline bool is_valid_unsigned_int(const std::string& str) {
 inline bool is_valid_double(const std::string& str) {
     if (str.empty()) return false;
     bool has_dot = false;
-    size_t start = (str[0] == '-') ? 1 : 0;
+    std::size_t start = (str[0] == '-') ? 1 : 0;
     if (start >= str.length()) return false;
-    for (size_t i = start; i < str.length(); ++i) {
+    for (std::size_t i = start; i < str.length(); ++i) {
         if (str[i] == '.') {
             if (has_dot) return false;
             has_dot = true;
@@ -102,6 +103,7 @@ void Getline(T& value, bool allow_empty = false) {
         else if constexpr (std::is_same_v<T, unsigned int>) {
             if (!is_valid_unsigned_int(input)) {
                 std::cerr << "Ошибка: введите неотрицательное целое число\n";
+
                 continue;
             }
             std::stringstream ss(input);

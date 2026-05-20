@@ -46,7 +46,6 @@ void AuthSystemUser::load_from_file() {
 void AuthSystemUser::save_to_file() {
     std::ofstream out_file("Users.txt", std::ios::trunc);
     if (!out_file.is_open()) {
-        std::cerr << "Ошибка открытия файла Users.txt для записи" << std::endl;
         return;
     }
     for (const auto& u : users) {
@@ -165,11 +164,23 @@ void AuthSystemUser::register_user() {
 
     if (!is_valid_username(username)) {
         std::cerr << "Логин должен быть от 5 до 20 символов, только буквы и цифры" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
     if (user_exists(username)) {
         std::cerr << "Пользователь с таким логином уже существует" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -178,6 +189,12 @@ void AuthSystemUser::register_user() {
 
     if (!is_valid_pass(password)) {
         std::cerr << "Пароль должен быть не менее 8 символов и содержать минимум 3 спецсимвола" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -185,21 +202,24 @@ void AuthSystemUser::register_user() {
     std::string choose;
     Getline(choose);
 
-    if (choose != "1" && choose != "2")
-    {
+    if (choose != "1" && choose != "2") {
         std::cerr << "Ошибка! Неверный выбор\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
 
     std::unique_ptr<User> newUser;
-    if (choose == "1")
-    {
+    if (choose == "1") {
         newUser = std::make_unique<RegularUser>(username, password);
 
     }
-    else if (choose == "2")
-    {
+    else if (choose == "2") {
         newUser = std::make_unique<AdminUser>(username, password);
     }
 
@@ -207,7 +227,7 @@ void AuthSystemUser::register_user() {
     save_to_file();
     Logger::log_attempt(username, true);
     std::cout << "Пользователь успешно зарегистрирован." << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
     system("cls");
 #else
@@ -240,7 +260,7 @@ void AuthSystemUser::change_user() {
 #endif
     if (!currentUser_ || currentUser_->status != "superadmin") {
         std::cerr << "Только superadmin может изменять пользователей" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else
@@ -297,14 +317,14 @@ void AuthSystemUser::user_pass_change() {
             Getline(new_password);
             if (!is_valid_pass(new_password)) {
                 std::cerr << "Новый пароль не соответствует требованиям" << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 break;
             }
             u->password = new_password;
             save_to_file();
             std::cout << "Пароль успешно изменён." << std::endl;
             success = true;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             break;
         }
     }
@@ -315,7 +335,7 @@ void AuthSystemUser::user_pass_change() {
         Sleep(1000);
         system("cls");
 #else
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         system("clear");
 #endif
     }
@@ -338,21 +358,21 @@ void AuthSystemUser::user_status_change() {
 
             if (u->status == "superadmin") {
                 std::cerr << "Нельзя изменить статус суперадминистратора" << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 break;
             }
             std::cout << "Введите новый статус (admin/user): ";
             std::cin >> new_status;
             if (new_status != "admin" && new_status != "user") {
                 std::cerr << "Недопустимый статус" << std::endl;
-                std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 break;
             }
             u->status = new_status;
             save_to_file();
             std::cout << "Статус успешно изменён." << std::endl;
             success = true;
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             break;
         }
     }
@@ -360,10 +380,10 @@ void AuthSystemUser::user_status_change() {
     if(!success) {
         std::cerr << "Пользователь не найден или данные не совпадают" << std::endl;
 #ifdef _WIN32
-        Sleep(1000);
+        Sleep(2000);
         system("cls");
 #else
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         system("clear");
 #endif
     }
@@ -413,7 +433,7 @@ void AuthSystemUser::remove_user() {
         Sleep(1000);
         system("cls");
 #else
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
         system("clear");
 #endif
     }

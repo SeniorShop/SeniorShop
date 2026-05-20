@@ -25,9 +25,9 @@ std::chrono::sys_days Supply::string_to_date(const std::string& str) {
 void Supply::print() const {
     std::cout << "Поставка под номером: " << number_supply << "\n";
     std::cout << "От кого (поставщик): " << name_user << "\n";
-    std::cout << "Дата выгрузки: " << date_to_string(date) << "\n";
-    std::cout << "Дата принятия: " << date_to_string(date_acception) << "\n";
-    std::cout << "Дата обработки: " << date_to_string(date_processing) << "\n";
+    //std::cout << "Дата выгрузки: " << date_to_string(date) << "\n";
+    //std::cout << "Дата принятия: " << date_to_string(date_acception) << "\n";
+    //std::cout << "Дата обработки: " << date_to_string(date_processing) << "\n";
     std::cout << "Кто взял: " << responsible_person << "\n";
     std::cout << "Товар: " << product_name.name
               << " (арт. " << product_name.article << ")\n";

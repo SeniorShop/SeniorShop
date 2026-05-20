@@ -1,7 +1,8 @@
-#pragma once
+#ifndef SALECONTROL_H
+#define SALECONTROL_H
+
 #include "SaleService.h"
 #include "Cart.h"
-#include <vector>
 
 class SaleController {
 public:
@@ -11,3 +12,5 @@ private:
     SaleService service;
     Cart cart;
 };
+
+#endif

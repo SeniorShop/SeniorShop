@@ -19,8 +19,12 @@ void storage_user_method(AuthSystemUser* auth) {
     bool is_exit = false;
     while (true) {
         std::cout << "Вы выбрали опцию редактирование персонала\n";
-        std::cout << "Вам доступны такие опции:\n1 - Показ всех пользователей\n2 - Добавить нового пользователя\n";
-        std::cout << "3 - Изменить пароль пользователю или статус\n4 - Удалить пользователя\n5 - Выход из опции в меню\n";
+        std::cout << "Вам доступны такие опции:\n";
+        std::cout << "1) Показ всех пользователей\n";
+        std::cout << "2) Добавить нового пользователя\n";
+        std::cout << "3) Изменить пароль пользователю или статус\n";
+        std::cout << "4) Удалить пользователя\n";
+        std::cout << "5) Выход из опции в меню\n";
         std::cout << "Ввод: ";
         Getline(choose);
 
@@ -52,11 +56,11 @@ void storage_user_method(AuthSystemUser* auth) {
     }
 
 #ifdef _WIN32
-            Sleep(1500);
+            Sleep(2000);
             system("cls");
             return;
 #else
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             system("clear");
             return;
 #endif

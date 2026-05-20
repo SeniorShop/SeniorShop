@@ -7,7 +7,12 @@ PromoManager::PromoManager() : discount_used(false) {
 void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
     if (discount_used) {
         std::cout << "Вы уже использовали акцию для этого чека!\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -28,9 +33,22 @@ void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pai
             total_sum -= discount;
             discount_used = true;
             std::cout << "Скидка 15% применена!\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
         }
-        else
+        else {
             std::cout << "Сумма чека меньше 2000 руб.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+        }
 
     }
     else if (choice == "2") {
@@ -42,7 +60,7 @@ void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pai
     else if (choice == "4") {
         apply_wheel_of_fortune(total_sum);
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 }
 
 void PromoManager::apply_math_quiz(double& total_sum) {
@@ -64,9 +82,22 @@ void PromoManager::apply_math_quiz(double& total_sum) {
         total_sum -= discount;
         discount_used = true;
         std::cout << "Верно! Скидка 30% ваша.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
-    else
+    else {
         std::cerr << "Неверно. Акция аннулирована.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+    }
 
 }
 
@@ -85,9 +116,22 @@ void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std
         total_sum -= 200;
         discount_used = true;
         std::cout << "Акция применена! Списано 200 руб за мясо.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
-    else
+    else {
         std::cerr << "Нужно минимум 10 кг мяса (у вас " << weight << ").\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+    }
 
 }
 
@@ -103,18 +147,23 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
     std::cout << "\n\n\n\t\t\tКОЛЕСО ФОРТУНЫ \n\n\n";
     std::cout << "Стоимость участия: 1000 рублей(добавятся к сумме чека в случае проигрыша)\n";
     std::cout << "Возможные призы:\n";
-    std::cout << "1. Скидка 10% на покупку\n";
-    std::cout << "2. Скидка 20% на покупку\n";
-    std::cout << "3. Скидка 30% на покупку\n";
-    std::cout << "4. Скидка 50% на покупку\n";
-    std::cout << "5. Бесплатная покупка (все товары бесплатно!)\n\n\n";
+    std::cout << "1) Скидка 10% на покупку\n";
+    std::cout << "2) Скидка 20% на покупку\n";
+    std::cout << "3) Скидка 30% на покупку\n";
+    std::cout << "4) Скидка 50% на покупку\n";
+    std::cout << "5) Бесплатная покупка (все товары бесплатно!)\n\n\n";
 
     std::cout << "Хотите участвовать?\n1 - Да\n2 - Нет\nВвод: ";
     Getline(choice);
 
     if (choice == "2") {
         std::cout << "Отказ от участия\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
     else if (choice != "1")
@@ -147,7 +196,7 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
         std::cout << "Увы, в этот раз без приза" << std::endl;
         total_sum += 1000;
         std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     }
 
     total_sum -= discount;
