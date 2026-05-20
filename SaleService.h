@@ -1,4 +1,5 @@
-#pragma once
+#ifndef SALESERVICE_H
+#define SALESERVICE_H
 #include "Cart.h"
 #include <vector>
 
@@ -10,5 +11,7 @@ public:
     const std::vector<Product>& get_products() const;
     bool add_to_cart(Cart& cart, unsigned int id, unsigned int count);
     void show_сart(const Cart& cart);
-    void apply_sale(const Cart& cart);
+    void apply_sale(const Cart& cart, double final_total);
 };
+
+#endif

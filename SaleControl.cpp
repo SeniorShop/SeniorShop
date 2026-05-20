@@ -17,9 +17,8 @@ void SaleController::start() {
 #endif
 
         if (products.empty()) {
-            std::cout << "Нет доступных товаров для продажи\n";
-            std::cout << "Нажмите Enter для выхода: ";
-            std::cin.get();
+            std::cerr << "Нет доступных товаров для продажи\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
@@ -33,18 +32,21 @@ void SaleController::start() {
                   << std::setw(5) << "ID"
                   << std::setw(25) << "Название"
                   << std::setw(20) << "Категория"
-                  << std::setw(12) << "Цена"
+                  << std::setw(10) << "Цена"
                   << std::setw(10) << "В наличии"
                   << std::setw(10) << "Артикль"
                   << "\n";
         std::cout << std::string(85, '-') << "\n";
 
         for (const auto& p : products) {
+            std::string name = p.name.empty() ? "Без названия" : p.name;
+            std::string category = p.category.empty() ? "Без категории" : p.category;
+
             std::cout << std::left
                       << std::setw(5) << p.id
-                      << std::setw(25) << (p.name.length() > 23 ? p.name.substr(0, 21) + ".." : p.name)
-                      << std::setw(20) << (p.category.length() > 18 ? p.category.substr(0, 16) + ".." : p.category)
-                      << std::setw(12) << std::fixed << std::setprecision(2) << p.price
+                      << std::setw(25) << (name.length() > 23 ? name.substr(0, 21) + ".." : name)
+                      << std::setw(20) << (category.length() > 18 ? category.substr(0, 16) + ".." : category)
+                      << std::setw(10) << std::fixed << std::setprecision(2) << p.price
                       << std::setw(10) << p.count
                       << std::setw(10) << p.article
                       << "\n";
@@ -52,8 +54,12 @@ void SaleController::start() {
         std::cout << std::string(85, '-') << "\n";
 
         std::string input;
-        std::cout << "\nВведите ID или артикул товара (или 'exit' для выхода): ";
+        std::cout << "\nВведите ID или артикль товара (или 'exit' для выхода): ";
         Getline(input);
+
+        if (input.empty()) {
+            continue;
+        }
 
         if (input == "exit") {
             break;
@@ -63,9 +69,8 @@ void SaleController::start() {
         try {
             id = std::stoi(input);
         } catch (...) {
-            std::cerr << "Ошибка: введите число (ID или артикул)\n";
-            std::cout << "Нажмите Enter: ";
-            std::cin.get();
+            std::cerr << "Ошибка: введите число (ID или артикль)\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
@@ -88,8 +93,7 @@ void SaleController::start() {
 
         if (!selected) {
             std::cerr << "Товар не найден\n";
-            std::cout << "Нажмите Enter: ";
-            std::cin.get();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
@@ -99,15 +103,13 @@ void SaleController::start() {
 
         if (count == 0) {
             std::cerr << "Количество должно быть больше 0\n";
-            std::cout << "Нажмите Enter: ";
-            std::cin.get();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
         if (selected->count < count) {
             std::cerr << "Недостаточно товара на складе (доступно: " << selected->count << ")\n";
-            std::cout << "Нажмите Enter: ";
-            std::cin.get();
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
@@ -127,7 +129,7 @@ void SaleController::start() {
             std::cout << "Добавление отменено\n";
         }
 
-        std::cout << "Следующие действия:\n";
+        std::cout << "\nСледующие действия:\n";
         std::cout << "1) Продолжить покупку / добавить ещё товары\n";
         std::cout << "2) Перейти к оплате\n";
         std::cout << "3) Отменить покупку (очистить корзину и выйти)\n";
@@ -140,9 +142,19 @@ void SaleController::start() {
             if (cart.empty()) {
                 std::cerr << "Корзина пуста\n";
             } else {
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
                 payment();
                 cart.clear();
                 std::cout << "Корзина очищена после оплаты\n";
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
                 break;
             }
         } else if (next_choice == 3) {
@@ -150,6 +162,13 @@ void SaleController::start() {
             std::cout << "Покупка отменена, корзина очищена\n";
             break;
         }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 }
 
@@ -160,47 +179,67 @@ void SaleController::payment() {
     for (const auto& item : cart.get_items()) {
         cart_for_promo.push_back({item.product.name, static_cast<double>(item.count)});
     }
+
     std::cout << "\n\n\n\t\t\tКОРЗИНА\n\n\n";
     for (const auto& item : cart.get_items()) {
-        std::cout << item.product.name << " x" << item.count << " = "
+        std::cout << item.product.name << " x " << item.count << " = "
                   << item.product.price * item.count << " руб.\n";
     }
     std::cout << "ИТОГО: " << total << " руб.\n";
-    std::cout << std::endl;
 
-    std::cout << "1) Принять участие в акциях\n";
+    std::cout << "\n1) Принять участие в акциях\n";
     std::cout << "2) Оплатить без акций\n";
     std::cout << "Выбор: ";
 
     int promo_choice;
     Getline(promo_choice);
 
+    double final_total = total;
+
     if (promo_choice == 1) {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         PromoManager promo;
-        promo.show_promo_menu(total, cart_for_promo);
+        promo.show_promo_menu(final_total, cart_for_promo);
     }
+
+    std::cout << "\nИтого к оплате: " << final_total << " руб.\n";
 
     int type;
     while (true) {
-        std::cout << "\nИтого к оплате: " << total << " руб.\n";
         std::cout << "1) Карта\n2) Наличные\n0) Отмена оплаты\nВыбор: ";
         Getline(type);
 
         if (type == 0) {
             std::cout << "Оплата отменена\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         } else if (type == 1) {
             std::cout << "Оплата картой...\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(1500));
-            std::cout << "Оплачено " << total << " руб.\n";
+            std::cout << "Оплачено " << final_total << " руб.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             break;
         } else if (type == 2) {
             double money;
             std::cout << "Внесите деньги: ";
             Getline(money);
-            if (money < total) {
+            if (money < final_total) {
                 std::cerr << "Недостаточно денег\n";
-                std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
                 system("cls");
 #else
@@ -208,11 +247,17 @@ void SaleController::payment() {
 #endif
                 continue;
             }
-            std::cout << "Сдача: " << (money - total) << " руб.\n";
+            std::cout << "Сдача: " << (money - final_total) << " руб.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             break;
         } else {
             std::cerr << "Неверный выбор\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
@@ -221,7 +266,7 @@ void SaleController::payment() {
         }
     }
 
-    service.apply_sale(cart);
+    service.apply_sale(cart,final_total);
     std::cout << "Продажа завершена. Спасибо за покупку!\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32

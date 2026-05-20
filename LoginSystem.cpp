@@ -13,9 +13,15 @@
 void LoginSystem::launch() {
     std::string choose;
 
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
     while (true) {
         std::cout << "\n\n\n\t\t\tАпрельское возвращение\n\n\n";
-        std::cout << "1 - Вход\n2- Выход\nВыбор: ";
+        std::cout << "1) Вход\n2) Выход\nВыбор: ";
         Getline(choose);
         if (choose == "1") {
             User* loggerUser = asu.login();

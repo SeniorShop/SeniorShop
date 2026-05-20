@@ -1,4 +1,5 @@
-#pragma once
+#ifndef CART_H
+#define CART_H
 #include "Product.h"
 #include <vector>
 
@@ -16,3 +17,5 @@ public:
     void clear();
     const std::vector<CartItem>& get_items() const;
 };
+
+#endif

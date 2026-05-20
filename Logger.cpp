@@ -3,7 +3,6 @@
 void Logger::log_attempt(const std::string& username, bool success) {
     std::ofstream log_file("Logs.txt", std::ios::app);
     if (!log_file.is_open()) {
-        std::cerr << "Ошибка открытия файла логов" << std::endl;
         return;
     }
     auto now = std::chrono::system_clock::now();

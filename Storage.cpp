@@ -6,12 +6,11 @@
 #include "AuthSystemUser.h"
 #include "MethodSuperAdmin.h"
 #include <algorithm>
+#include <thread>
 #ifdef _WIN32
 #include "Windows.h"
-#include <thread>
 #else
 #include "stdlib.h"
-#include <thread>
 #endif
 
 void Storage::set_auth_system(AuthSystemUser* auth) {
@@ -21,7 +20,6 @@ void Storage::set_auth_system(AuthSystemUser* auth) {
 void Storage::load_from_file(const std::string& product_database) {
     std::ifstream input(product_database);
     if (!input.is_open()) {
-        std::cerr << "Ошибка открытия файла '" << product_database << "'" << std::endl;
         return;
     }
     goods.clear();
@@ -32,13 +30,11 @@ void Storage::load_from_file(const std::string& product_database) {
         goods.push_back(product);
     }
     input.close();
-    std::cout << "Было считано товаров с базы данных: " << goods.size() << std::endl;
 }
 
 void Storage::save_to_file(const std::string& product_database) {
     std::ofstream output(product_database);
     if (!output.is_open()) {
-        std::cerr << "Ошибка открытия файла" << std::endl;
         return;
     }
     for (const auto& write_product : goods) {
@@ -70,8 +66,19 @@ void Storage::super_admin_menu() {
         std::cout << "0) Выход\n";
         std::cout << "Выберите действие: ";
         std::string choose;
-        Getline(choose);
-        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+        Getline(choose,true);
+
+        if(choose.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choose[0] < '0' || choose[0] > '9') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
@@ -104,8 +111,6 @@ void Storage::super_admin_menu() {
             break;
         case '8':
             get_check.show_financial_report("Checks.txt");
-            std::cout << "Нажмите на кнопку Enter для продолжения: ";
-            std::cin.get();
             break;
         case '9':
             supply_menu();
@@ -132,7 +137,7 @@ void Storage::change_product_price() {
 
     if (goods.empty()) {
         std::cerr << "Список товаров пустой\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else
@@ -143,17 +148,21 @@ void Storage::change_product_price() {
 
     show_all();
 
-    std::string name, category;
-    std::cout << "Название товара: ";
-    Getline(name);
-    std::cout << "Категория товара: ";
-    Getline(category);
+    int article = 0;
+    std::cout << "Введите артикль товара: ";
+    Getline(article);
 
     auto find = std::find_if(goods.begin(), goods.end(),
-                             [&](const Product& p) { return p.name == name && p.category == category; });
+                             [&](const Product& p) { return p.article == article; });
 
     if (find == goods.end()) {
         std::cerr << "Товар не найден\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -165,6 +174,12 @@ void Storage::change_product_price() {
 
     if (new_price < 0.0 || new_price > 10000.0) {
         std::cerr << "Ошибка: цена должна быть от 0 до 10000 руб.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
 
@@ -196,9 +211,19 @@ void Storage::supply_menu() {
         std::cout << "0) Выход\n";
         std::cout << "Выбор: ";
         std::string choice;
-        Getline(choice);
+        Getline(choice,true);
 
-        if(choice.empty() || choice[0] < '0' || choice[0] > '5') {
+        if(choice.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if(choice[0] < '0' || choice[0] > '5') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
@@ -256,15 +281,26 @@ void Storage::admin_menu() {
         std::cout << "7) Поставки\n";
         std::cout << "0) Выход\n";;
         std::cout << "Выберите действие: ";
-        std::string choose;
-        Getline(choose);
-        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+        std::string choice;
+        Getline(choice,true);
+
+        if(choice.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choice[0] < '0' || choice[0] > '9') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
         }
 
-        switch(choose[0]) {
+        switch(choice[0]) {
         case '1':
             start_sales.start();
             break;
@@ -282,8 +318,6 @@ void Storage::admin_menu() {
             break;
         case '6':
             get_check.show_financial_report("Checks.txt");
-            std::cout << "Нажмите Enter для продолжения: ";
-            std::cin.get();
             break;
         case '7':
             supply_menu();
@@ -297,6 +331,7 @@ void Storage::admin_menu() {
     }
     return;
 }
+
 void Storage::add_supply_products(const Supply& supply) {
     for (auto& p : goods) {
         if (p.article == supply.product_name.article) {
@@ -329,15 +364,26 @@ void Storage::user_menu() {
         std::cout << "4) Поставки\n";
         std::cout << "0) Выход\n";
         std::cout << "Выберите действие: ";
-        std::string choose;
-        Getline(choose);
-        if (choose.empty() || choose[0] < '0' || choose[0] > '9') {
+        std::string choice;
+        Getline(choice,true);
+
+        if(choice.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choice[0] < '0' || choice[0] > '9') {
             std::cerr << "Ошибка! Введите одну цифру от 0 до 9.\n";
             system("pause");
             continue;
         }
 
-        switch(choose[0]) {
+        switch(choice[0]) {
         case '0':
             is_exit = true;
             break;
@@ -349,8 +395,6 @@ void Storage::user_menu() {
             break;
         case '3':
             get_check.show_financial_report("Checks.txt");
-            std::cout << "Нажмите Enter для продолжения: ";
-            std::cin.get();
             break;
         case '4':
             supply_menu();
@@ -391,10 +435,22 @@ void Storage::add_product() {
         Getline(new_product.name);
         if (new_product.name.empty() || new_product.name == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
         if (new_product.name.size() > 60) {
             std::cerr << "Название слишком длинное (максимум 60 символов).\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         break;
@@ -405,11 +461,11 @@ void Storage::add_product() {
         Getline(new_product.category);
         if (new_product.category.empty() || new_product.category == "exit") {
             std::cerr << "Операция добавления отменена.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
-            system("cls");
+        system("cls");
 #else
-            system("clear");
+        system("clear");
 #endif
             return;
         }
@@ -425,35 +481,53 @@ void Storage::add_product() {
         Getline(new_product.price);
         if (new_product.price < 0) {
             std::cerr << "Некорректная цена. Введите положительное число.\n";
-            continue;
-        }
-        if (new_product.price == 0) {
-            std::cerr << "Операция добавления отменена.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
             system("clear");
 #endif
+            continue;
+        }
+        if (new_product.price == 0) {
+            std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
             return;
         }
         if (new_product.price > 10000.0) {
             std::cerr << "Цена не может превышать 10000.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         break;
     }
 
     while (true) {
-        std::cout << "Артикул (целое число, 0 - отмена): ";
+        std::cout << "Артикль (целое число, 0 - отмена): ";
         Getline(new_product.article);
         if (new_product.article < 0 ) {
-            std::cerr << "Некорректный артикул\n";
+            std::cerr << "Некорректный артикль\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         if(new_product.article == 0) {
             std::cerr << "Операция добавления отменена.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
@@ -470,6 +544,12 @@ void Storage::add_product() {
         Getline(new_product.begin_date);
         if (new_product.begin_date.empty() || new_product.begin_date == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
 
@@ -477,11 +557,23 @@ void Storage::add_product() {
         Getline(new_product.end_date);
         if (new_product.end_date.empty() || new_product.end_date == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
 
         if (!validate_dates(new_product.begin_date, new_product.end_date)) {
             std::cout << "Пожалуйста, введите корректные даты заново.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         dates_valid = true;
@@ -492,10 +584,22 @@ void Storage::add_product() {
         Getline(new_product.count);
         if (new_product.count < 0) {
             std::cerr << "Некорректное количество.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
             continue;
         }
         if(new_product.count == 0) {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
             return;
         }
         if (new_product.count > 199) {
@@ -510,10 +614,22 @@ void Storage::add_product() {
         Getline(new_product.manufacturer);
         if (new_product.manufacturer.empty() || new_product.manufacturer == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
             return;
         }
         if (new_product.manufacturer.size() > 60) {
             std::cerr << "Название производителя слишком длинное (максимум 60 символов).\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
             continue;
         }
         break;
@@ -524,10 +640,22 @@ void Storage::add_product() {
         Getline(new_product.country);
         if (new_product.country.empty() || new_product.country == "exit") {
             std::cerr << "Операция добавления отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             return;
         }
         if (new_product.country.size() > 55) {
             std::cerr << "Название страны слишком длинное (максимум 55 символов).\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         break;
@@ -552,12 +680,14 @@ void Storage::show_all() {
     system("clear");
 #endif
 
+    load_from_file("Product.txt");
+
     goods.erase(std::remove_if(goods.begin(), goods.end(),
                                [](const Product& p) { return p.count == 0; }), goods.end());
 
     if (goods.empty()) {
         std::cout << "Склад пуст.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else
@@ -609,6 +739,12 @@ void Storage::show_valid_products() {
 #endif
     if (goods.empty()) {
         std::cerr << "Список товаров пустой" << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return;
     }
     int valid_count = 0;
@@ -657,9 +793,21 @@ void Storage::check_expired_products() {
 
     if (expired_count == 0) {
         std::cout << "Просроченных товаров нет\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
     else {
         std::cout << "Всего просроченных товаров: " << expired_count << "\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 }
 
@@ -701,20 +849,16 @@ bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::
     try {
         auto begin_date = parse_date(begin_date_str);
         auto end_date = parse_date(end_date_str);
-
-        if (begin_date > end_date) {
-            std::cerr << "Дата начала не может быть позже даты окончания!\n";
-            return false;
-        }
-
-        return true;
+        return begin_date <= end_date;
     }
     catch (...) {
         std::cerr << "Неверный формат даты! Используйте ДД.ММ.ГГГГ\n";
         return false;
     }
 }
+
 bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) {
+
     if (begin_date.length() != 10 || end_date.length() != 10) {
         std::cerr << "Ошибка: дата должна быть в формате ДД.ММ.ГГГГ\n";
         return false;
@@ -731,7 +875,19 @@ bool Storage::validate_dates(const std::string& begin_date, const std::string& e
 
     auto now = std::chrono::system_clock::now();
     auto today = std::chrono::floor<std::chrono::days>(now);
+    auto begin = parse_date(begin_date);
     auto end = parse_date(end_date);
+
+    if (begin > today) {
+        std::cerr << "Ошибка: дата начала срока годности не может быть в будущем\n";
+        return false;
+    }
+
+    auto min_date = parse_date("01.01.2026");
+    if (begin < min_date) {
+        std::cerr << "Ошибка: дата начала срока годности слишком старая (должна быть не ранее 01.01.2026)\n";
+        return false;
+    }
 
     if (end < today) {
         auto days_ago = std::chrono::duration_cast<std::chrono::days>(today - end).count();
@@ -751,6 +907,12 @@ bool Storage::check_characteristics(const Product& p) {
     auto exist = std::find(goods.begin(), goods.end(), p);
     if (exist != goods.end()) {
         std::cerr << "Товар уже есть\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
         return false;
     }
 
@@ -808,4 +970,5 @@ bool Storage::check_characteristics(const Product& p) {
 
     return true;
 }
+
 

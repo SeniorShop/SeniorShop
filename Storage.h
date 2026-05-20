@@ -45,4 +45,4 @@ private:
     std::string format_field(std::string str, std::size_t width) const;
 };
 
-#endif // STORAGE_H
+#endif
