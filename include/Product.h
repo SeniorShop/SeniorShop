@@ -74,20 +74,23 @@ inline bool is_valid_bool(const std::string& str) {
            str == "1" || str == "0";
 }
 
-
 template<typename T>
-void Getline(T& value, bool allow_empty = false) {
+inline void Getline(T& value, bool allow_empty = false) {
     std::string input;
     while (true) {
         std::getline(std::cin, input, '\n');
+        if (input.empty()) {
+            std::cerr << "Ошибка: поле не может быть пустым\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+        }
         if (std::cin.fail()) {
             std::cin.clear();
             std::cin.ignore(365000, '\n');
-            continue;
-        }
-
-        if (!allow_empty && input.empty()) {
-            std::cerr << "Ошибка: поле не может быть пустым\n";
             continue;
         }
 
@@ -162,6 +165,7 @@ struct Product {
     unsigned int count = 0;
     std::string manufacturer = "";
     std::string country = "";
+    std::string supplier;
 
     Product();
     Product(const Product& other);

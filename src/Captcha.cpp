@@ -1,5 +1,5 @@
-#include "Captcha.h"
-#include "Product.h"
+#include "../include/Captcha.h"
+#include "../include/Product.h"
 
 void Captcha::generate() {
     const std::string charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";

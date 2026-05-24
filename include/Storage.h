@@ -36,6 +36,15 @@ public:
     void user_menu();
     void supply_menu();
     void change_product_price();
+    void show_all_for_actions();
+
+    void edit_storage_menu(std::string status = "superadmin");
+    void delete_product();
+    void change_product_name();
+    void replenish_product();
+    void auto_writeoff_expired();
+    void writeoff_product();
+
 private:
     bool check_characteristics(const Product& analyse_product);
     bool is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str);
@@ -43,6 +52,7 @@ private:
     bool is_expired(const std::string& end_date_str);
     std::chrono::sys_days parse_date(const std::string& date_str);
     std::string format_field(std::string str, std::size_t width) const;
+    std::string date_to_string(std::chrono::sys_days tp) const;
 };
 
 #endif

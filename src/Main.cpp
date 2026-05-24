@@ -1,7 +1,7 @@
-#include "LoginSystem.h"
+#include "../include/LoginSystem.h"
 
 #ifdef _WIN32
-#include <Windows.h>
+#include "Windows.h"
 #elif __linux__
 #include <clocale>
 #else

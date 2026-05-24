@@ -1,5 +1,6 @@
 #ifndef CHECK_H
 #define CHECK_H
+
 #include "Product.h"
 #include <string>
 #include <vector>
@@ -12,15 +13,16 @@ enum class TransactionType {
 };
 
 struct Check {
-    int type;
+    int type = 0;
     std::string product_name;
-    double price;
-    int count;
+    double price = 0.0;
+    int count = 0;
     std::string employee_name;
     std::string date;
 
     Check() = default;
     Check(TransactionType type, std::string name, double price, int count, std::string emp_name, std::string date);
+    Check(TransactionType type, double totalAmount, const std::string& emp_name, const std::string& date);
 
     void save_check(const std::string& filename) const;
     void show_financial_report(const std::string& filename);

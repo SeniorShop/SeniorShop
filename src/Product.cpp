@@ -1,4 +1,4 @@
-#include "Product.h"
+#include "../include/Product.h"
 
 Product::Product(const Product& other) {
     this->id = other.id;
@@ -11,22 +11,16 @@ Product::Product(const Product& other) {
     this->count = other.count;
     this->manufacturer = other.manufacturer;
     this->country = other.country;
+    this->supplier = other.supplier;
 }
+
 Product::Product() = default;
+
 bool Product::operator==(const Product& other) const {
     return name == other.name && category == other.category && article == other.article;
 }
-unsigned int Product::get_id() {return id;}
-unsigned int Product::get_count() {return count;}
 
-//void setColor(int color)
-//{
-//    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-//    SetConsoleTextAttribute(hConsole, color);
-//}
+unsigned int Product::get_id() { return id; }
+unsigned int Product::get_count() { return count; }
 
-//void resetColor()
-//{
-//    setColor(7);
-//}
 

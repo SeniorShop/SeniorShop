@@ -1,9 +1,9 @@
-#include "MethodSuperAdmin.h"
+#include "../include/MethodSuperAdmin.h"
 #include <iostream>
-#include "Product.h"
-#include "AuthSystemUser.h"
+#include "../include/Product.h"
+#include "../include/AuthSystemUser.h"
 #ifdef _WIN32
-#include <windows.h>
+#include <Windows.h>
 #else
 #include "stdlib.h"
 #include <thread>
@@ -33,20 +33,20 @@ void storage_user_method(AuthSystemUser* auth) {
             continue;
         }
 
-        switch(choose[0]) {
-        case '1':
+        switch(std::stoi(choose)) {
+        case 1:
             auth->show_all_users();
             break;
-        case '2':
+        case 2:
             auth->register_user();
             break;
-        case '3':
+        case 3:
             auth->change_user();
             break;
-        case '4':
+        case 4:
             auth->remove_user();
             break;
-        case '5':
+        case 5:
             is_exit = true;
             break;
         }

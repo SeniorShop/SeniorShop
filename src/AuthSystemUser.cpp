@@ -1,4 +1,4 @@
-#include "AuthSystemUser.h"
+#include "../include/AuthSystemUser.h"
 #include <filesystem>
 #include <algorithm>
 #include <unordered_set>
@@ -135,15 +135,20 @@ User* AuthSystemUser::login() {
 
     Logger::log_attempt(username, false);
     std::cout << "Неверный логин или пароль" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     return nullptr;
 }
 
 
 void AuthSystemUser::register_user() {
-
     if (!currentUser_ || currentUser_->status != "superadmin") {
         std::cerr << "Только суперадминистратор может создавать новых пользователей" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else
@@ -236,6 +241,11 @@ void AuthSystemUser::register_user() {
 }
 
 void AuthSystemUser::show_all_users() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
     std::cout << "\n\n\n\t\t\tСПИСОК ПОЛЬЗОВАТЕЛЕЙ\n\n\n";
     std::cout << std::left
               << std::setw(25) << "Логин"
@@ -250,6 +260,14 @@ void AuthSystemUser::show_all_users() {
                   << "\n";
     }
     std::cout << std::string(40, '-') << "\n";
+
+    std::cout << "Нажмите Enter для продолжения: ";
+    std::cin.get();
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void AuthSystemUser::change_user() {
@@ -283,7 +301,7 @@ void AuthSystemUser::change_user() {
     }
     else {
         std::cerr << "Ошибка! Неверный выбор" << std::endl;
-        std::this_thread::sleep_for(std::chrono::milliseconds(1500));
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else

@@ -1,5 +1,5 @@
-#include "SaleControl.h"
-#include "SellActiv.h"
+#include "../include/SaleControl.h"
+#include "../include/SellActiv.h"
 #include <iostream>
 #include <chrono>
 #include <thread>
@@ -19,39 +19,33 @@ void SaleController::start() {
         if (products.empty()) {
             std::cerr << "Нет доступных товаров для продажи\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
             break;
         }
 
-        std::cout << "\n\n\n\t\t\tДОСТУПНЫЕ ТОВАРЫ\n\n\n";
+        std::cout << "\n========== ДОСТУПНЫЕ ТОВАРЫ ==========\n";
         std::cout << std::left
                   << std::setw(5) << "ID"
                   << std::setw(25) << "Название"
                   << std::setw(20) << "Категория"
                   << std::setw(10) << "Цена"
-                  << std::setw(10) << "В наличии"
+                  << std::setw(8) << "Кол-во"
                   << std::setw(10) << "Артикль"
+                  << std::setw(12) << "Годен до"
                   << "\n";
-        std::cout << std::string(85, '-') << "\n";
+        std::cout << std::string(95, '-') << "\n";
 
         for (const auto& p : products) {
-            std::string name = p.name.empty() ? "Без названия" : p.name;
-            std::string category = p.category.empty() ? "Без категории" : p.category;
-
             std::cout << std::left
                       << std::setw(5) << p.id
-                      << std::setw(25) << (name.length() > 23 ? name.substr(0, 21) + ".." : name)
-                      << std::setw(20) << (category.length() > 18 ? category.substr(0, 16) + ".." : category)
+                      << std::setw(25) << (p.name.length() > 23 ? p.name.substr(0, 21) + ".." : p.name)
+                      << std::setw(20) << (p.category.length() > 18 ? p.category.substr(0, 16) + ".." : p.category)
                       << std::setw(10) << std::fixed << std::setprecision(2) << p.price
-                      << std::setw(10) << p.count
+                      << std::setw(8) << p.count
                       << std::setw(10) << p.article
+                      << std::setw(12) << p.end_date
                       << "\n";
         }
-        std::cout << std::string(85, '-') << "\n";
+        std::cout << std::string(95, '-') << "\n";
 
         std::string input;
         std::cout << "\nВведите ID или артикль товара (или 'exit' для выхода): ";
@@ -117,6 +111,7 @@ void SaleController::start() {
         std::cout << "Товар: " << selected->name << "\n";
         std::cout << "Количество: " << count << "\n";
         std::cout << "Сумма: " << selected->price * count << " руб.\n";
+        std::cout << "Срок годности до: " << selected->end_date << "\n";
         std::cout << "Подтвердить добавление? (y/n): ";
 
         std::string confirm;
@@ -125,8 +120,20 @@ void SaleController::start() {
         if (confirm == "y" || confirm == "Y") {
             cart.add(*selected, count);
             std::cout << "Товар добавлен в корзину\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
         } else {
             std::cout << "Добавление отменено\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
         }
 
         std::cout << "\nСледующие действия:\n";
@@ -141,35 +148,26 @@ void SaleController::start() {
         if (next_choice == 2) {
             if (cart.empty()) {
                 std::cerr << "Корзина пуста\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             } else {
-#ifdef _WIN32
-                system("cls");
-#else
-                system("clear");
-#endif
                 payment();
                 cart.clear();
                 std::cout << "Корзина очищена после оплаты\n";
-#ifdef _WIN32
-                system("cls");
-#else
-                system("clear");
-#endif
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 break;
             }
         } else if (next_choice == 3) {
             cart.clear();
             std::cout << "Покупка отменена, корзина очищена\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             break;
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
     }
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void SaleController::payment() {
@@ -179,6 +177,12 @@ void SaleController::payment() {
     for (const auto& item : cart.get_items()) {
         cart_for_promo.push_back({item.product.name, static_cast<double>(item.count)});
     }
+
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 
     std::cout << "\n\n\n\t\t\tКОРЗИНА\n\n\n";
     for (const auto& item : cart.get_items()) {

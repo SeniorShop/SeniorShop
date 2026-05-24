@@ -1,4 +1,4 @@
-#include "SellActiv.h"
+#include "../include/SellActiv.h"
 
 PromoManager::PromoManager() : discount_used(false) {
     srand(static_cast<unsigned int>(time(0)));
@@ -25,6 +25,10 @@ void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pai
     std::cout << "0. Пропустить\n";
     std::cout << "Выбор: ";
     Getline(choice);
+
+    if(choice.empty()) {
+
+    }
 
     if (choice == "1") {
         double discount = 0.0;
@@ -114,6 +118,7 @@ void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std
 
     if (weight >= 10.0) {
         total_sum -= 200;
+        if (total_sum < 0) total_sum = 0; // доп
         discount_used = true;
         std::cout << "Акция применена! Списано 200 руб за мясо.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -197,6 +202,11 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
         total_sum += 1000;
         std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 
     total_sum -= discount;

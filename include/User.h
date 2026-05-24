@@ -5,11 +5,10 @@
 #include <memory>
 #include <sstream>
 class User {
-    // !!! Нужно пересмотреть и подумать над типом public
 public:
     std::string username;
     std::string password;
-    std::string status; // superadmin, admin, user
+    std::string status;
     User() = default;
     User(const std::string& name, const std::string& pass, const std::string& currentSt) : username(name), password(pass), status(currentSt) {}
     virtual ~User() = default;
@@ -18,7 +17,6 @@ public:
     {
         return username + "|" + password + "|" + status;
     }
-    // восстановление из файла
     static std::unique_ptr<User> deserialize(const std::string& line);
 
     virtual std::unique_ptr<User> clone() const = 0;
@@ -27,7 +25,6 @@ public:
     {
         return username == other.username && password == other.password && status == other.status;
     }
-
 };
 
 class SuperAdminUser final : public User {
