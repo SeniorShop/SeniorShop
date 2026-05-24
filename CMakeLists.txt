@@ -20,9 +20,8 @@ add_executable(SeniorShop src/Main.cpp
     include/Cart.h src/Cart.cpp
     include/SaleControl.h src/SaleControl.cpp
     include/SaleService.h src/SaleService.cpp
-    include/SupplierManager.h
+    include/SupplierManager.h src/SupplierManager.cpp
     include/Check.h src/Check.cpp
-    src/SupplierManager.cpp
 )
 
 include(GNUInstallDirs)
