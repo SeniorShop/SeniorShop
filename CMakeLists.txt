@@ -26,7 +26,7 @@ add_executable(SeniorShop src/Main.cpp
 )
 
 include(GNUInstallDirs)
-install(TARGETS project
+install(TARGETS SeniorShop
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
