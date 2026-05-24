@@ -16,7 +16,7 @@ add_executable(SeniorShop src/Main.cpp
     include/User.h src/User.cpp
     include/LoginSystem.h src/LoginSystem.cpp
     include/Captcha.h src/Captcha.cpp
-    include/MethodSuperAdmin src/MethodSuperAdmin.cpp
+    include/MethodSuperAdmin.h src/MethodSuperAdmin.cpp
     include/Cart.h src/Cart.cpp
     include/SaleControl.h src/SaleControl.cpp
     include/SaleService.h src/SaleService.cpp
