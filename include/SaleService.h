@@ -12,9 +12,9 @@ public:
     std::vector<Product> load();
     void refresh();
     const std::vector<Product>& get_products() const;
-    bool add_to_cart(Cart& cart, unsigned int id, unsigned int count);
+    bool add_to_cart(Cart& cart, int article, unsigned int count);
     void show_cart(const Cart& cart);
-    void apply_sale(const Cart& cart, double final_total);
+    void apply_sale(const Cart& cart, double final_total, const std::string& employee);
     bool is_expired(const std::string& date_str);
     std::chrono::sys_days parse_date(const std::string& date_str);
 };
