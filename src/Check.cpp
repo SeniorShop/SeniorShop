@@ -43,12 +43,11 @@ void Check::show_financial_report(const std::string& filename) {
         std::cout << "5) Полный финансовый отчёт\n";
         std::cout << "0) Назад\n";
         std::cout << "Выбор: ";
-
         std::string choice;
         Getline(choice, true);
 
-        if (choice.empty()) {
-            std::cerr << "Ошибка: введите номер пункта меню\n";
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
@@ -58,8 +57,26 @@ void Check::show_financial_report(const std::string& filename) {
             continue;
         }
 
-        if (choice.size() != 1) {
-            std::cerr << "Ошибка: введите одну цифру\n";
+        if (choice.empty()) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
@@ -324,33 +341,56 @@ void Check::show_supplies() {
               << std::setw(10) << "Номер"
               << std::setw(25) << "Поставщик"
               << std::setw(20) << "Ответственный"
-              << std::setw(20) << "Товар"
-              << std::setw(8) << "Кол-во"
+              << std::setw(25) << "Товар"
+              << std::setw(10) << "Кол-во"
               << std::setw(15) << "Статус"
               << "\n";
-    std::cout << std::string(98, '-') << "\n";
+    std::cout << std::string(105, '-') << "\n";
 
     std::string line;
     int count = 0;
     while (std::getline(supply_file, line)) {
         if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string num, supplier, responsible, product, status;
+        std::string temp;
+
+        std::getline(ss, num, '|');
+        std::getline(ss, supplier, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, responsible, '|');
+        std::getline(ss, product, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::getline(ss, temp, '|');
+        std::string quantity_str;
+        std::getline(ss, quantity_str, '|');
+        for (int i = 0; i < 4; ++i) std::getline(ss, temp, '|');
+        std::getline(ss, status);
+
+        std::cout << std::left
+                  << std::setw(10) << num
+                  << std::setw(25) << (supplier.length() > 23 ? supplier.substr(0, 21) + ".." : supplier)
+                  << std::setw(20) << (responsible.length() > 18 ? responsible.substr(0, 16) + ".." : responsible)
+                  << std::setw(25) << (product.length() > 23 ? product.substr(0, 21) + ".." : product)
+                  << std::setw(10) << quantity_str
+                  << std::setw(15) << status
+                  << "\n";
         count++;
-        std::cout << line << "\n";
     }
     supply_file.close();
 
     if (count == 0) {
         std::cout << "Нет записей о поставках\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
     }
 
-    std::cout << std::string(98, '-') << "\n";
-    std::cout << "\nНажмите Enter для продолжения...";
+    std::cout << std::string(105, '-') << "\n";
+    std::cout << "\nНажмите Enter для продолжения: ";
     std::cin.get();
 #ifdef _WIN32
     system("cls");

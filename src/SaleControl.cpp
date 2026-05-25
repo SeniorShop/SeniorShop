@@ -35,6 +35,7 @@ void SaleController::start() {
         std::cout << std::string(95, '-') << "\n";
 
         for (const auto& p : products) {
+            if (p.count == 0) continue;
             std::cout << std::left
                       << std::setw(5) << p.id
                       << std::setw(25) << (p.name.length() > 23 ? p.name.substr(0, 21) + ".." : p.name)
@@ -48,7 +49,7 @@ void SaleController::start() {
         std::cout << std::string(95, '-') << "\n";
 
         std::string input;
-        std::cout << "\nВведите ID или артикль товара (или 'exit' для выхода): ";
+        std::cout << "\nВведите артикль товара (или 'exit' для выхода): ";
         Getline(input);
 
         if (input.empty()) {
@@ -59,34 +60,33 @@ void SaleController::start() {
             break;
         }
 
-        int id;
-        try {
-            id = std::stoi(input);
-        } catch (...) {
-            std::cerr << "Ошибка: введите число (ID или артикль)\n";
+        bool is_valid = true;
+        for (char c : input) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите число (артикль товара)\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
+        int article = std::stoi(input);
+
+        // Поиск товара по артикулу
         const Product* selected = nullptr;
         for (const auto& p : products) {
-            if (p.id == id) {
+            if (p.article == article && p.count > 0) {
                 selected = &p;
                 break;
             }
         }
 
         if (!selected) {
-            for (const auto& p : products) {
-                if (p.article == id) {
-                    selected = &p;
-                    break;
-                }
-            }
-        }
-
-        if (!selected) {
-            std::cerr << "Товар не найден\n";
+            std::cerr << "Товар с артиклем " << article << " не найден\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
@@ -101,40 +101,13 @@ void SaleController::start() {
             continue;
         }
 
-        if (selected->count < count) {
-            std::cerr << "Недостаточно товара на складе (доступно: " << selected->count << ")\n";
+        if (!service.add_to_cart(cart, selected->article, count)) {
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             continue;
         }
 
-        std::cout << "\nВы хотите добавить в корзину:\n";
-        std::cout << "Товар: " << selected->name << "\n";
-        std::cout << "Количество: " << count << "\n";
-        std::cout << "Сумма: " << selected->price * count << " руб.\n";
-        std::cout << "Срок годности до: " << selected->end_date << "\n";
-        std::cout << "Подтвердить добавление? (y/n): ";
-
-        std::string confirm;
-        Getline(confirm);
-
-        if (confirm == "y" || confirm == "Y") {
-            cart.add(*selected, count);
-            std::cout << "Товар добавлен в корзину\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
-        } else {
-            std::cout << "Добавление отменено\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
-        }
+        std::cout << "\nТовар добавлен в корзину\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
         std::cout << "\nСледующие действия:\n";
         std::cout << "1) Продолжить покупку / добавить ещё товары\n";
@@ -270,7 +243,9 @@ void SaleController::payment() {
         }
     }
 
-    service.apply_sale(cart,final_total);
+    std::string employee_name = "Сотрудник";
+
+    service.apply_sale(cart, final_total, employee_name);
     std::cout << "Продажа завершена. Спасибо за покупку!\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32

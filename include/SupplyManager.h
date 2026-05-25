@@ -21,6 +21,7 @@ public:
     void change_supply_from_file();
     void delete_supply_from_file();
     void apply_supply_to_storage(Storage& storage);
+    void show_all_supplies_for_actions();
 
 private:
     bool validate_supply_dates(const std::string& begin_date, const std::string& end_date);

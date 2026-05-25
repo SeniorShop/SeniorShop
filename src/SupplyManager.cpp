@@ -48,6 +48,7 @@ void SupplyManager::load_from_file() {
         ss >> s.product_name.count; ss.ignore();
         std::getline(ss, s.product_name.manufacturer, '|');
         std::getline(ss, s.product_name.country, '|');
+        std::getline(ss, s.product_name.supplier, '|');
         ss >> act_int; ss.ignore();
         std::getline(ss, s.status);
 
@@ -80,6 +81,7 @@ void SupplyManager::add_to_file(const Supply& s) {
          << s.product_name.count << "|"
          << s.product_name.manufacturer << "|"
          << s.product_name.country << "|"
+         << s.product_name.supplier << "|"
          << (s.is_actually ? 1 : 0) << "|"
          << s.status << "\n";
     file.close();
@@ -345,13 +347,41 @@ void SupplyManager::show_all_supplies() {
 #endif
 }
 
+void SupplyManager::show_all_supplies_for_actions() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    if (supplies.empty()) {
+        std::cout << "Нет поставок.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+        return;
+    }
+    for (const auto& s : supplies) {
+        s.print();
+    }
+}
+
 void SupplyManager::change_supply_from_file() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
+    show_all_supplies_for_actions();
+
     unsigned int num;
     std::cout << "Номер поставки для изменения: ";
     Getline(num);
     for (auto& s : supplies) {
         if (s.number_supply == num) {
-            s.print();
             std::string new_status;
             std::cout << "Новый статус (текущий: " << s.status << "): ";
             Getline(new_status);
@@ -383,6 +413,14 @@ void SupplyManager::change_supply_from_file() {
 }
 
 void SupplyManager::delete_supply_from_file() {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
+    show_all_supplies_for_actions();
+
     unsigned int num;
     std::cout << "Номер поставки для удаления: ";
     Getline(num);
@@ -420,6 +458,25 @@ void SupplyManager::delete_supply_from_file() {
 }
 
 void SupplyManager::apply_supply_to_storage(Storage& storage) {
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+    if (supplies.empty()) {
+        std::cout << "Нет поставок.\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+        return;
+    }
+
+    show_all_supplies_for_actions();
+
+
     unsigned int num;
     std::cout << "Номер поставки для применения: ";
     Getline(num);

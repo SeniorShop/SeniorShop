@@ -5,66 +5,112 @@ PromoManager::PromoManager() : discount_used(false) {
 }
 
 void PromoManager::show_promo_menu(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
-    if (discount_used) {
-        std::cout << "Вы уже использовали акцию для этого чека!\n";
+    while(true) {
+        if (discount_used) {
+            std::cout << "Вы уже использовали акцию для этого чека!\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            break;
+        }
+
+        std::string choice;
+        std::cout << "\n\tДОСТУПНЫЕ АКЦИИ\n";
+        std::cout << "1. Скидка 15% (при покупке от 2000 руб)\n";
+        std::cout << "2. Математическая задача (скидка 30%)\n";
+        std::cout << "3. Мясная акция (10кг мяса = -200 руб)\n";
+        std::cout << "4. Колесо Фортуны (участие 1000 руб)\n";
+        std::cout << "0. Пропустить\n";
+        std::cout << "Выбор: ";
+        Getline(choice, true);
+
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choice.empty()) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choice == "1") {
+            double discount = 0.0;
+            if (total_sum >= 2000) {
+                discount = total_sum * 0.15;
+                total_sum -= discount;
+                discount_used = true;
+                std::cout << "Скидка 15% применена!\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+            }
+            else {
+                std::cout << "Сумма чека меньше 2000 руб.\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+            }
+
+        }
+        else if (choice == "2") {
+            apply_math_quiz(total_sum);
+        }
+        else if (choice == "3") {
+            apply_meat_promotion(total_sum, cart);
+        }
+        else if (choice == "4") {
+            apply_wheel_of_fortune(total_sum);
+        }
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
 #else
         system("clear");
 #endif
-        return;
     }
 
-    std::string choice;
-    std::cout << "\n\tДОСТУПНЫЕ АКЦИИ\n";
-    std::cout << "1. Скидка 15% (при покупке от 2000 руб)\n";
-    std::cout << "2. Математическая задача (скидка 30%)\n";
-    std::cout << "3. Мясная акция (10кг мяса = -200 руб)\n";
-    std::cout << "4. Колесо Фортуны (участие 1000 руб)\n";
-    std::cout << "0. Пропустить\n";
-    std::cout << "Выбор: ";
-    Getline(choice);
-
-    if(choice.empty()) {
-
-    }
-
-    if (choice == "1") {
-        double discount = 0.0;
-        if (total_sum >= 2000) {
-            discount = total_sum * 0.15;
-            total_sum -= discount;
-            discount_used = true;
-            std::cout << "Скидка 15% применена!\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
-        }
-        else {
-            std::cout << "Сумма чека меньше 2000 руб.\n";
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-            system("cls");
-#else
-            system("clear");
-#endif
-        }
-
-    }
-    else if (choice == "2") {
-        apply_math_quiz(total_sum);
-    }
-    else if (choice == "3") {
-        apply_meat_promotion(total_sum, cart);
-    }
-    else if (choice == "4") {
-        apply_wheel_of_fortune(total_sum);
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    return;
 }
 
 void PromoManager::apply_math_quiz(double& total_sum) {
@@ -75,10 +121,30 @@ void PromoManager::apply_math_quiz(double& total_sum) {
 #endif
     int a = rand() % 50 + 10;
     int b = rand() % 50 + 10;
-    int answer;
+    std::string answer_str;
     std::cout << "Решите пример: " << a << " + " << b << " = ";
-    std::cin >> answer;
-    std::cin.ignore();
+    Getline(answer_str);
+
+    bool is_valid = true;
+    for (char c : answer_str) {
+        if (!std::isdigit(static_cast<unsigned char>(c))) {
+            is_valid = false;
+            break;
+        }
+    }
+
+    if (!is_valid) {
+        std::cerr << "Ошибка: введите число\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+        return;
+    }
+
+    int answer = std::stoi(answer_str);
     double discount = 0.0;
 
     if (answer == (a + b)) {
@@ -86,23 +152,16 @@ void PromoManager::apply_math_quiz(double& total_sum) {
         total_sum -= discount;
         discount_used = true;
         std::cout << "Верно! Скидка 30% ваша.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
-    }
-    else {
+    } else {
         std::cerr << "Неверно. Акция аннулирована.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
     }
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std::pair<std::string, double>>& cart) {
@@ -113,31 +172,28 @@ void PromoManager::apply_meat_promotion(double& total_sum, const std::vector<std
 #endif
     double weight = 0;
     for (const auto& item : cart) {
-        if (item.first == "Мясо" || item.first == "мясо") weight += item.second;
+        std::string name_lower = item.first;
+        std::transform(name_lower.begin(), name_lower.end(), name_lower.begin(), ::tolower);
+        if (name_lower.find("мясо") != std::string::npos) {
+            weight += item.second;
+        }
     }
 
     if (weight >= 10.0) {
         total_sum -= 200;
-        if (total_sum < 0) total_sum = 0; // доп
+        if (total_sum < 0) total_sum = 0;
         discount_used = true;
         std::cout << "Акция применена! Списано 200 руб за мясо.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
-    }
-    else {
+    } else {
         std::cerr << "Нужно минимум 10 кг мяса (у вас " << weight << ").\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
     }
 
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
 }
 
 void PromoManager::apply_wheel_of_fortune(double& total_sum) {
@@ -150,7 +206,7 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
 
     std::cout << "\nНаш магазин рад, что вы приняли участие в нашей акции\n";
     std::cout << "\n\n\n\t\t\tКОЛЕСО ФОРТУНЫ \n\n\n";
-    std::cout << "Стоимость участия: 1000 рублей(добавятся к сумме чека в случае проигрыша)\n";
+    std::cout << "Стоимость участия: 1000 рублей (списывается сразу при участии)\n";
     std::cout << "Возможные призы:\n";
     std::cout << "1) Скидка 10% на покупку\n";
     std::cout << "2) Скидка 20% на покупку\n";
@@ -171,13 +227,23 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
 #endif
         return;
     }
-    else if (choice != "1")
+    else if (choice != "1") {
         return;
+    }
+
+    total_sum += 1000;
+    std::cout << "Стоимость участия (1000 руб.) добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 
     double discount = 0.0;
-
     int prize = rand() % 100 + 1;
-    if (prize >= 26 && prize <= 50) {
+
+    if (prize >= 1 && prize <= 25) {
+        std::cout << "Увы, в этот раз без приза\n";
+        discount_used = true;
+        return;
+    }
+    else if (prize >= 26 && prize <= 50) {
         discount = total_sum * 0.10;
         std::cout << "ВЫИГРЫШ: Скидка 10%!" << std::endl;
     }
@@ -196,21 +262,11 @@ void PromoManager::apply_wheel_of_fortune(double& total_sum) {
     else if (prize >= 96 && prize <= 100) {
         total_sum = 0;
         std::cout << "ДЖЕКПОТ: Покупка бесплатно!" << std::endl;
-    }
-    else {
-        std::cout << "Увы, в этот раз без приза" << std::endl;
-        total_sum += 1000;
-        std::cout << "Стоимость участия добавлена к чеку. Текущая сумма: " << total_sum << " руб.\n";
-        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
-#ifdef _WIN32
-        system("cls");
-#else
-        system("clear");
-#endif
+        discount_used = true;
+        return;
     }
 
     total_sum -= discount;
     if (total_sum < 0) total_sum = 0;
-
     discount_used = true;
 }

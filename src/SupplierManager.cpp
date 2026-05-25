@@ -55,25 +55,81 @@ std::string SupplierManager::choose_supplier() {
     }
 
     std::vector<std::string> names;
-    std::cout << "\n\n\n\t\t\tВЫБОР ПОСТАВЩИКА\n\n\n";
-    int index = 1;
-    for (const auto& supplier : suppliers) {
-        std::cout << index << ". " << supplier.first << "\n";
-        names.push_back(supplier.first);
-        index++;
-    }
-    std::cout << "0. Свой ввод\n";
-    int choice;
+
     while (true) {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+
+        std::cout << "\n\n\n\t\t\tВЫБОР ПОСТАВЩИКА\n\n\n";
+        int index = 1;
+        names.clear();
+        for (const auto& supplier : suppliers) {
+            std::cout << index << ". " << supplier.first << "\n";
+            names.push_back(supplier.first);
+            index++;
+        }
+        std::cout << "0. Свой ввод\n";
+
+        std::string choice_str;
         std::cout << "Выбор: ";
-        Getline(choice);
+        Getline(choice_str);
+
+        if (choice_str.empty()) {
+            std::cerr << "Ошибка: введите номер пункта меню\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice_str) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры (0-" << names.size() << ")\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        int choice = std::stoi(choice_str);
 
         if (choice == 0) {
             std::string custom;
             std::cout << "Введите поставщика: ";
             Getline(custom);
-            if (!custom.empty()) return custom;
+
+            std::size_t start = custom.find_first_not_of(" \t\n\r\f\v");
+            if (start != std::string::npos) {
+                std::size_t end = custom.find_last_not_of(" \t\n\r\f\v");
+                custom = custom.substr(start, end - start + 1);
+            }
+
+            if (!custom.empty()) {
+                return custom;
+            }
             std::cerr << "Поставщик не может быть пустым.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
 
@@ -81,7 +137,13 @@ std::string SupplierManager::choose_supplier() {
             return names[choice - 1];
         }
 
-        std::cerr << "Неверный выбор. Попробуйте снова.\n";
+        std::cerr << "Неверный выбор. Введите число от 0 до " << names.size() << "\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 }
 
@@ -93,26 +155,87 @@ std::string SupplierManager::choose_category(const std::string& supplier) {
         std::cout << "Введите категорию вручную: ";
         std::string custom;
         Getline(custom);
+
+        std::size_t start = custom.find_first_not_of(" \t\n\r\f\v");
+        if (start != std::string::npos) {
+            std::size_t end = custom.find_last_not_of(" \t\n\r\f\v");
+            custom = custom.substr(start, end - start + 1);
+        }
         return custom;
     }
 
     const auto& categories = it->second;
-    std::cout << "\n\n\n\t\t\tКАТЕГОРИИ ПОСТАВЩИКА " << supplier << "\n\n\n";
-    for (std::size_t i = 0; i < categories.size(); ++i) {
-        std::cout << i + 1 << ". " << categories[i] << "\n";
-    }
-    std::cout << "0. Свой ввод\n";
-    int choice;
+
     while (true) {
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+
+        std::cout << "\n\n\n\t\t\tКАТЕГОРИИ ПОСТАВЩИКА " << supplier << "\n\n\n";
+        for (std::size_t i = 0; i < categories.size(); ++i) {
+            std::cout << i + 1 << ". " << categories[i] << "\n";
+        }
+        std::cout << "0. Свой ввод\n";
+
+        std::string choice_str;
         std::cout << "Выбор: ";
-        Getline(choice);
+        Getline(choice_str);
+
+        if (choice_str.empty()) {
+            std::cerr << "Ошибка: введите номер категории\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice_str) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры (0-" << categories.size() << ")\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        int choice = std::stoi(choice_str);
 
         if (choice == 0) {
             std::string custom;
             std::cout << "Введите категорию: ";
             Getline(custom);
-            if (!custom.empty()) return custom;
+
+            size_t start = custom.find_first_not_of(" \t\n\r\f\v");
+            if (start != std::string::npos) {
+                std::size_t end = custom.find_last_not_of(" \t\n\r\f\v");
+                custom = custom.substr(start, end - start + 1);
+            }
+
+            if (!custom.empty()) {
+                return custom;
+            }
             std::cerr << "Категория не может быть пустой.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
 
@@ -120,6 +243,12 @@ std::string SupplierManager::choose_category(const std::string& supplier) {
             return categories[choice - 1];
         }
 
-        std::cerr << "Неверный выбор. Попробуйте снова.\n";
+        std::cerr << "Неверный выбор. Введите число от 0 до " << categories.size() << "\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
     }
 }
