@@ -82,41 +82,48 @@ const std::vector<Product>& SaleService::get_products() const {
     return products;
 }
 
-bool SaleService::add_to_cart(Cart& cart, unsigned int id, unsigned int count) {
+bool SaleService::add_to_cart(Cart& cart, int article, unsigned int count) {
     refresh();
 
-    if (id < 1 || id > products.size()) {
-        std::cout << "Ошибка: неверный ID товара\n";
-        return false;
+    // Поиск товара по артикулу
+    const Product* p = nullptr;
+    for (const auto& prod : products) {
+        if (prod.article == article) {
+            p = &prod;
+            break;
+        }
     }
 
-    const Product& p = products[id - 1];
+    if (!p) {
+        std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+        return false;
+    }
 
     if (count == 0) {
         std::cerr << "Ошибка: количество должно быть больше 0\n";
         return false;
     }
 
-    if (p.count < count) {
-        std::cerr << "Ошибка: на складе только " << p.count << " шт. товара\n";
+    if (p->count < count) {
+        std::cerr << "Ошибка: на складе только " << p->count << " шт. товара\n";
         return false;
     }
 
-    if (is_expired(p.end_date)) {
+    if (is_expired(p->end_date)) {
         std::cerr << "Ошибка: товар просрочен! Нельзя добавить в корзину.\n";
         return false;
     }
 
-    auto end_date = parse_date(p.end_date);
+    auto end_date = parse_date(p->end_date);
     auto now = std::chrono::system_clock::now();
     auto today = std::chrono::floor<std::chrono::days>(now);
     auto days_left = std::chrono::duration_cast<std::chrono::days>(end_date - today).count();
     if (days_left <= 7 && days_left > 0) {
-        std::cout << "Внимание! Срок годности товара \"" << p.name
+        std::cout << "Внимание! Срок годности товара \"" << p->name
                   << "\" истекает через " << days_left << " дней!\n";
     }
 
-    cart.add(p, count);
+    cart.add(*p, count);
     return true;
 }
 
@@ -128,12 +135,12 @@ void SaleService::show_cart(const Cart& cart) {
     std::cout << "\n\n\n\t\t\tКОРЗИНА\n\n\n";
     for (const auto& item : cart.get_items()) {
         std::cout << item.product.name << " x " << item.count
-            << " = " << item.product.price * item.count << " руб.\n";
+                  << " = " << item.product.price * item.count << " руб.\n";
     }
     std::cout << "ИТОГО: " << cart.total() << " руб.\n";
 }
 
-void SaleService::apply_sale(const Cart& cart, double final_total) {
+void SaleService::apply_sale(const Cart& cart, double final_total, const std::string& employee) {
     if (cart.empty()) return;
     refresh();
 
@@ -174,8 +181,18 @@ void SaleService::apply_sale(const Cart& cart, double final_total) {
        << std::setw(2) << tm->tm_sec;
     std::string date_str = ss.str();
 
-    Check check(TransactionType::Sale, final_total, "Сотрудник", date_str);
-    check.save_check("Checks.txt");
+    for (const auto& item : cart.get_items()) {
+        Check check(TransactionType::Sale,
+                    item.product.name,
+                    item.product.price,
+                    item.count,
+                    employee,
+                    date_str);
+        check.save_check("Checks.txt");
+    }
+
+    Check totalCheck(TransactionType::Sale, final_total, employee, date_str);
+    totalCheck.save_check("Checks.txt");
 
     std::cout << "Продажа оформлена. Сумма: " << final_total << " руб.\n";
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));

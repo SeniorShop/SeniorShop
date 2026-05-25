@@ -10,7 +10,7 @@
 #endif
 
 void storage_user_method(AuthSystemUser* auth) {
-    std::string choose;
+    std::string choice;
 #ifdef _WIN32
     system("cls");
 #else
@@ -26,14 +26,61 @@ void storage_user_method(AuthSystemUser* auth) {
         std::cout << "4) Удалить пользователя\n";
         std::cout << "5) Выход из опции в меню\n";
         std::cout << "Ввод: ";
-        Getline(choose);
+        Getline(choice);
 
-        if(choose.empty() || choose[0] < '0' || choose[0] > '5') {
-            std::cerr << "Ошибка. Введите цифру от 1 до 5\n";
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
 
-        switch(std::stoi(choose)) {
+        if (choice.empty()) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if(std::stoi(choice) <= 0 || std::stoi(choice) > 5) {
+            std::cerr << "Ошибка. Введите цифру от 1 до 5\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        switch(std::stoi(choice)) {
         case 1:
             auth->show_all_users();
             break;
@@ -49,6 +96,15 @@ void storage_user_method(AuthSystemUser* auth) {
         case 5:
             is_exit = true;
             break;
+        default:
+            std::cerr << "Неизвестная опция\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            break;
         }
 
         if(is_exit) break;
@@ -56,12 +112,9 @@ void storage_user_method(AuthSystemUser* auth) {
     }
 
 #ifdef _WIN32
-            Sleep(2000);
             system("cls");
-            return;
 #else
-            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
             system("clear");
-            return;
 #endif
+    return;
 }

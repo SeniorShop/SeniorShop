@@ -19,12 +19,26 @@ void Storage::add_supply_products(const Supply& supply) {
                            [&](const Product& p) { return p.article == supply.product_name.article; });
 
     if (it != goods.end()) {
+        if (it->count + supply.product_name.count > 199) {
+            std::cerr << "Ошибка: превышение максимального количества (199) для товара '"
+                      << it->name << "'. Текущее количество: " << it->count
+                      << ", попытка добавить: " << supply.product_name.count
+                      << ". Операция отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            return;
+        }
         it->count += supply.product_name.count;
         std::cout << "Товар обновлён: " << it->name
                   << " + " << supply.product_name.count << " шт.\n"
                   << "Теперь на складе: " << it->count << " шт.\n";
     }
     else {
+        if (supply.product_name.count > 199) {
+            std::cerr << "Ошибка: количество товара '" << supply.product_name.name
+                      << "' превышает максимальное значение (199). Операция отменена.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+            return;
+        }
         goods.push_back(supply.product_name);
         std::cout << "Добавлен новый товар: " << supply.product_name.name
                   << " (" << supply.product_name.count << " шт.)\n";
@@ -93,7 +107,8 @@ void Storage::super_admin_menu() {
         std::string choice;
         Getline(choice, true);
 
-        if (choice.empty()) {
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
@@ -103,14 +118,9 @@ void Storage::super_admin_menu() {
             continue;
         }
 
-        if (std::stoi(choice) < 0 || std::stoi(choice) > 6) {
-            std::cerr << "Ошибка! Введите цифру от 0 до 6.\n";
-#ifdef _WIN32
-            system("pause");
-#else
-            std::cout << "Нажмите Enter для продолжения: ";
-            std::cin.get();
-#endif
+        if (choice.empty()) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
@@ -119,7 +129,39 @@ void Storage::super_admin_menu() {
             continue;
         }
 
-        switch (std::stoi(choice)) {
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        int num_choice = std::stoi(choice);
+
+        if (num_choice < 0 || num_choice > 6) {
+            std::cerr << "Ошибка! Введите цифру от 0 до 6.\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        switch (num_choice) {
         case 0:
             is_exit = true;
             break;
@@ -179,6 +221,17 @@ void Storage::admin_menu() {
         std::string choice;
         Getline(choice, true);
 
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
         if (choice.empty()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -188,6 +241,26 @@ void Storage::admin_menu() {
 #endif
             continue;
         }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
         if (std::stoi(choice) < 0 || std::stoi(choice) > 9) {
             std::cerr << "Ошибка! Введите цифру от 0 до 9.\n";
 #ifdef _WIN32
@@ -235,6 +308,13 @@ void Storage::admin_menu() {
         }
         if (is_exit) break;
     }
+
+#ifdef _WIN32
+    system("cls");
+#else
+    system("clear");
+#endif
+
 }
 
 void Storage::user_menu() {
@@ -255,6 +335,17 @@ void Storage::user_menu() {
         std::string choice;
         Getline(choice, true);
 
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
         if (choice.empty()) {
             std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -264,6 +355,26 @@ void Storage::user_menu() {
 #endif
             continue;
         }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
         if (std::stoi(choice) < 0 || std::stoi(choice) > 4) {
             std::cerr << "Ошибка! Введите цифру от 0 до 4.\n";
 #ifdef _WIN32
@@ -272,6 +383,17 @@ void Storage::user_menu() {
             std::cout << "Нажмите Enter для продолжения: ";
             std::cin.get();
 #endif
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if(std::isalpha(choice[0])) {
+            std::cerr << "Неверное действие\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
             system("cls");
 #else
@@ -336,10 +458,14 @@ void Storage::show_all_for_actions() {
     system("clear");
 #endif
 
-    goods.erase(std::remove_if(goods.begin(), goods.end(),
-                               [](const Product& p) { return p.count == 0; }), goods.end());
+    std::vector<Product> display_goods;
+    for (const auto& p : goods) {
+        if (p.count > 0) {
+            display_goods.push_back(p);
+        }
+    }
 
-    if (goods.empty()) {
+    if (display_goods.empty()) {
         std::cout << "Склад пуст.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -372,8 +498,8 @@ void Storage::show_all_for_actions() {
               << "|\n";
     std::cout << std::setfill('-') << std::setw(total_width) << "" << std::setfill(' ') << "\n";
 
-    for (size_t i = 0; i < goods.size(); ++i) {
-        const Product& p = goods[i];
+    for (size_t i = 0; i < display_goods.size(); ++i) {
+        const Product& p = display_goods[i];
         std::cout << std::left
                   << "| " << std::setw(w_id) << i + 1
                   << "| " << std::setw(w_name) << format_field(p.name, w_name - 1)
@@ -757,10 +883,14 @@ void Storage::show_all() {
 
     load_from_file("Product.txt");
 
-    goods.erase(std::remove_if(goods.begin(), goods.end(),
-                               [](const Product& p) { return p.count == 0; }), goods.end());
+    std::vector<Product> display_goods;
+    for (const auto& p : goods) {
+        if (p.count > 0) {
+            display_goods.push_back(p);
+        }
+    }
 
-    if (goods.empty()) {
+    if (display_goods.empty()) {
         std::cout << "Склад пуст.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -793,8 +923,8 @@ void Storage::show_all() {
               << "|\n";
     std::cout << std::setfill('-') << std::setw(total_width) << "" << std::setfill(' ') << "\n";
 
-    for (size_t i = 0; i < goods.size(); ++i) {
-        const Product& p = goods[i];
+    for (size_t i = 0; i < display_goods.size(); ++i) {
+        const Product& p = display_goods[i];
         std::cout << std::left
                   << "| " << std::setw(w_id) << i + 1
                   << "| " << std::setw(w_name) << format_field(p.name, w_name - 1)
@@ -852,8 +982,8 @@ void Storage::change_product_price() {
     double new_price;
     std::cout << "Введите новую цену: ";
     Getline(new_price);
-    if (new_price < 0.0 || new_price > 10000.0) {
-        std::cerr << "Ошибка: цена должна быть от 0 до 10000 руб.\n";
+    if (new_price <= 0.0 || new_price > 10000.0) {
+        std::cerr << "Ошибка: цена должна быть от 1 до 10000 руб.\n";
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
         system("cls");
@@ -960,9 +1090,50 @@ void Storage::supply_menu() {
         std::cout << "Выбор: ";
         std::string choice;
         Getline(choice, true);
-        if (choice.empty()) continue;
-        if (choice[0] < '0' || choice[0] > '5') {
+
+        if(choice.size() > 2) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (choice.empty()) {
+            std::cerr << "Ошибка: введите номер действия\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
+            continue;
+        }
+
+        if (std::stoi(choice) < 0 || std::stoi(choice) > 5) {
             std::cerr << "Ошибка! Введите цифру от 0 до 5.\n";
+            continue;
+        }
+
+        bool is_valid = true;
+        for (char c : choice) {
+            if (!std::isdigit(static_cast<unsigned char>(c))) {
+                is_valid = false;
+                break;
+            }
+        }
+
+        if (!is_valid) {
+            std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+            std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+            system("cls");
+#else
+            system("clear");
+#endif
             continue;
         }
         switch (std::stoi(choice)) {
@@ -1025,6 +1196,7 @@ void Storage::edit_storage_menu(std::string status) {
             std::cout << "Выбор: ";
             std::string choice;
             Getline(choice, true);
+
             if (choice.empty()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -1034,6 +1206,26 @@ void Storage::edit_storage_menu(std::string status) {
 #endif
                 continue;
             }
+
+            bool is_valid = true;
+            for (char c : choice) {
+                if (!std::isdigit(static_cast<unsigned char>(c))) {
+                    is_valid = false;
+                    break;
+                }
+            }
+
+            if (!is_valid) {
+                std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+                continue;
+            }
+
             if (std::stoi(choice) < 0 || std::stoi(choice) > 6) {
                 std::cerr << "Ошибка! Введите цифру от 0 до 6.\n";
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -1090,6 +1282,18 @@ void Storage::edit_storage_menu(std::string status) {
             std::cout << "Выбор: ";
             std::string choice;
             Getline(choice, true);
+
+            if(choice.size() > 2) {
+                std::cerr << "Ошибка: введите номер действия\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+                continue;
+            }
+
             if (choice.empty()) {
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
 #ifdef _WIN32
@@ -1099,6 +1303,26 @@ void Storage::edit_storage_menu(std::string status) {
 #endif
                 continue;
             }
+
+            bool is_valid = true;
+            for (char c : choice) {
+                if (!std::isdigit(static_cast<unsigned char>(c))) {
+                    is_valid = false;
+                    break;
+                }
+            }
+
+            if (!is_valid) {
+                std::cerr << "Ошибка: введите только цифры от 0 до 6\n";
+                std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+                system("cls");
+#else
+                system("clear");
+#endif
+                continue;
+            }
+
             if (std::stoi(choice) < 0 || std::stoi(choice) > 3) {
                 std::cerr << "Ошибка! Введите цифру от 0 до 3.\n";
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));

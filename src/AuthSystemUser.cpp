@@ -114,10 +114,52 @@ bool AuthSystemUser::user_exists(const std::string& username) const {
 
 User* AuthSystemUser::login() {
     std::string username, password;
-    std::cout << "Введите логин: ";
-    Getline(username);
-    std::cout << "Введите пароль: ";
-    Getline(password);
+
+    while (true) {
+        std::cout << "Введите логин: ";
+        Getline(username);
+
+        std::size_t start = username.find_first_not_of(" \t\n\r\f\v");
+        if (start != std::string::npos) {
+            username = username.substr(start);
+        }
+        std::size_t end = username.find_last_not_of(" \t\n\r\f\v");
+        if (end != std::string::npos) {
+            username = username.substr(0, end + 1);
+        }
+
+        if (!username.empty()) break;
+        std::cerr << "Логин не может быть пустым\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+    }
+
+    while (true) {
+        std::cout << "Введите пароль: ";
+        Getline(password);
+
+        std::size_t start = password.find_first_not_of(" \t\n\r\f\v");
+        if (start != std::string::npos) {
+            password = password.substr(start);
+        }
+        std::size_t end = password.find_last_not_of(" \t\n\r\f\v");
+        if (end != std::string::npos) {
+            password = password.substr(0, end + 1);
+        }
+
+        if (!password.empty()) break;
+        std::cerr << "Пароль не может быть пустым\n";
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
+    }
 
     if (!check_bot.verify()) {
         std::cerr << "Ошибка авторизации (капча)" << std::endl;
@@ -373,14 +415,13 @@ void AuthSystemUser::user_status_change() {
 
     for (auto& u : users) {
         if (u->username == name && u->password == password && u->status == status) {
-
             if (u->status == "superadmin") {
                 std::cerr << "Нельзя изменить статус суперадминистратора" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
                 break;
             }
             std::cout << "Введите новый статус (admin/user): ";
-            std::cin >> new_status;
+            Getline(new_status);
             if (new_status != "admin" && new_status != "user") {
                 std::cerr << "Недопустимый статус" << std::endl;
                 std::this_thread::sleep_for(std::chrono::milliseconds(2000));
@@ -405,7 +446,6 @@ void AuthSystemUser::user_status_change() {
         system("clear");
 #endif
     }
-
     return;
 }
 
