@@ -1,4 +1,5 @@
 #include "../include/SellActiv.h"
+#include <algorithm>
 
 PromoManager::PromoManager() : discount_used(false) {
     srand(static_cast<unsigned int>(time(0)));
