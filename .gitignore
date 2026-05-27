@@ -424,8 +424,7 @@ FodyWeavers.xsd
 build/
 
 #Resurses
-Logs.txt
-Users.txt
+*.txt
 
 #Visual Studio
 .vs/
