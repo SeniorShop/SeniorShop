@@ -114,7 +114,7 @@ bool DatabaseStorage::create_tables() {
 bool DatabaseStorage::initialize() {
     std::string dir = dbPath.substr(0, dbPath.find_last_of('/'));
     if (!dir.empty()) {
-        createDirectory(dir);
+        create_directory(dir);
     }
 
     int rc = sqlite3_open(dbPath.c_str(), &db);
@@ -397,14 +397,14 @@ Supply DatabaseStorage::get_supply_by_number(int supplyNumber) {
     sqlite3_bind_int(stmt, 1, supplyNumber);
 
     if (sqlite3_step(stmt) == SQLITE_ROW) {
-        s = rowToSupply(stmt);
+        s = row_to_supply(stmt);
     }
 
     sqlite3_finalize(stmt);
     return s;
 }
 
-std::vector<Supply> DatabaseStorage::get_all_Supplies() {
+std::vector<Supply> DatabaseStorage::get_all_supplies() {
     std::vector<Supply> supplies;
     const char* sql = "SELECT * FROM supplies ORDER BY number_supply";
     sqlite3_stmt* stmt;
