@@ -33,10 +33,12 @@ add_library(native SHARED ${SOURCES})
 target_include_directories(native PRIVATE 
     include 
     ${SQLite3_INCLUDE_DIRS}
+    ${JNI_INCLUDE_DIRS}
 )
 
 target_link_libraries(native 
     ${SQLite3_LIBRARIES}
+    ${JNI_LIBRARIES}
     pthread
     dl
 )
