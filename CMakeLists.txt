@@ -24,7 +24,7 @@ set(SOURCES
     src/Supply.cpp
     src/MethodSuperAdmin.cpp
     src/DatabaseStorage.cpp
-    src/android_jni_bridge.cpp
+    jni/android_jni_bridge.cpp
 )
 
 add_library(native SHARED ${SOURCES})
