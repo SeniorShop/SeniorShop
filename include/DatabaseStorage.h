@@ -2,7 +2,7 @@
 #define DATABASESTORAGE_H
 
 #include "IStorage.h"
-//#include "sqlite3.h"
+#include "sqlite3.h"
 #include <string>
 #include <memory>
 
