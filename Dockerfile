@@ -1,13 +1,17 @@
-FROM debian:bookworm-slim
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
 
 RUN apt-get update && apt-get install -y \
-    g++ \
+    g++-12 \
     cmake \
     make \
     libsqlite3-dev \
-    default-jdk \
+    openjdk-17-jdk \
     maven \
     && rm -rf /var/lib/apt/lists/*
+
+RUN update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
 
 WORKDIR /app
 
