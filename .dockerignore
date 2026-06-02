@@ -1,0 +1,11 @@
+.git
+.gitignore
+*.md
+build/
+jni_build/
+*.txt
+!CMakeLists.txt
+*.db
+database/
+.DS_Store
+*.log
