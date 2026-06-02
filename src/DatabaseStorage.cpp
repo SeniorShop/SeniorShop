@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #endif
 
-// Создание директории для БД
 static bool create_directory(const std::string& path) {
 #ifdef _WIN32
     return CreateDirectoryA(path.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
@@ -36,7 +35,7 @@ bool DatabaseStorage::execute_SQL(const std::string& sql) {
     return true;
 }
 
-bool DatabaseStorage::createTables() {
+bool DatabaseStorage::create_tables() {
     const std::string sqlProducts = R"(
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -282,7 +281,7 @@ std::vector<Product> DatabaseStorage::get_all_products() {
     return products;
 }
 
-bool DatabaseStorage::productExists(int article) {
+bool DatabaseStorage::product_exists(int article) {
     const char* sql = "SELECT 1 FROM products WHERE article = ? LIMIT 1";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
@@ -319,7 +318,7 @@ Supply DatabaseStorage::row_to_supply(sqlite3_stmt* stmt) {
     return s;
 }
 
-bool DatabaseStorage::saveSupply(const Supply& supply) {
+bool DatabaseStorage::save_supply(const Supply& supply) {
     const char* sql = R"(
         INSERT OR REPLACE INTO supplies
         (number_supply, supplier, date, date_acception, date_processing,
