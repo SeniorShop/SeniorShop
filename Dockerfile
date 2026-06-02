@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y \
     cmake \
     make \
     libsqlite3-dev \
+    sqlite3 \
     openjdk-21-jdk \
     maven \
     && rm -rf /var/lib/apt/lists/*
