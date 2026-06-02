@@ -139,7 +139,7 @@ void DatabaseStorage::close() {
     }
 }
 
-int DatabaseStorage::get_last_insert_Id() {
+int DatabaseStorage::get_last_insert_ID() {
     return sqlite3_last_insert_rowid(db);
 }
 
@@ -413,7 +413,7 @@ std::vector<Supply> DatabaseStorage::get_all_supplies() {
     if (rc != SQLITE_OK) return supplies;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        supplies.push_back(rowToSupply(stmt));
+        supplies.push_back(row_to_supply(stmt));
     }
 
     sqlite3_finalize(stmt);
