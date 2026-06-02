@@ -622,5 +622,5 @@ bool DatabaseStorage::user_exists(const std::string& username) {
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    return rc == SQL;
+    return rc == SQLITE_ROW;
 }
