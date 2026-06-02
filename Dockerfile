@@ -1,7 +1,12 @@
-FROM debian:trixie-slim
+FROM debian:bookworm-slim
 
 RUN apt-get update && apt-get install -y \
-    g++ cmake make libsqlite3-dev openjdk-17-jdk maven \
+    g++ \
+    cmake \
+    make \
+    libsqlite3-dev \
+    default-jdk \
+    maven \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
