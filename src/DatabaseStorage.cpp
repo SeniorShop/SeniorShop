@@ -197,7 +197,7 @@ bool DatabaseStorage::load_product(int article, Product& outProduct) {
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW) {
-        outProduct = rowToProduct(stmt);
+        outProduct = row_to_product(stmt);
         sqlite3_finalize(stmt);
         return true;
     }
@@ -274,7 +274,7 @@ std::vector<Product> DatabaseStorage::get_all_products() {
     if (rc != SQLITE_OK) return products;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        products.push_back(rowToProduct(stmt));
+        products.push_back(row_to_product(stmt));
     }
 
     sqlite3_finalize(stmt);
@@ -463,14 +463,14 @@ std::vector<Check> DatabaseStorage::get_sales_checks() {
     if (rc != SQLITE_OK) return checks;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        checks.push_back(rowToCheck(stmt));
+        checks.push_back(row_to_check(stmt));
     }
 
     sqlite3_finalize(stmt);
     return checks;
 }
 
-std::vector<Check> DatabaseStorage::get_writeoff_Checks() {
+std::vector<Check> DatabaseStorage::get_writeoff_checks() {
     std::vector<Check> checks;
     const char* sql = "SELECT * FROM checks WHERE type = 2 ORDER BY date DESC";
     sqlite3_stmt* stmt;
@@ -479,7 +479,7 @@ std::vector<Check> DatabaseStorage::get_writeoff_Checks() {
     if (rc != SQLITE_OK) return checks;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        checks.push_back(rowToCheck(stmt));
+        checks.push_back(row_to_check(stmt));
     }
 
     sqlite3_finalize(stmt);
@@ -622,4 +622,5 @@ bool DatabaseStorage::user_exists(const std::string& username) {
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    return rc == SQL
+    return rc == SQL;
+}
