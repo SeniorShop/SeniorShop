@@ -6,6 +6,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 find_package(SQLite3 REQUIRED)
+find_package(JNI REQUIRED)
 
 set(SOURCES
     src/Storage.cpp
