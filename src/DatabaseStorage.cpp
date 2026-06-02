@@ -9,7 +9,6 @@
 #include <sys/stat.h>
 #endif
 
-// Создание директории для БД
 static bool create_directory(const std::string& path) {
 #ifdef _WIN32
     return CreateDirectoryA(path.c_str(), NULL) || GetLastError() == ERROR_ALREADY_EXISTS;
@@ -36,7 +35,7 @@ bool DatabaseStorage::execute_SQL(const std::string& sql) {
     return true;
 }
 
-bool DatabaseStorage::createTables() {
+bool DatabaseStorage::create_tables() {
     const std::string sqlProducts = R"(
         CREATE TABLE IF NOT EXISTS products (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -198,7 +197,7 @@ bool DatabaseStorage::load_product(int article, Product& outProduct) {
 
     rc = sqlite3_step(stmt);
     if (rc == SQLITE_ROW) {
-        outProduct = rowToProduct(stmt);
+        outProduct = row_to_product(stmt);
         sqlite3_finalize(stmt);
         return true;
     }
@@ -275,14 +274,14 @@ std::vector<Product> DatabaseStorage::get_all_products() {
     if (rc != SQLITE_OK) return products;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        products.push_back(rowToProduct(stmt));
+        products.push_back(row_to_product(stmt));
     }
 
     sqlite3_finalize(stmt);
     return products;
 }
 
-bool DatabaseStorage::productExists(int article) {
+bool DatabaseStorage::product_exists(int article) {
     const char* sql = "SELECT 1 FROM products WHERE article = ? LIMIT 1";
     sqlite3_stmt* stmt;
     int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
@@ -319,7 +318,7 @@ Supply DatabaseStorage::row_to_supply(sqlite3_stmt* stmt) {
     return s;
 }
 
-bool DatabaseStorage::saveSupply(const Supply& supply) {
+bool DatabaseStorage::save_supply(const Supply& supply) {
     const char* sql = R"(
         INSERT OR REPLACE INTO supplies
         (number_supply, supplier, date, date_acception, date_processing,
@@ -464,14 +463,14 @@ std::vector<Check> DatabaseStorage::get_sales_checks() {
     if (rc != SQLITE_OK) return checks;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        checks.push_back(rowToCheck(stmt));
+        checks.push_back(row_to_check(stmt));
     }
 
     sqlite3_finalize(stmt);
     return checks;
 }
 
-std::vector<Check> DatabaseStorage::get_writeoff_Checks() {
+std::vector<Check> DatabaseStorage::get_writeoff_checks() {
     std::vector<Check> checks;
     const char* sql = "SELECT * FROM checks WHERE type = 2 ORDER BY date DESC";
     sqlite3_stmt* stmt;
@@ -480,7 +479,7 @@ std::vector<Check> DatabaseStorage::get_writeoff_Checks() {
     if (rc != SQLITE_OK) return checks;
 
     while (sqlite3_step(stmt) == SQLITE_ROW) {
-        checks.push_back(rowToCheck(stmt));
+        checks.push_back(row_to_check(stmt));
     }
 
     sqlite3_finalize(stmt);
@@ -623,4 +622,5 @@ bool DatabaseStorage::user_exists(const std::string& username) {
     rc = sqlite3_step(stmt);
     sqlite3_finalize(stmt);
 
-    return rc == SQL
+    return rc == SQL;
+}
