@@ -475,3 +475,145 @@ void Check::show_full_financial_report(const std::string& filename) {
     system("clear");
 #endif
 }
+
+std::string Check::get_financial_report_string(const std::string& filename) {
+    std::ifstream in(filename);
+    if (!in.is_open()) {
+        return "Нет данных";
+    }
+
+    double total_sales = 0;
+    double total_losses = 0;
+    std::map<std::string, double> staff_stats;
+
+    std::string line;
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        int t, cnt;
+        double pr;
+        std::string p_name, emp, dt;
+        char delim;
+
+        ss >> t >> delim;
+        std::getline(ss, p_name, '|');
+        ss >> pr >> delim >> cnt >> delim;
+        std::getline(ss, emp, '|');
+        std::getline(ss, dt);
+
+        double sum = pr * cnt;
+        if (t == 0) {
+            total_sales += sum;
+            staff_stats[emp] += sum;
+        } else if (t == 2) {
+            total_losses += sum;
+        }
+    }
+    in.close();
+
+    std::stringstream report;
+    report << "Выручка от продаж: " << total_sales << " руб.\n";
+    report << "Убытки (списания): " << total_losses << " руб.\n";
+    report << "Чистая прибыль: " << (total_sales - total_losses) << " руб.\n";
+
+    return report.str();
+}
+
+std::string Check::get_sales_documents_JSON(const std::string& filename) const {
+    std::ifstream in(filename);
+    if (!in.is_open()) return "[]";
+
+    std::string json = "[";
+    bool first = true;
+    std::string line;
+
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        int t, cnt;
+        double pr;
+        std::string p_name, emp, dt;
+        char delim;
+
+        ss >> t >> delim;
+        std::getline(ss, p_name, '|');
+        ss >> pr >> delim >> cnt >> delim;
+        std::getline(ss, emp, '|');
+        std::getline(ss, dt);
+
+        if (t == 0) {
+            if (!first) json += ",";
+            first = false;
+
+            std::string safe_name = p_name;
+            size_t pos = 0;
+            while ((pos = safe_name.find('"', pos)) != std::string::npos) {
+                safe_name.replace(pos, 1, "\\\"");
+                pos += 2;
+            }
+
+            json += "{";
+            json += "\"product\":\"" + safe_name + "\",";
+            json += "\"price\":" + std::to_string(pr) + ",";
+            json += "\"count\":" + std::to_string(cnt) + ",";
+            json += "\"total\":" + std::to_string(pr * cnt) + ",";
+            json += "\"employee\":\"" + emp + "\",";
+            json += "\"date\":\"" + dt + "\"";
+            json += "}";
+        }
+    }
+
+    json += "]";
+    return json;
+}
+
+std::string Check::get_write_offs_JSON(const std::string& filename) const {
+    std::ifstream in(filename);
+    if (!in.is_open()) return "[]";
+
+    std::string json = "[";
+    bool first = true;
+    std::string line;
+
+    while (std::getline(in, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        int t, cnt;
+        double pr;
+        std::string p_name, emp, dt;
+        char delim;
+
+        ss >> t >> delim;
+        std::getline(ss, p_name, '|');
+        ss >> pr >> delim >> cnt >> delim;
+        std::getline(ss, emp, '|');
+        std::getline(ss, dt);
+
+        if (t == 2) {
+            if (!first) json += ",";
+            first = false;
+
+            std::string safe_name = p_name;
+            size_t pos = 0;
+            while ((pos = safe_name.find('"', pos)) != std::string::npos) {
+                safe_name.replace(pos, 1, "\\\"");
+                pos += 2;
+            }
+
+            json += "{";
+            json += "\"product\":\"" + safe_name + "\",";
+            json += "\"price\":" + std::to_string(pr) + ",";
+            json += "\"count\":" + std::to_string(cnt) + ",";
+            json += "\"total\":" + std::to_string(pr * cnt) + ",";
+            json += "\"reason\":\"" + emp + "\",";
+            json += "\"date\":\"" + dt + "\"";
+            json += "}";
+        }
+    }
+
+    json += "]";
+    return json;
+}

@@ -5,7 +5,6 @@ RUN apt-get update && apt-get install -y \
     cmake \
     make \
     libsqlite3-dev \
-    sqlite3 \
     openjdk-21-jdk \
     maven \
     && rm -rf /var/lib/apt/lists/*
@@ -21,7 +20,7 @@ RUN mkdir build && cd build && \
     cmake -DBUILD_SHARED_LIBS=ON .. && \
     make && \
     mkdir -p /app/libs && \
-    cp libnative.so /app/libs/
+    cp SeniorShop /app/seniorshop   
 
 COPY telegram-bot/ ./telegram-bot/
 
