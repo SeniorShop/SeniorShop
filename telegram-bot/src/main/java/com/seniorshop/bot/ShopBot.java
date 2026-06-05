@@ -18,20 +18,9 @@ public class ShopBot extends TelegramLongPollingBot {
     
     @Override
     public void onUpdateReceived(Update update) {
-        System.out.println("Получено обновление: " + update);
-    
-        if (!update.hasMessage() || !update.getMessage().hasText()) {
-            System.out.println("Пропущено: нет текстового сообщения");
-            return;
-        }
-    
-    String command = update.getMessage().getText();
-    long chatId = update.getMessage().getChatId();
-    String userName = update.getMessage().getFrom().getFirstName();
-    
-    System.out.println("Команда: " + command + " от " + userName);
         if (!update.hasMessage() || !update.getMessage().hasText()) return;
         
+        // Только ОДНО объявление каждой переменной!
         String command = update.getMessage().getText();
         long chatId = update.getMessage().getChatId();
         String userName = update.getMessage().getFrom().getFirstName();
@@ -77,7 +66,7 @@ public class ShopBot extends TelegramLongPollingBot {
                 boolean result = NativeLib.applySupply(num);
                 return result ? "Поставка #" + num + " применена" : "Поставка #" + num + " не найдена";
             } catch (NumberFormatException e) {
-                return "Неверный формат. Используйте: /apply 123";
+                return "❌ Неверный формат. Используйте: /apply 123";
             }
         }
         
