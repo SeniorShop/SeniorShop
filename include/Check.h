@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <thread>
+#include <map>
 
 enum class TransactionType {
     Sale = 0,
@@ -31,6 +32,9 @@ struct Check {
     void show_writeoffs(const std::string& filename);
     void show_supplies();
     void show_full_financial_report(const std::string& filename);
+    std::string get_financial_report_string(const std::string& filename);
+    std::string get_sales_documents_JSON(const std::string& filename) const;
+    std::string get_write_offs_JSON(const std::string& filename) const;
 };
 
 #endif

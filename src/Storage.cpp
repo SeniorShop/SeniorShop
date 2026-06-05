@@ -1580,7 +1580,7 @@ void Storage::auto_writeoff_expired() {
     }
 }
 
-std::chrono::sys_days Storage::parse_date(const std::string& date_str) {
+std::chrono::sys_days Storage::parse_date(const std::string& date_str) const {
     int day, month, year;
     char dot1, dot2;
     std::istringstream ss(date_str);
@@ -1596,7 +1596,7 @@ std::string Storage::format_field(std::string str, std::size_t width) const {
     return str;
 }
 
-bool Storage::is_expired(const std::string& end_date_str) {
+bool Storage::is_expired(const std::string& end_date_str) const {
     try {
         auto end_date = parse_date(end_date_str);
         auto now = std::chrono::system_clock::now();
@@ -1608,7 +1608,7 @@ bool Storage::is_expired(const std::string& end_date_str) {
     }
 }
 
-bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str) {
+bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::string& end_date_str) const {
     try {
         auto begin = parse_date(begin_date_str);
         auto end = parse_date(end_date_str);
@@ -1619,7 +1619,7 @@ bool Storage::is_date_range_valid(const std::string& begin_date_str, const std::
     }
 }
 
-bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) {
+bool Storage::validate_dates(const std::string& begin_date, const std::string& end_date) const {
     if (begin_date.length() != 10 || end_date.length() != 10) {
         std::cerr << "Ошибка: дата должна быть в формате ДД.ММ.ГГГГ\n";
         return false;
@@ -1732,5 +1732,218 @@ bool Storage::check_characteristics(const Product& p) {
         std::cerr << "Цена/Количество/Артикль должны быть положительными\n";
         return false;
     }
+    return true;
+}
+
+const Product* Storage::get_product_by_article(int article) const {
+    auto it = std::find_if(goods.begin(), goods.end(),
+                           [article](const Product& p) { return p.article == article; });
+    if (it == goods.end()) return nullptr;
+    return &(*it);
+}
+
+bool Storage::add_product_from_JNI(const Product& product) {
+    if (product.name.empty() || product.name.size() > 60) {
+        std::cerr << "Ошибка: название не может быть пустым или длиннее 60 символов\n";
+        return false;
+    }
+
+    if (product.category.empty() || product.category.size() > 50) {
+        std::cerr << "Ошибка: категория не может быть пустой или длиннее 50 символов\n";
+        return false;
+    }
+
+    if (product.price <= 0 || product.price > 10000) {
+        std::cerr << "Ошибка: цена должна быть от 0.01 до 10000\n";
+        return false;
+    }
+
+    if (product.article <= 0) {
+        std::cerr << "Ошибка: артикль должен быть положительным\n";
+        return false;
+    }
+
+    for (const auto& p : goods) {
+        if (p.article == product.article) {
+            std::cerr << "Ошибка: товар с артиклем " << product.article << " уже существует\n";
+            return false;
+        }
+    }
+
+    if (!validate_dates(product.begin_date, product.end_date)) {
+        std::cerr << "Ошибка: неверные даты\n";
+        return false;
+    }
+
+    if (product.count == 0 || product.count > 199) {
+        std::cerr << "Ошибка: количество должно быть от 1 до 199\n";
+        return false;
+    }
+
+    if (product.country.empty() || product.country.size() > 55) {
+        std::cerr << "Ошибка: страна не может быть пустой или длиннее 55 символов\n";
+        return false;
+    }
+
+    Product new_product = product;
+    new_product.id = goods.empty() ? 1 : goods.back().id + 1;
+    new_product.manufacturer = "";
+
+    goods.push_back(new_product);
+    save_to_file("Product.txt");
+
+    std::cout << "Товар '" << new_product.name << "' успешно добавлен\n";
+    return true;
+}
+
+bool Storage::delete_product_by_article(int article) {
+    auto it = std::find_if(goods.begin(), goods.end(),
+                           [article](const Product& p) { return p.article == article; });
+
+    if (it == goods.end()) {
+        std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+        return false;
+    }
+
+    goods.erase(it);
+    save_to_file("Product.txt");
+
+    std::cout << "Товар с артиклем " << article << " удалён\n";
+    return true;
+}
+
+bool Storage::update_product_count(int article, unsigned int new_count) {
+    if (new_count > 199) {
+        std::cerr << "Ошибка: количество не может превышать 199\n";
+        return false;
+    }
+
+    auto it = std::find_if(goods.begin(), goods.end(),
+                           [article](const Product& p) { return p.article == article; });
+
+    if (it == goods.end()) {
+        std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+        return false;
+    }
+
+    it->count = new_count;
+    save_to_file("Product.txt");
+
+    std::cout << "Количество товара обновлено: " << article << " -> " << new_count << "\n";
+    return true;
+}
+
+bool Storage::update_product_price(int article, double new_price) {
+    if (new_price <= 0 || new_price > 10000) {
+        std::cerr << "Ошибка: цена должна быть от 0.01 до 10000\n";
+        return false;
+    }
+
+    auto it = std::find_if(goods.begin(), goods.end(),
+                           [article](const Product& p) { return p.article == article; });
+
+    if (it == goods.end()) {
+        std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+        return false;
+    }
+
+    it->price = new_price;
+    save_to_file("Product.txt");
+
+    std::cout << "Цена товара обновлена: " << article << " -> " << new_price << "\n";
+    return true;
+}
+
+bool Storage::update_product_name(int article, const std::string& new_name) {
+    if (new_name.empty() || new_name.size() > 60) {
+        std::cerr << "Ошибка: название должно быть от 1 до 60 символов\n";
+        return false;
+    }
+
+    auto it = std::find_if(goods.begin(), goods.end(),
+                           [article](const Product& p) { return p.article == article; });
+
+    if (it == goods.end()) {
+        std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+        return false;
+    }
+
+    it->name = new_name;
+    save_to_file("Product.txt");
+
+    std::cout << "Название товара обновлено: " << article << " -> " << new_name << "\n";
+    return true;
+}
+
+bool Storage::is_product_expired(const std::string& end_date_str) const {
+    return is_expired(end_date_str);
+}
+
+bool Storage::apply_sale_from_cart(const std::vector<std::pair<int, unsigned int>>& items,
+                                   double final_total, const std::string& employee) {
+    if (items.empty()) {
+        std::cerr << "Ошибка: корзина пуста\n";
+        return false;
+    }
+
+    load_from_file("Product.txt");
+
+    for (const auto& item : items) {
+        int article = item.first;
+        unsigned int count = item.second;
+
+        auto it = std::find_if(goods.begin(), goods.end(),
+                               [article](const Product& p) { return p.article == article; });
+
+        if (it == goods.end()) {
+            std::cerr << "Ошибка: товар с артиклем " << article << " не найден\n";
+            return false;
+        }
+
+        if (it->count < count) {
+            std::cerr << "Ошибка: недостаточно товара " << it->name << "\n";
+            return false;
+        }
+
+        if (is_expired(it->end_date)) {
+            std::cerr << "Ошибка: товар " << it->name << " просрочен\n";
+            return false;
+        }
+
+        it->count -= count;
+    }
+
+    save_to_file("Product.txt");
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t t = std::chrono::system_clock::to_time_t(now);
+    std::tm* tm = std::localtime(&t);
+    std::stringstream ss;
+    ss << std::setfill('0')
+       << std::setw(2) << tm->tm_mday << "."
+       << std::setw(2) << (tm->tm_mon + 1) << "."
+       << (tm->tm_year + 1900) << " "
+       << std::setw(2) << tm->tm_hour << ":"
+       << std::setw(2) << tm->tm_min << ":"
+       << std::setw(2) << tm->tm_sec;
+    std::string date_str = ss.str();
+
+    for (const auto& item : items) {
+        int article = item.first;
+        unsigned int count = item.second;
+
+        auto it = std::find_if(goods.begin(), goods.end(),
+                               [article](const Product& p) { return p.article == article; });
+
+        if (it != goods.end()) {
+            Check check(TransactionType::Sale, it->name, it->price, count, employee, date_str);
+            check.save_check("Checks.txt");
+        }
+    }
+
+    Check total_check(TransactionType::Sale, final_total, employee, date_str);
+    total_check.save_check("Checks.txt");
+
+    std::cout << "Продажа оформлена на сумму " << final_total << " руб.\n";
     return true;
 }

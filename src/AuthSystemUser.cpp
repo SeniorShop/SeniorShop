@@ -497,3 +497,106 @@ void AuthSystemUser::remove_user() {
     }
     return;
 }
+
+std::string AuthSystemUser::get_all_users_JSON() const {
+    std::string json = "[";
+    bool first = true;
+
+    for (const auto& u : users) {
+        if (!first) json += ",";
+        first = false;
+
+        json += "{";
+        json += "\"username\":\"" + u->username + "\",";
+        json += "\"status\":\"" + u->status + "\"";
+        json += "}";
+    }
+
+    json += "]";
+    return json;
+}
+
+bool AuthSystemUser::register_user_direct(const std::string& username,
+                                          const std::string& password,
+                                          const std::string& role) {
+    if (!is_super_admin()) {
+        std::cerr << "Только суперадминистратор может создавать пользователей\n";
+        return false;
+    }
+
+    std::string user = username;
+    std::string pass = password;
+
+    auto trim = [](std::string& str) {
+        size_t start = str.find_first_not_of(" \t\n\r\f\v");
+        if (start != std::string::npos) {
+            str = str.substr(start);
+        }
+        size_t end = str.find_last_not_of(" \t\n\r\f\v");
+        if (end != std::string::npos) {
+            str = str.substr(0, end + 1);
+        }
+    };
+
+    trim(user);
+    trim(pass);
+
+    if (!is_valid_username(user)) {
+        std::cerr << "Логин должен быть от 5 до 20 символов, только буквы и цифры\n";
+        return false;
+    }
+
+    if (user_exists(user)) {
+        std::cerr << "Пользователь уже существует\n";
+        return false;
+    }
+
+    if (!is_valid_pass(pass)) {
+        std::cerr << "Пароль должен быть не менее 8 символов и содержать минимум 3 спецсимвола\n";
+        return false;
+    }
+
+    if (role != "user" && role != "admin") {
+        std::cerr << "Неверная роль. Должно быть 'user' или 'admin'\n";
+        return false;
+    }
+
+    std::unique_ptr<User> new_user;
+    if (role == "admin") {
+        new_user = std::make_unique<AdminUser>(user, pass);
+    } else {
+        new_user = std::make_unique<RegularUser>(user, pass);
+    }
+
+    users.push_back(std::move(new_user));
+    save_to_file();
+
+    return true;
+}
+
+bool AuthSystemUser::delete_user_direct(const std::string& username) {
+    if (!is_super_admin()) {
+        std::cerr << "Только суперадминистратор может удалять пользователей\n";
+        return false;
+    }
+
+    if (currentUser_ && currentUser_->username == username) {
+        std::cerr << "Нельзя удалить самого себя\n";
+        return false;
+    }
+
+    for (auto it = users.begin(); it != users.end(); ++it) {
+        if ((*it)->username == username) {
+            if ((*it)->status == "superadmin") {
+                std::cerr << "Нельзя удалить суперадминистратора\n";
+                return false;
+            }
+            users.erase(it);
+            save_to_file();
+            return true;
+        }
+    }
+
+    std::cerr << "Пользователь не найден\n";
+    return false;
+}

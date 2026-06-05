@@ -59,6 +59,7 @@ public:
     bool update_user_role(const std::string& username, const std::string& newRole) override;
     bool delete_user(const std::string& username) override;
     bool user_exists(const std::string& username) override;
+    std::string get_all_users_json();
     std::vector<std::pair<std::string, std::string>> get_all_users() override;
 };
 

@@ -47,10 +47,6 @@ static jstring stringToJString(JNIEnv* env, const std::string& str) {
     return env->NewStringUTF(str.c_str());
 }
 
-// ============================================================
-// Основные JNI-функции для пакета com.yourcompany.store
-// ============================================================
-
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
@@ -720,91 +716,71 @@ Java_com_yourcompany_store_NativeLib_applySupply(JNIEnv* env, jobject thiz, jint
 
 } // extern "C"
 
-// ============================================================
-// Обёртки для тестового класса TestJNI
-// ============================================================
-
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
-Java_TestJNI_init(JNIEnv* env, jclass clazz, jstring dataDir) {
+Java_com_seniorshop_bot_NativeLib_init(JNIEnv* env, jclass clazz, jstring dataDir) {
     return Java_com_yourcompany_store_NativeLib_init(env, nullptr, dataDir);
 }
 
 JNIEXPORT void JNICALL
-Java_TestJNI_cleanup(JNIEnv* env, jclass clazz) {
+Java_com_seniorshop_bot_NativeLib_cleanup(JNIEnv* env, jclass clazz) {
     Java_com_yourcompany_store_NativeLib_cleanup(env, nullptr);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_TestJNI_login(JNIEnv* env, jclass clazz, jstring username, jstring password) {
+Java_com_seniorshop_bot_NativeLib_login(JNIEnv* env, jclass clazz, jstring username, jstring password) {
     return Java_com_yourcompany_store_NativeLib_login(env, nullptr, username, password);
 }
 
 JNIEXPORT jstring JNICALL
-Java_TestJNI_getAllProducts(JNIEnv* env, jclass clazz) {
+Java_com_seniorshop_bot_NativeLib_getAllProducts(JNIEnv* env, jclass clazz) {
     return Java_com_yourcompany_store_NativeLib_getAllProducts(env, nullptr);
 }
 
 JNIEXPORT jstring JNICALL
-Java_TestJNI_getUserRole(JNIEnv* env, jclass clazz) {
+Java_com_seniorshop_bot_NativeLib_getCurrentUser(JNIEnv* env, jclass clazz) {
+    return Java_com_yourcompany_store_NativeLib_getCurrentUser(env, nullptr);
+}
+
+JNIEXPORT jstring JNICALL
+Java_com_seniorshop_bot_NativeLib_getUserRole(JNIEnv* env, jclass clazz) {
     return Java_com_yourcompany_store_NativeLib_getUserRole(env, nullptr);
 }
 
 JNIEXPORT jstring JNICALL
-Java_TestJNI_getCurrentUser(JNIEnv* env, jclass clazz) {
-    return Java_com_yourcompany_store_NativeLib_getCurrentUser(env, nullptr);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_TestJNI_addProduct(JNIEnv* env, jclass clazz,
-                        jstring name, jstring category,
-                        jdouble price, jint article,
-                        jstring beginDate, jstring endDate,
-                        jint count, jstring country,
-                        jstring supplier) {
-    return Java_com_yourcompany_store_NativeLib_addProduct(env, nullptr,
-        name, category, price, article, beginDate, endDate, count, country, supplier);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_TestJNI_deleteProduct(JNIEnv* env, jclass clazz, jint article) {
-    return Java_com_yourcompany_store_NativeLib_deleteProduct(env, nullptr, article);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_TestJNI_addToCart(JNIEnv* env, jclass clazz, jint article, jint count) {
-    return Java_com_yourcompany_store_NativeLib_addToCart(env, nullptr, article, count);
-}
-
-JNIEXPORT jdouble JNICALL
-Java_TestJNI_getCartTotal(JNIEnv* env, jclass clazz) {
-    return Java_com_yourcompany_store_NativeLib_getCartTotal(env, nullptr);
-}
-
-JNIEXPORT void JNICALL
-Java_TestJNI_clearCart(JNIEnv* env, jclass clazz) {
-    Java_com_yourcompany_store_NativeLib_clearCart(env, nullptr);
-}
-
-JNIEXPORT jboolean JNICALL
-Java_TestJNI_applySale(JNIEnv* env, jclass clazz, jdouble finalTotal, jstring employee) {
-    return Java_com_yourcompany_store_NativeLib_applySale(env, nullptr, finalTotal, employee);
-}
-
-JNIEXPORT jstring JNICALL
-Java_TestJNI_getFinancialReport(JNIEnv* env, jclass clazz) {
+Java_com_seniorshop_bot_NativeLib_getFinancialReport(JNIEnv* env, jclass clazz) {
     return Java_com_yourcompany_store_NativeLib_getFinancialReport(env, nullptr);
 }
 
 JNIEXPORT jstring JNICALL
-Java_TestJNI_getAllSupplies(JNIEnv* env, jclass clazz) {
+Java_com_seniorshop_bot_NativeLib_getAllSupplies(JNIEnv* env, jclass clazz) {
     return Java_com_yourcompany_store_NativeLib_getAllSupplies(env, nullptr);
 }
 
 JNIEXPORT jboolean JNICALL
-Java_TestJNI_applySupply(JNIEnv* env, jclass clazz, jint supply_number) {
-    return Java_com_yourcompany_store_NativeLib_applySupply(env, nullptr, supply_number);
+Java_com_seniorshop_bot_NativeLib_applySupply(JNIEnv* env, jclass clazz, jint supplyNumber) {
+    return Java_com_yourcompany_store_NativeLib_applySupply(env, nullptr, supplyNumber);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_seniorshop_bot_NativeLib_addToCart(JNIEnv* env, jclass clazz, jint article, jint count) {
+    return Java_com_yourcompany_store_NativeLib_addToCart(env, nullptr, article, count);
+}
+
+JNIEXPORT jdouble JNICALL
+Java_com_seniorshop_bot_NativeLib_getCartTotal(JNIEnv* env, jclass clazz) {
+    return Java_com_yourcompany_store_NativeLib_getCartTotal(env, nullptr);
+}
+
+JNIEXPORT void JNICALL
+Java_com_seniorshop_bot_NativeLib_clearCart(JNIEnv* env, jclass clazz) {
+    Java_com_yourcompany_store_NativeLib_clearCart(env, nullptr);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_seniorshop_bot_NativeLib_applySale(JNIEnv* env, jclass clazz, jdouble finalTotal, jstring employee) {
+    return Java_com_yourcompany_store_NativeLib_applySale(env, nullptr, finalTotal, employee);
 }
 
 } // extern "C"

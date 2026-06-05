@@ -5,7 +5,6 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-find_package(SQLite3 REQUIRED)
 find_package(JNI REQUIRED)
 
 set(SOURCES
@@ -24,7 +23,6 @@ set(SOURCES
     src/SaleService.cpp
     src/Supply.cpp
     src/MethodSuperAdmin.cpp
-    src/DatabaseStorage.cpp
     jni/android_jni_bridge.cpp
 )
 
@@ -32,12 +30,10 @@ add_library(native SHARED ${SOURCES})
 
 target_include_directories(native PRIVATE 
     include 
-    ${SQLite3_INCLUDE_DIRS}
     ${JNI_INCLUDE_DIRS}
 )
 
 target_link_libraries(native 
-    ${SQLite3_LIBRARIES}
     ${JNI_LIBRARIES}
     pthread
     dl

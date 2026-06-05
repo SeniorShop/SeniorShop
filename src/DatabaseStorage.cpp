@@ -624,3 +624,48 @@ bool DatabaseStorage::user_exists(const std::string& username) {
 
     return rc == SQLITE_ROW;
 }
+
+std::vector<std::pair<std::string, std::string>> DatabaseStorage::get_all_users() {
+    std::vector<std::pair<std::string, std::string>> result;
+
+    if (!db) {
+        std::cerr << "Database not initialized" << std::endl;
+        return result;
+    }
+
+    const char* sql = "SELECT username, role FROM users ORDER BY username";
+    sqlite3_stmt* stmt;
+
+    int rc = sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr);
+    if (rc != SQLITE_OK) {
+        std::cerr << "Failed to prepare statement: " << sqlite3_errmsg(db) << std::endl;
+        return result;
+    }
+
+    while (sqlite3_step(stmt) == SQLITE_ROW) {
+        std::string username = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 0));
+        std::string role = reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1));
+        result.push_back({username, role});
+    }
+
+    sqlite3_finalize(stmt);
+    return result;
+}
+
+std::string DatabaseStorage::get_all_users_json() {
+    std::string json = "[";
+    bool first = true;
+
+    for (const auto& user : get_all_users()) {
+        if (!first) json += ",";
+        first = false;
+
+        json += "{";
+        json += "\"username\":\"" + user.first + "\",";
+        json += "\"role\":\"" + user.second + "\"";
+        json += "}";
+    }
+
+    json += "]";
+    return json;
+}

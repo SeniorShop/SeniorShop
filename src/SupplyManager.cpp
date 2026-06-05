@@ -507,3 +507,43 @@ void SupplyManager::apply_supply_to_storage(Storage& storage) {
     system("clear");
 #endif
 }
+
+bool SupplyManager::add_supply(const Supply& supply) {
+    for (const auto& s : supplies) {
+        if (s.number_supply == supply.number_supply) {
+            std::cerr << "Ошибка: поставка с номером " << supply.number_supply << " уже существует\n";
+            return false;
+        }
+    }
+
+    for (const auto& s : supplies) {
+        if (s.product_name.article == supply.product_name.article) {
+            std::cerr << "Ошибка: товар с артиклем " << supply.product_name.article << " уже есть в другой поставке\n";
+            return false;
+        }
+    }
+
+    supplies.push_back(supply);
+    add_to_file(supply);
+
+    return true;
+}
+
+bool SupplyManager::delete_supply_by_number(unsigned int number) {
+    auto it = std::find_if(supplies.begin(), supplies.end(),
+                           [number](const Supply& s) { return s.number_supply == number; });
+
+    if (it == supplies.end()) {
+        return false;
+    }
+
+    supplies.erase(it);
+
+    std::ofstream fout(filename, std::ios::trunc);
+    fout.close();
+    for (const auto& s : supplies) {
+        add_to_file(s);
+    }
+
+    return true;
+}
