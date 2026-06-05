@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+# Копируем исходники
 COPY include/ ./include/
 COPY src/ ./src/
 COPY jni/ ./jni/
@@ -20,8 +21,9 @@ RUN mkdir build && cd build && \
     cmake -DBUILD_SHARED_LIBS=ON .. && \
     make && \
     mkdir -p /app/libs && \
-    cp SeniorShop /app/seniorshop   
-
+    cp libnative.so /app/libs/ && \
+    cp libnative.so /app/build/ 2>/dev/null || true
+    
 COPY telegram-bot/ ./telegram-bot/
 
 RUN cd /app/telegram-bot && \
@@ -30,4 +32,6 @@ RUN cd /app/telegram-bot && \
 
 RUN mkdir -p /app/database
 
-CMD java -Djava.library.path=/app/libs -jar /app/bot.jar
+RUN ls -la /app/libs/
+
+CMD java -Djava.library.path=/app/libs:/app/build -jar /app/bot.jar
