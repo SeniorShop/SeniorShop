@@ -2,20 +2,28 @@ package com.seniorshop.bot;
 
 public class NativeLib {
     static {
-        String os = System.getProperty("os.name").toLowerCase();
-        String libPath;
+        String[] possiblePaths = {
+            "/app/libs/libnative.so",      
+            "/app/build/libnative.so",     
+            "/app/libnative.so",           
+            "./libnative.so"               
+        };
         
-        if (os.contains("win")) {
-            libPath = "/app/libs/native.dll"; 
-        } else {
-            libPath = "/app/libs/libnative.so";
+        boolean loaded = false;
+        for (String libPath : possiblePaths) {
+            try {
+                System.load(libPath);
+                System.out.println("JNI loaded: " + libPath);
+                loaded = true;
+                break;
+            } catch (UnsatisfiedLinkError e) {
+                System.err.println("Failed to load: " + libPath);
+            }
         }
         
-        try {
-            System.load(libPath);
-            System.out.println("JNI loaded: " + libPath);
-        } catch (UnsatisfiedLinkError e) {
-            System.err.println("Failed to load: " + e.getMessage());
+        if (!loaded) {
+            System.err.println("Could not load native library from any path");
+            System.err.println("   Check that libnative.so exists in the container");
         }
     }
     
