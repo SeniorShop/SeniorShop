@@ -18,6 +18,18 @@ public class ShopBot extends TelegramLongPollingBot {
     
     @Override
     public void onUpdateReceived(Update update) {
+        System.out.println("Получено обновление: " + update);
+    
+        if (!update.hasMessage() || !update.getMessage().hasText()) {
+            System.out.println("Пропущено: нет текстового сообщения");
+            return;
+        }
+    
+    String command = update.getMessage().getText();
+    long chatId = update.getMessage().getChatId();
+    String userName = update.getMessage().getFrom().getFirstName();
+    
+    System.out.println("Команда: " + command + " от " + userName);
         if (!update.hasMessage() || !update.getMessage().hasText()) return;
         
         String command = update.getMessage().getText();
@@ -39,7 +51,7 @@ public class ShopBot extends TelegramLongPollingBot {
     private String handleCommand(String command) {
         if (command.equals("/start")) {
             return "Добро пожаловать в магазин!\n\n" +
-                   "📋 Команды:\n" +
+                   "Команды:\n" +
                    "/products - список товаров\n" +
                    "/report - финансовый отчёт\n" +
                    "/supplies - список поставок\n" +
