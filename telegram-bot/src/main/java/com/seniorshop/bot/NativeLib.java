@@ -2,28 +2,20 @@ package com.seniorshop.bot;
 
 public class NativeLib {
     static {
-        String[] possiblePaths = {
-            "/app/libs/libnative.so",      
-            "/app/build/libnative.so",     
-            "/app/libnative.so",           
-            "./libnative.so"               
-        };
+        String os = System.getProperty("os.name").toLowerCase();
+        String libPath;
         
-        boolean loaded = false;
-        for (String libPath : possiblePaths) {
-            try {
-                System.load(libPath);
-                System.out.println("JNI loaded: " + libPath);
-                loaded = true;
-                break;
-            } catch (UnsatisfiedLinkError e) {
-                System.err.println("Failed to load: " + libPath);
-            }
+        if (os.contains("win")) {
+            libPath = "/app/libs/native.dll"; 
+        } else {
+            libPath = "/app/libs/libnative.so";
         }
         
-        if (!loaded) {
-            System.err.println("Could not load native library from any path");
-            System.err.println("   Check that libnative.so exists in the container");
+        try {
+            System.load(libPath);
+            System.out.println("JNI loaded: " + libPath);
+        } catch (UnsatisfiedLinkError e) {
+            System.err.println("Failed to load: " + e.getMessage());
         }
     }
     
@@ -38,4 +30,17 @@ public class NativeLib {
     public static native double getCartTotal();
     public static native void clearCart();
     public static native boolean applySale(double finalTotal, String employee);
+    
+    public static native boolean addProduct(String name, String category,
+                                             double price, int article,
+                                             String beginDate, String endDate,
+                                             int count, String country,
+                                             String supplier);
+    
+    public static native boolean createSupply(int supplyNumber, String supplier,
+                                               String responsible, String productName,
+                                               String category, double price,
+                                               int article, String beginDate,
+                                               String endDate, int quantity,
+                                               String country);
 }
