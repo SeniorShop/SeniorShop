@@ -716,6 +716,10 @@ Java_com_yourcompany_store_NativeLib_applySupply(JNIEnv* env, jobject thiz, jint
 
 } // extern "C"
 
+// ============================================================
+// Обёртки для пакета com.seniorshop.bot (Telegram бот)
+// ============================================================
+
 extern "C" {
 
 JNIEXPORT jboolean JNICALL
@@ -781,6 +785,30 @@ Java_com_seniorshop_bot_NativeLib_clearCart(JNIEnv* env, jclass clazz) {
 JNIEXPORT jboolean JNICALL
 Java_com_seniorshop_bot_NativeLib_applySale(JNIEnv* env, jclass clazz, jdouble finalTotal, jstring employee) {
     return Java_com_yourcompany_store_NativeLib_applySale(env, nullptr, finalTotal, employee);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_seniorshop_bot_NativeLib_addProduct(JNIEnv* env, jclass clazz,
+                                              jstring name, jstring category,
+                                              jdouble price, jint article,
+                                              jstring beginDate, jstring endDate,
+                                              jint count, jstring country,
+                                              jstring supplier) {
+    return Java_com_yourcompany_store_NativeLib_addProduct(env, nullptr,
+        name, category, price, article, beginDate, endDate, count, country, supplier);
+}
+
+JNIEXPORT jboolean JNICALL
+Java_com_seniorshop_bot_NativeLib_createSupply(JNIEnv* env, jclass clazz,
+                                                jint supplyNumber, jstring supplier,
+                                                jstring responsible, jstring productName,
+                                                jstring category, jdouble price,
+                                                jint article, jstring beginDate,
+                                                jstring endDate, jint quantity,
+                                                jstring country) {
+    return Java_com_yourcompany_store_NativeLib_createSupply(env, nullptr,
+        supplyNumber, supplier, responsible, productName, category, price,
+        article, beginDate, endDate, quantity, country);
 }
 
 } // extern "C"

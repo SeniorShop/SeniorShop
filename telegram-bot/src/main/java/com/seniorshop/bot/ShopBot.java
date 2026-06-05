@@ -37,113 +37,137 @@ public class ShopBot extends TelegramLongPollingBot {
     }
     
     private String handleCommand(String command) {
-    if (command.equals("/start")) {
-        return "Добро пожалствовать в магазин!\n\n" +
-               "Команды:\n" +
-               "/products - список товаров\n" +
-               "/addproduct - добавить товар\n" +
-               "/report - финансовый отчёт\n" +
-               "/supplies - список поставок\n" +
-               "/addsupply - создать поставку\n" +
-               "/apply N - применить поставку №N\n" +
-               "/help - помощь";
-    }
-    
-    if (command.equals("/products")) {
-        return NativeLib.getAllProducts();
-    }
-    
-    if (command.startsWith("/addproduct")) {
-        return "Используйте формат: /addproduct|Название|Категория|Цена|Артикль|Годен до|Количество|Страна|Поставщик\n\n" +
-               "Пример:\n/addproduct|Кола|Напитки|99.99|1001|31.12.2026|50|США|Coca-Cola";
-    }
-    
-    if (command.startsWith("/addproduct|")) {
-        String[] parts = command.split("\\|");
-        if (parts.length != 9) {
-            return "Неверный формат. Используйте:\n/addproduct|Название|Категория|Цена|Артикль|Годен до|Количество|Страна|Поставщик";
+        if (command.equals("/start")) {
+            return "Добро пожаловать в магазин!\n\n" +
+                   "Команды:\n" +
+                   "/products - список товаров\n" +
+                   "/addproduct - добавить товар\n" +
+                   "/report - финансовый отчёт\n" +
+                   "/supplies - список поставок\n" +
+                   "/addsupply - создать поставку\n" +
+                   "/apply N - применить поставку №N\n" +
+                   "/help - помощь";
         }
         
-        try {
-            String name = parts[1];
-            String category = parts[2];
-            double price = Double.parseDouble(parts[3]);
-            int article = Integer.parseInt(parts[4]);
-            String endDate = parts[5];
-            int count = Integer.parseInt(parts[6]);
-            String country = parts[7];
-            String supplier = parts[8];
-            String beginDate = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        if (command.startsWith("/addproduct|")) {
+            String[] parts = command.split("\\|");
             
-            boolean result = NativeLib.addProduct(name, category, price, article, beginDate, endDate, count, country, supplier);
-            return result ? "Товар успешно добавлен!" : "Ошибка добавления товара";
-        } catch (Exception e) {
-            return "Ошибка: " + e.getMessage();
-        }
-    }
-    
-    if (command.equals("/report")) {
-        return NativeLib.getFinancialReport();
-    }
-    
-    if (command.equals("/supplies")) {
-        return NativeLib.getAllSupplies();
-    }
-    
-    if (command.startsWith("/addsupply")) {
-        return "Используйте формат: /addsupply|Номер|Поставщик|Ответственный|Товар|Категория|Цена|Артикль|Начало срока|Конец срока|Количество|Страна\n\n" +
-               "Пример:\n/addsupply|1|Coca-Cola|Иванов|Кола|Напитки|99.99|1001|01.06.2026|31.12.2026|50|США";
-    }
-    
-    if (command.startsWith("/addsupply|")) {
-        String[] parts = command.split("\\|");
-        if (parts.length != 12) {
-            return "Неверный формат. Используйте:\n/addsupply|Номер|Поставщик|Ответственный|Товар|Категория|Цена|Артикль|Начало срока|Конец срока|Количество|Страна";
+            System.out.println("Add product - parts length: " + parts.length);
+            for (int i = 0; i < parts.length; i++) {
+                System.out.println("  parts[" + i + "] = '" + parts[i] + "'");
+            }
+            
+            if (parts.length != 9) {
+                return "Неверный формат. Ожидается 9 полей, получено: " + parts.length + 
+                       "\n\nИспользуйте:\n/addproduct|Название|Категория|Цена|Артикль|Годен до|Количество|Страна|Поставщик\n\n" +
+                       "Пример:\n/addproduct|Кола|Напитки|99.99|1001|31.12.2026|50|США|Coca-Cola";
+            }
+            
+            try {
+                String name = parts[1];
+                String category = parts[2];
+                double price = Double.parseDouble(parts[3]);
+                int article = Integer.parseInt(parts[4]);
+                String endDate = parts[5];
+                int count = Integer.parseInt(parts[6]);
+                String country = parts[7];
+                String supplier = parts[8];
+                String beginDate = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+                
+                System.out.println("Adding product: name=" + name + ", article=" + article + ", price=" + price);
+                
+                boolean result = NativeLib.addProduct(name, category, price, article, beginDate, endDate, count, country, supplier);
+                return result ? "Товар '" + name + "' успешно добавлен!" : "Ошибка добавления товара. Возможно, артикль " + article + " уже существует.";
+            } catch (NumberFormatException e) {
+                return "Ошибка: неверный формат числа (цена, артикль или количество). " + e.getMessage();
+            } catch (Exception e) {
+                return "Ошибка: " + e.getMessage();
+            }
         }
         
-        try {
-            int number = Integer.parseInt(parts[1]);
-            String supplier = parts[2];
-            String responsible = parts[3];
-            String productName = parts[4];
-            String category = parts[5];
-            double price = Double.parseDouble(parts[6]);
-            int article = Integer.parseInt(parts[7]);
-            String beginDate = parts[8];
-            String endDate = parts[9];
-            int quantity = Integer.parseInt(parts[10]);
-            String country = parts[11];
+        if (command.equals("/addproduct")) {
+            return "Формат добавления товара:\n\n" +
+                   "/addproduct|Название|Категория|Цена|Артикль|Годен до|Количество|Страна|Поставщик\n\n" +
+                   "Пример:\n/addproduct|Кола|Напитки|99.99|1001|31.12.2026|50|США|Coca-Cola";
+        }
+
+        if (command.equals("/products")) {
+            return NativeLib.getAllProducts();
+        }
+
+        if (command.equals("/report")) {
+            return NativeLib.getFinancialReport();
+        }
+
+        if (command.equals("/supplies")) {
+            return NativeLib.getAllSupplies();
+        }
+
+        if (command.startsWith("/addsupply|")) {
+            String[] parts = command.split("\\|");
             
-            boolean result = NativeLib.createSupply(number, supplier, responsible, productName, category, price, article, beginDate, endDate, quantity, country);
-            return result ? "Поставка #" + number + " успешно создана!" : "Ошибка создания поставки";
-        } catch (Exception e) {
-            return "❌ Ошибка: " + e.getMessage();
+            System.out.println("Add supply - parts length: " + parts.length);
+            
+            if (parts.length != 12) {
+                return "Неверный формат. Ожидается 12 полей, получено: " + parts.length + 
+                       "\n\nИспользуйте:\n/addsupply|Номер|Поставщик|Ответственный|Товар|Категория|Цена|Артикль|Начало срока|Конец срока|Количество|Страна";
+            }
+            
+            try {
+                int number = Integer.parseInt(parts[1]);
+                String supplier = parts[2];
+                String responsible = parts[3];
+                String productName = parts[4];
+                String category = parts[5];
+                double price = Double.parseDouble(parts[6]);
+                int article = Integer.parseInt(parts[7]);
+                String beginDate = parts[8];
+                String endDate = parts[9];
+                int quantity = Integer.parseInt(parts[10]);
+                String country = parts[11];
+                
+                System.out.println("Creating supply: #" + number + ", product=" + productName);
+                
+                boolean result = NativeLib.createSupply(number, supplier, responsible, productName, category, price, article, beginDate, endDate, quantity, country);
+                return result ? "Поставка #" + number + " успешно создана!" : "Ошибка создания поставки";
+            } catch (NumberFormatException e) {
+                return "❌ Ошибка: неверный формат числа. " + e.getMessage();
+            } catch (Exception e) {
+                return "❌ Ошибка: " + e.getMessage();
+            }
         }
-    }
-    
-    if (command.startsWith("/apply ")) {
-        try {
-            int num = Integer.parseInt(command.substring(7));
-            boolean result = NativeLib.applySupply(num);
-            return result ? "Поставка #" + num + " применена" : "Поставка #" + num + " не найдена";
-        } catch (NumberFormatException e) {
-            return "Неверный формат. Используйте: /apply 123";
+        
+        // ========== СПРАВКА ПО СОЗДАНИЮ ПОСТАВКИ ==========
+        if (command.equals("/addsupply")) {
+            return "Формат создания поставки:\n\n" +
+                   "/addsupply|Номер|Поставщик|Ответственный|Товар|Категория|Цена|Артикль|Начало срока|Конец срока|Количество|Страна\n\n" +
+                   "Пример:\n/addsupply|1|Coca-Cola|Иванов|Кола|Напитки|99.99|1001|01.06.2026|31.12.2026|50|США";
         }
-    }
-    
-    if (command.equals("/help")) {
-        return "Доступные команды:\n" +
-               "/start - приветствие\n" +
-               "/products - список товаров\n" +
-               "/addproduct|... - добавить товар\n" +
-               "/report - финансовый отчёт\n" +
-               "/supplies - список поставок\n" +
-               "/addsupply|... - создать поставку\n" +
-               "/apply N - применить поставку\n" +
-               "/help - эта справка";
-    }
-    
-    return "Неизвестная команда. Введите /help";
+        
+        // ========== ПРИМЕНЕНИЕ ПОСТАВКИ ==========
+        if (command.startsWith("/apply ")) {
+            try {
+                int num = Integer.parseInt(command.substring(7));
+                boolean result = NativeLib.applySupply(num);
+                return result ? "Поставка #" + num + " применена" : "Поставка #" + num + " не найдена";
+            } catch (NumberFormatException e) {
+                return "❌ Неверный формат. Используйте: /apply 123";
+            }
+        }
+        
+        if (command.equals("/help")) {
+            return "Доступные команды:\n\n" +
+                   "/start - приветствие\n" +
+                   "/products - список товаров\n" +
+                   "/addproduct - добавить товар\n" +
+                   "/report - финансовый отчёт\n" +
+                   "/supplies - список поставок\n" +
+                   "/addsupply - создать поставку\n" +
+                   "/apply N - применить поставку\n" +
+                   "/help - эта справка";
+        }
+        
+        return "❌ Неизвестная команда. Введите /help";
     }
     
     private void sendMessage(long chatId, String text) {
